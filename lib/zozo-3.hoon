@@ -605,7 +605,7 @@
       (reinstall-subs full-pax)
     (apply-move-qualified (prefix-move [p+ship ~] move) %.y)
   ::
-  ++  ingress-cull
+  ++  ingress-bump
     ::
     ::  wipe data subtree, increment lifes, reset cases and logs.
     ::  crashes if any views exist at or below pax.
@@ -614,11 +614,11 @@
     |=  pax=pith
     ^+  cor
     =/  full-pax  (under-our pax)
-    =.  cor  (vlog "ae: cull at {(pate full-pax)}")
-    ?.  (meta-allowed full-pax)  (reject-shallow "cull" full-pax)
+    =.  cor  (vlog "ae: bump at {(pate full-pax)}")
+    ?.  (meta-allowed full-pax)  (reject-shallow "bump" full-pax)
     ::  check no ancestor of full-pax has a view
     ::
-    ~|  %cannot-cull-an-installed-view
+    ~|  %cannot-bump-an-installed-view
     ?<  ?=(^ (~(anc ox cod) full-pax |=(m=_cod ?&(?=(^ leaf.m) ?=(^ view.u.leaf.m)))))
     ::  check no node at or below full-pax has a view
     ::

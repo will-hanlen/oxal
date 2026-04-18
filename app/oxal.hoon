@@ -192,11 +192,11 @@
         abet:(ingress-uninstall:engine pax)
       (emil cz)
       ::
-    %cull
+    %bump
       ::
       =+  !<  pax=pith  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-cull:engine pax)
+        abet:(ingress-bump:engine pax)
       (emil cz)
       ::
     ::

@@ -1,9 +1,3 @@
-new piece of state which tracks the number of times the app has been nuked.
-it is a @ud and it is passed into the acer engine.
-this @ud gets prefixed to all of the the grow paths so that after nuking
-the new agent gets a clean grow namespace.
-
-rename %cull to %bump
 
 mirror remote faucets via grow
 - the acer tracks which mirrors exist.

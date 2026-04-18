@@ -351,9 +351,9 @@
             /my-app
             '''
           ::
-            :-  'cull'
+            :-  'bump'
             '''
-            :-  %cull  !>
+            :-  %bump  !>
             ^-  pith
             /bing
             '''
