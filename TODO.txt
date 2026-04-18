@@ -1,7 +1,9 @@
-move to own private repo and push
+new piece of state which tracks the number of times the app has been nuked.
+it is a @ud and it is passed into the acer engine.
+this @ud gets prefixed to all of the the grow paths so that after nuking
+the new agent gets a clean grow namespace.
 
-agent move everything to abet core
-- +*  engine  ~(. ae acer our.bowl | &)
+rename %cull to %bump
 
 mirror remote faucets via grow
 - the acer tracks which mirrors exist.

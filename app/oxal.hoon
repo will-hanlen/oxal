@@ -19,38 +19,95 @@
 ++  on-init
   ::
   ^-  (quip card:agent:gall _this)
-  :_  this
-  :~  bind-card
-  ==
+  =^  cards  state  abet:init:cor
+  [cards this]
   ::
 ++  on-load
   ::
   |=  ole=vase
   ^-  (quip card:agent:gall _this)
-  =/  =(unit state-0)  (mole |.(!<(state-0 ole)))
-  :-  ~[bind-card]
-  ?~  unit  this
-  this(state u.unit)
+  =^  cards  state  abet:(load:cor ole)
+  [cards this]
   ::
 ++  on-poke
   ::
   |=  [=mark =vase]
   ^-  (quip card:agent:gall _this)
   =^  cards  state  abet:(poke:cor mark vase)
-  :-  cards  this
+  [cards this]
   ::
 ++  on-fail
   ::
   |=  [=term =tang]
   ^-  (quip card:agent:gall _this)
-  %-  (slog term tang)
-  `this
+  =^  cards  state  abet:(fail:cor term tang)
+  [cards this]
   ::
 ++  on-watch
   ::
   |=  =path
   ^-  (quip card:agent:gall _this)
-  ?+  path  `this
+  =^  cards  state  abet:(watch:cor path)
+  [cards this]
+  ::
+++  on-leave
+  ::
+  |=  =path
+  ^-  (quip card:agent:gall _this)
+  =^  cards  state  abet:(leave:cor path)
+  [cards this]
+  ::
+++  on-agent
+  ::
+  |=  [=wire =sign:agent:gall]
+  ^-  (quip card:agent:gall _this)
+  =^  cards  state  abet:(agent:cor wire sign)
+  [cards this]
+  ::
+++  on-arvo
+  ::
+  |=  [=wire =sign-arvo]
+  ^-  (quip card:agent:gall _this)
+  =^  cards  state  abet:(arvo:cor wire sign-arvo)
+  [cards this]
+  ::
+++  on-save  save:cor
+++  on-peek  peek:cor
+::
+--
+::
+|_  [=bowl:gall cards=(list card:agent:gall)]
++*  engine  ~(. ae acer our.bowl verb &)
+++  cor   .
+++  abet  :-  (flop cards)  state
+++  emit  |=  =card:agent:gall  cor(cards [card cards])
+++  emil  |=  caz=(list card:agent:gall)  cor(cards (welp (flop caz) cards))
+::
+++  bind-card  [%pass /eyre-inner-bind %arvo %e %connect [~ `path`['-' ~]] %oxal]
+::
+++  init  (emit bind-card)
+::
+++  load
+  ::
+  |=  ole=vase
+  ^+  cor
+  =/  unit=(unit state-0)  (mole |.(!<(state-0 ole)))
+  =.  cor  (emit bind-card)
+  ?~  unit  cor
+  cor(state u.unit)
+::
+++  fail
+  ::
+  |=  [=term =tang]
+  ^+  cor
+  %-  (slog term tang)
+  cor
+::
+++  watch
+  ::
+  |=  =path
+  ^+  cor
+  ?+  path  cor
     [%sub *]
       =/  pax=pith  (pave t.path)
       =/  full-pax=pith  [p+our.bowl pax]
@@ -59,36 +116,32 @@
       =/  =meta  (fall (~(get ox code.file.acer) full-pax) *meta)
       ?~  gall.meta  !!
       ?>  (check-auth u.gall.meta our.bowl src.bowl)
-      =/  resp  (~(initial-watch-response ae [acer our.bowl verb &]) full-pax)
-      :_  this  :~
-        [%give %fact ~ %oxal-snap !>(resp)]
-      ==
+      =/  resp  (initial-watch-response:engine full-pax)
+      (emit %give %fact ~ %oxal-snap !>(resp))
     ::
-    [%life *]  `this
-    [%snap *]  `this
-    [%logs *]  `this
+    [%life *]  cor
+    [%snap *]  cor
+    [%logs *]  cor
   ==
-  ::
-++  on-leave
+::
+++  leave
   ::
   |=  =path
-  ^-  (quip card:agent:gall _this)
-  `this
-  ::
-++  on-agent
+  cor
+::
+++  agent
   ::
   |=  [=wire =sign:agent:gall]
-  ^-  (quip card:agent:gall _this)
-  `this
-  ::
-++  on-arvo
+  cor
+::
+++  arvo
   ::
   |=  [=wire =sign-arvo]
-  ^-  (quip card:agent:gall _this)
-  `this
-  ::
-++  on-save   !>  state
-++  on-peek
+  cor
+::
+++  save  !>(state)
+::
+++  peek
   ::
   |=  =path
   ^-  (unit (unit cage))
@@ -99,18 +152,9 @@
     [%x %file ~]        ``noun+!>(file.acer)
     [%x %our ~]         ``noun+!>(our.bowl)
   ==
-  ::
---
-::
-|_  [=bowl:gall cards=(list card:agent:gall)]
-++  cor   .
-++  abet  :-  (flop cards)  state
-++  emit  |=  =card:agent:gall  cor(cards [card cards])
-++  emil  |=  caz=(list card:agent:gall)  cor(cards (welp (flop caz) cards))
-::
-++  bind-card  [%pass /eyre-inner-bind %arvo %e %connect [~ `path`['-' ~]] %oxal]
 ::
 ++  poke
+  :::
   |=  [=mark =vase]
   ^+  cor
   ?+  mark  ~|(bad-poke/mark !!)
@@ -121,53 +165,60 @@
       %-  (slog leaf+"verbosity: {?:(val "y" "n")}" ~)
       cor(verb val)
       ::
+    %wipe
+      ::
+      =.  file.acer  *file
+      %-  (slog 'oxal: wipe' ~)
+      cor
+    ::
     %do-move
       ::
       =+  !<  =move  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(~(ingress-do-move ae [acer our.bowl verb &]) [move %.n])
+        abet:(ingress-do-move:engine [move %.n])
       (emil cz)
       ::
     %install
       ::
       =+  !<  [pax=pith =source]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(~(ingress-install ae [acer our.bowl verb &]) pax source)
+        abet:(ingress-install:engine pax source)
       (emil cz)
       ::
     %uninstall
       ::
       =+  !<  pax=pith  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(~(ingress-uninstall ae [acer our.bowl verb &]) pax)
+        abet:(ingress-uninstall:engine pax)
       (emil cz)
       ::
     %cull
       ::
       =+  !<  pax=pith  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(~(ingress-cull ae [acer our.bowl verb &]) pax)
+        abet:(ingress-cull:engine pax)
       (emil cz)
       ::
+    ::
     %set-grow
       ::
       =+  !<  [pax=pith val=?]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(~(ingress-set-grow ae [acer our.bowl verb &]) pax val)
+        abet:(ingress-set-grow:engine pax val)
       (emil cz)
       ::
     %set-eyre
       ::
       =+  !<  [pax=pith val=(unit auth)]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(~(ingress-set-eyre ae [acer our.bowl verb &]) pax val)
+        abet:(ingress-set-eyre:engine pax val)
       (emil cz)
       ::
     %set-gall
       ::
       =+  !<  [pax=pith val=(unit auth)]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(~(ingress-set-gall ae [acer our.bowl verb &]) pax val)
+        abet:(ingress-set-gall:engine pax val)
       (emil cz)
       ::
     ::
@@ -178,14 +229,10 @@
       ::
       =+  !<  [=ship pax=pith snap=data =move =life =case]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(~(ingress-hear-remote ae [acer our.bowl verb &]) ship pax snap move life case)
+        abet:(ingress-hear-remote:engine ship pax snap move life case)
       (emil cz)
       ::
-    %wipe
-      ::
-      =.  file.acer  *file
-      %-  (slog 'oxal: wipe' ~)
-      cor
+    ::
     %handle-http-request
       ::
       =+  !<  [rid=@ta req=inbound-request:eyre]  vase
