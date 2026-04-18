@@ -21,7 +21,8 @@
       {
         "id": "hoon",
         "extensions": [".hoon"],
-        "aliases": ["Hoon"]
+        "aliases": ["Hoon"],
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
@@ -29,6 +30,14 @@
         "language": "hoon",
         "scopeName": "source.hoon",
         "path": "./hoon.tmLanguage.json"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "editor.action.commentLine",
+        "key": "ctrl+/",
+        "mac": "cmd+/",
+        "when": "editorTextFocus && !editorReadonly && editorLangId == hoon"
       }
     ]
   }
