@@ -1,4 +1,4 @@
-::  hawk-init: static asset server
+::  hawk-init: static assets :: xx remove this file
 ::
 /+  *zozo-1, dbug
 ::

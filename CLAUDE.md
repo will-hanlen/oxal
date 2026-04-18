@@ -29,8 +29,11 @@ transformations.
 
 The test pier is running at http://localhost:80.
 
-After making a change to the souce code, you can apply the change by
-running: `./.compile walrus-migrev-dolseg`
+After making a change to the source code, you can apply the change by
+running: `sh .commit.sh`
+
+To run an arbitrary dojo command on the test ship, run something
+like: `sh .run.sh "|hi ~zod"`
 
 ## Style
 

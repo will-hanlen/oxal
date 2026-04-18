@@ -1,12 +1,24 @@
 #!/usr/bin/env bash
 # Send a command to an Urbit dojo running in tmux and return its output.
 #
-# Usage: dojo-cmd.sh <tmux-target> <timeout_secs> <command>
+# Usage: dojo.sh <session:window> <timeout_secs> <command> [--sync=<pier-location>]
+#   e.g. dojo.sh oxal:master-migrev-dolseg 30 '(add 2 3)'
+#        dojo.sh oxal:master-migrev-dolseg 360 '|commit %oxal' \
+#                --sync=.piers/master-migrev-dolseg/oxal
+#
+# The first arg is passed to tmux as the exact target (the `=` prefix
+# is added when this script calls tmux), so it may be any valid tmux
+# session:window pair — the window name need not match the ship's @p.
+#
+# --sync=<desk-location> (optional): before running the command,
+# rsync this repo's source tree into <desk-location> (the
+# development desk). Pair with '|commit %oxal' to apply source changes.
 #
 # stdout:  Dojo output (between start and done sentinels)
-# stderr:  OK / TIMEOUT
+# stderr:  OK / TIMEOUT / ABORT
 # Exit 0:  Command completed. Inspect stdout for results/errors.
-# Exit 1:  Timeout or couldn't get a clean prompt.
+# Exit 1:  Timeout, couldn't get a clean prompt, start sentinel never
+#          echoed (dojo not in an interactable state), or bad args.
 #
 # Strategy: Generate a unique ID per invocation. Send %start-<id> before
 # the command and %done-<id> after. Both are valid dojo expressions that
@@ -16,10 +28,42 @@
 
 set -euo pipefail
 
-TARGET="${1:?tmux target required}"
-TIMEOUT="${2:?timeout required}"
-COMMAND="${3:?command required}"
+TARGET=""
+TIMEOUT=""
+COMMAND=""
+PIER=""
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --sync=*) PIER="${1#--sync=}"; shift ;;
+    --sync)   PIER="${2:?--sync requires a pier location}"; shift 2 ;;
+    -*)       echo "Unknown flag: $1" >&2; exit 1 ;;
+    *)
+      if   [ -z "$TARGET" ];  then TARGET="$1"
+      elif [ -z "$TIMEOUT" ]; then TIMEOUT="$1"
+      elif [ -z "$COMMAND" ]; then COMMAND="$1"
+      else echo "Unexpected arg: $1" >&2; exit 1
+      fi
+      shift ;;
+  esac
+done
+
+if [ -z "$TARGET" ] || [ -z "$TIMEOUT" ] || [ -z "$COMMAND" ]; then
+  echo "Usage: dojo.sh <session:window> <timeout_secs> <command> [--sync=<pier-location>]" >&2
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 INTERVAL=1
+
+if [ -n "$PIER" ]; then
+  if [ ! -d "$PIER" ]; then
+    echo "Error: pier location not found at ${PIER}" >&2
+    exit 1
+  fi
+  echo "Syncing source to ${PIER}..." >&2
+  rsync -avL --delete --exclude='.*' "${SCRIPT_DIR}/" "${PIER}"
+fi
 
 # Unique ID prevents collisions between concurrent/sequential runs
 RUN_ID=$(printf '%04x%04x' $((RANDOM)) $((RANDOM)))
