@@ -183,6 +183,7 @@
 +$  acer
   ::
   $:  =file
+      nuke=@ud
       xfms=(map @t transformer)
       ::
       ::  future field: an index of local subscribers keyed by remote

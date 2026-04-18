@@ -879,8 +879,8 @@
     =/  bp=path  (bare-path full-pax)
     ?-    bump
         [%case *]
-      =/  snap-path=path  [%snap (scot %ud life.met) (scot %ud case.met) bp]
-      =/  logs-path=path  [%logs (scot %ud life.met) (scot %ud case.met) bp]
+      =/  snap-path=path  [(scot %ud nuke.ax) %snap (scot %ud life.met) (scot %ud case.met) bp]
+      =/  logs-path=path  [(scot %ud nuke.ax) %logs (scot %ud life.met) (scot %ud case.met) bp]
       =.  cor
         %-  emit
         [%give %fact ~[snap-path] %oxal-data !>(snap)]
@@ -888,8 +888,8 @@
       [%give %fact ~[logs-path] %oxal-move !>([move.bump life.met case.met])]
     ::
         [%life ~]
-      =/  life-path=path  [%life bp]
-      =/  snap-path=path  [%snap (scot %ud life.met) '0' bp]
+      =/  life-path=path  [(scot %ud nuke.ax) %life bp]
+      =/  snap-path=path  [(scot %ud nuke.ax) %snap (scot %ud life.met) '0' bp]
       =.  cor
         %-  emit
         [%give %fact ~[life-path] %oxal-life !>(life.met)]
@@ -906,8 +906,8 @@
     |=  [full-pax=pith met=meta snap=data]
     ^+  cor
     =/  bp=path  (bare-path full-pax)
-    =/  life-path=path  [%life bp]
-    =/  snap-path=path  [%snap (scot %ud life.met) (scot %ud case.met) bp]
+    =/  life-path=path  [(scot %ud nuke.ax) %life bp]
+    =/  snap-path=path  [(scot %ud nuke.ax) %snap (scot %ud life.met) (scot %ud case.met) bp]
     =.  cor
       %-  emit
       [%give %fact ~[life-path] %oxal-life !>(life.met)]
