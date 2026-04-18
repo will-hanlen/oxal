@@ -1,0 +1,23 @@
+{
+  "desc": "Home/End move to start/end of command prompt",
+  "before": ["hello"],
+  "frames": [
+    {
+      "desc": "Enter command mode, type 'wq'",
+      "keys": [":", "w", "q"],
+      "mode": "prompt",
+      "commandBuf": "wq",
+      "promptCol": 2
+    },
+    {
+      "desc": "Home goes to start",
+      "keys": ["home"],
+      "promptCol": 0
+    },
+    {
+      "desc": "End goes to end",
+      "keys": ["end"],
+      "promptCol": 2
+    }
+  ]
+}

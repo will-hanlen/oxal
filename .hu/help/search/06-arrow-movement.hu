@@ -1,0 +1,23 @@
+{
+  "desc": "Arrow keys move cursor within search prompt",
+  "before": ["hello world"],
+  "frames": [
+    {
+      "desc": "Enter search mode and type 'abc'",
+      "keys": ["/", "a", "b", "c"],
+      "mode": "prompt",
+      "searchBuf": "abc",
+      "promptCol": 3
+    },
+    {
+      "desc": "Left arrow moves back",
+      "keys": ["left", "left"],
+      "promptCol": 1
+    },
+    {
+      "desc": "Right arrow moves forward",
+      "keys": ["right"],
+      "promptCol": 2
+    }
+  ]
+}

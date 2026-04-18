@@ -1,0 +1,6 @@
+{
+  "desc": "u undoes last change",
+  "before": ["aa", "bb", "cc"],
+  "keys": ["j", "d", "u"],
+  "after": ["aa", "bb", "cc"]
+}

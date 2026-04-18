@@ -1,0 +1,20 @@
+{
+  "desc": "> indent unfolds fold that would swallow the line",
+  "before": ["header", "  child1", "  child2", "peer"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "cursor on peer (visible idx 1 since fold hides children)",
+      "keys": ["j"],
+      "cursor": [1, 0],
+      "folds": [0]
+    },
+    {
+      "desc": "> indents peer into fold range — fold auto-unfolds",
+      "keys": [">"],
+      "after": ["header", "  child1", "  child2", "  peer"],
+      "cursor": [3, 2],
+      "folds": []
+    }
+  ]
+}

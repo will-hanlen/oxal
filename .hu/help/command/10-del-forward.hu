@@ -1,0 +1,24 @@
+{
+  "desc": "Del deletes forward in command prompt",
+  "before": ["hello"],
+  "frames": [
+    {
+      "desc": "Type 'abcd'",
+      "keys": [":", "a", "b", "c", "d"],
+      "commandBuf": "abcd",
+      "promptCol": 4
+    },
+    {
+      "desc": "Go home, delete forward with Del",
+      "keys": ["home", "delete"],
+      "commandBuf": "bcd",
+      "promptCol": 0
+    },
+    {
+      "desc": "Del again",
+      "keys": ["delete"],
+      "commandBuf": "cd",
+      "promptCol": 0
+    }
+  ]
+}

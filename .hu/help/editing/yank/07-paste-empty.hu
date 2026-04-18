@@ -1,0 +1,7 @@
+{
+  "desc": "paste with empty yank buffer does nothing",
+  "before": ["hello", "world"],
+  "keys": ["p"],
+  "after": ["hello", "world"],
+  "cursor": [0, 0]
+}

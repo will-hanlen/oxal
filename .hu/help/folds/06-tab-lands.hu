@@ -1,0 +1,18 @@
+{
+  "desc": "Tab inside a section folds it and lands cursor on the header",
+  "lineComment": "::",
+  "before": ["arm1", "  :: body1", "arm2", "  :: body2a", "  body2b", "arm3", "  :: body3"],
+  "frames": [
+    {
+      "desc": "move to body2a and press tab to fold arm2",
+      "keys": ["j", "j", "j", "tab"],
+      "cursor": [2, 0]
+    },
+    {
+      "desc": "unfold with tab to verify we're on arm2",
+      "keys": ["tab"],
+      "cursor": [2, 0],
+      "after": ["arm1", "  :: body1", "arm2", "  :: body2a", "  body2b", "arm3", "  :: body3"]
+    }
+  ]
+}

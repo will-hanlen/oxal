@@ -1,0 +1,10 @@
+{
+  "desc": "v enters char select, h/l extends selection",
+  "before": ["hello world", "second line"],
+  "frames": [
+    { "desc": "v enters char select", "keys": ["v"], "mode": "select", "cursor": [0, 0] },
+    { "desc": "l extends right", "keys": ["l", "l", "l"], "cursor": [0, 3], "mode": "select" },
+    { "desc": "h moves back left", "keys": ["h"], "cursor": [0, 2], "mode": "select" },
+    { "desc": "escape cancels", "keys": ["escape"], "mode": "normal" }
+  ]
+}

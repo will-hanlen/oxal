@@ -1,0 +1,8 @@
+{
+  "desc": "< outdent with only 1 space removes just 1",
+  "before": [" aa", "bb"],
+  "keys": ["<"],
+  "after": ["aa", "bb"],
+  "cursor": [0, 0],
+  "mode": "normal"
+}

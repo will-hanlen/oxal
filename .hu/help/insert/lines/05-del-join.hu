@@ -1,0 +1,8 @@
+{
+  "desc": "delete at end of line joins with next line",
+  "before": ["hello", "world"],
+  "keys": ["A", "delete", "escape"],
+  "after": ["helloworld"],
+  "cursor": [0, 5],
+  "mode": "normal"
+}

@@ -1,0 +1,6 @@
+{
+  "desc": "k at first line stays put",
+  "before": ["only"],
+  "keys": ["k", "k", "k"],
+  "cursor": [0, 0]
+}

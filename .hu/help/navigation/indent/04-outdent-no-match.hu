@@ -1,0 +1,6 @@
+{
+  "desc": "} at indent 0 stays put",
+  "before": ["top", "same", "also"],
+  "keys": ["z"],
+  "cursor": [0, 0]
+}

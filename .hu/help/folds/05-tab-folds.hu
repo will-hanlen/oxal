@@ -1,0 +1,8 @@
+{
+  "desc": "Tab on non-foldable line folds containing section header",
+  "lineComment": "::",
+  "before": ["header", "  :: child1", "  child2"],
+  "keys": ["j", "tab"],
+  "folds": [0],
+  "cursor": [0, 0]
+}

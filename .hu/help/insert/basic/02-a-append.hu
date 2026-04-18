@@ -1,0 +1,6 @@
+{
+  "desc": "a inserts after cursor position",
+  "before": ["ab"],
+  "keys": ["l", "a", "X", "escape"],
+  "after": ["abX"]
+}

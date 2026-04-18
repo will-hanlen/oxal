@@ -1,0 +1,11 @@
+{
+  "desc": "Space cycles selection unit through line, section, indent, parent",
+  "before": ["root", "  header", "    child1", "    child2", "  other"],
+  "frames": [
+    { "desc": "enter select on child1", "keys": ["j", "j", " "], "mode": "select" },
+    { "desc": "cycle to section", "keys": [" "], "mode": "select" },
+    { "desc": "cycle to indent", "keys": [" "], "mode": "select" },
+    { "desc": "cycle to parent", "keys": [" "], "mode": "select" },
+    { "desc": "cycle back to line", "keys": [" "], "mode": "select" }
+  ]
+}

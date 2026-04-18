@@ -1,0 +1,14 @@
+{
+  "desc": "deleting a line above two folded regions shifts both folds",
+  "lineComment": "::",
+  "before": ["top", "first", "  :: a", "  :: b", "second", "  :: c", "  :: d", "bottom"],
+  "beforeFolds": [1, 4],
+  "frames": [
+    {
+      "desc": "delete first line shifts both folds down by one",
+      "keys": ["d"],
+      "after": ["first", "  :: a", "  :: b", "second", "  :: c", "  :: d", "bottom"],
+      "folds": [0, 3]
+    }
+  ]
+}

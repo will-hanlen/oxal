@@ -1,0 +1,6 @@
+{
+  "desc": "i enters insert mode, type to add text",
+  "before": [""],
+  "keys": ["i", "h", "e", "l", "l", "o", "escape"],
+  "after": ["hello"]
+}

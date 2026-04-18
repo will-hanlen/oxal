@@ -1,0 +1,8 @@
+{
+  "desc": "P with char yank pastes inline before cursor",
+  "before": ["abcdef"],
+  "frames": [
+    { "desc": "v-select de", "keys": ["l", "l", "l", "v", "l", "y"], "mode": "normal" },
+    { "desc": "P pastes 'de' before cursor at col 4", "keys": ["P"], "after": ["abcddeef"], "cursor": [0, 5] }
+  ]
+}

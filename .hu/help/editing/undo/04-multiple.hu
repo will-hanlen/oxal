@@ -1,0 +1,10 @@
+{
+  "desc": "multiple undos restore through several edits",
+  "before": ["one", "two", "three"],
+  "frames": [
+    { "desc": "delete first line", "keys": ["d"], "after": ["two", "three"] },
+    { "desc": "delete again", "keys": ["d"], "after": ["three"] },
+    { "desc": "undo second delete", "keys": ["u"], "after": ["two", "three"] },
+    { "desc": "undo first delete", "keys": ["u"], "after": ["one", "two", "three"] }
+  ]
+}

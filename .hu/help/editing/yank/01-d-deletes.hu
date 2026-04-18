@@ -1,0 +1,6 @@
+{
+  "desc": "d deletes current line",
+  "before": ["aa", "bb", "cc"],
+  "keys": ["j", "d"],
+  "after": ["aa", "cc"]
+}

@@ -1,0 +1,9 @@
+{
+  "desc": "fold hides lines, j skips over them",
+  "lineComment": "::",
+  "before": ["top", "  :: a", "  b", "bottom"],
+  "keys": ["tab", "j"],
+  "after": ["top", "  :: a", "  b", "bottom"],
+  "folds": [0],
+  "cursor": [1, 0]
+}

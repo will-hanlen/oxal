@@ -1,0 +1,14 @@
+{
+  "desc": "inserting a line below a folded region does not affect the fold",
+  "lineComment": "::",
+  "before": ["header", "  :: child1", "  :: child2", "bottom"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "move to bottom (visible line 1), open line below",
+      "keys": ["j", "o", "n", "e", "w", "Escape"],
+      "after": ["header", "  :: child1", "  :: child2", "bottom", "new"],
+      "folds": [0]
+    }
+  ]
+}

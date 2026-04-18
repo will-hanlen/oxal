@@ -1,0 +1,11 @@
+/.bin
+/.git
+/.urb
+/.http.ports
+/.run
+/.vere.lock
+/.piers
+/out
+*.swp
+.todo
+

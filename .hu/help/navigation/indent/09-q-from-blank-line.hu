@@ -1,0 +1,6 @@
+{
+  "desc": "q from blank line (indent 0) stays put — no less-indented line exists",
+  "before": ["top", "  child", "", "  sibling"],
+  "keys": ["j", "j", "q"],
+  "cursor": [2, 0]
+}

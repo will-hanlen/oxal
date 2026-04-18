@@ -1,0 +1,134 @@
+HU - Indentation-Structured Text Editor
+===========================================
+
+A modal terminal editor that uses indentation as the primary
+structural signal. Works well with any indentation-based language
+(Hoon, Python, YAML, Haskell, etc.).
+
+Run:  node hu.js <file>
+
+
+MODES
+-----
+
+  normal    Default mode. Navigate, fold, delete, yank, paste.
+  insert    Type text. Enter with i/a/o, exit with Esc.
+  select    Highlight lines or chars. Enter with Space/v.
+  command   Ex-style commands. Enter with :
+  search    Find text. Enter with /
+
+
+NORMAL MODE
+-----------
+
+  Movement
+    j / k           move down / up
+    h / l           move left / right
+    w / b           next / prev word
+    J / K           next / prev sibling (same indent level)
+    q / z           nearest less-indented line above / below
+    g / G           top / bottom of file
+
+  Folding
+    Tab             toggle fold at cursor
+    F               fold all foldable lines at cursor's indent
+    E               expand all folds
+
+  Editing
+    d               delete line (yanks it)
+    y               yank (copy) line
+    p / P           paste below / above
+    H / L           outdent / indent line
+    o / O           open new line below / above (enters insert)
+    u / r           undo / redo
+    "               open yank register panel
+
+  Mode switching
+    i / a           insert before / after cursor
+    I / A           insert at line start / end
+    Space           start line selection
+    v               start character selection
+    /               search
+    :               command mode
+    :help           open this help file
+
+
+INSERT MODE
+-----------
+
+    Esc             return to normal mode
+    Home / End      beginning / end of line
+    Arrows          move cursor
+    Backspace       delete behind
+    Delete          delete forward
+    Tab             insert two spaces
+    Shift-Tab       remove indent
+
+
+SELECT MODE
+-----------
+
+    j / k           extend selection down / up
+    Space           cycle unit: line > section > indent > parent
+    d               delete selection
+    y               yank selection
+    H / L           outdent / indent selection
+    Esc             cancel selection
+
+
+COMMANDS  (type : then the command)
+--------
+
+    :w              save
+    :q              quit
+    :wq             save and quit
+    :q!             force quit (discard changes)
+    :123            go to line 123
+
+
+ABOUT THIS TEST DIRECTORY
+=========================
+
+Each .hu file is a JSON test fixture that describes a sequence
+of keystrokes and the expected editor state after each step.
+
+Tests are organized into subdirectories by category:
+  navigation/   cursor movement, word nav, sibling nav
+  editing/      insert, delete, yank, paste, indent, undo
+  folds/        fold/unfold, fold-all, fold navigation
+  select/       line and char selection, unit cycling
+  search/       find, next/prev match
+  command/      ex-style commands
+
+File format (frames style):
+
+  {
+    "desc": "description of what this test covers",
+    "before": ["line one", "line two", "line three"],
+    "frames": [
+      {
+        "desc": "press j to move down",
+        "keys": ["j"],
+        "after": ["line one", "line two", "line three"],
+        "cursor": [1, 0]
+      },
+      {
+        "desc": "delete the line",
+        "keys": ["d"],
+        "after": ["line one", "line three"],
+        "cursor": [1, 0]
+      }
+    ]
+  }
+
+  "before"      starting buffer contents (array of lines)
+  "beforeFolds" optional array of line numbers folded at start
+  "frames"      sequence of steps, each with:
+    "keys"      array of key names to press in order
+    "desc"      what this step does
+    "after"     expected buffer lines after the keys
+    "cursor"    expected [line, col] position
+    "mode"      expected mode (normal, insert, select)
+
+Each test is a visual mockup: the before state, then each frame
+as [keys] followed by the resulting after state.

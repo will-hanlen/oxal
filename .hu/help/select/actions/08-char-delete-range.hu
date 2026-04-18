@@ -1,0 +1,8 @@
+{
+  "desc": "v-select partial chars then d deletes range",
+  "before": ["abcdef", "ghijkl"],
+  "frames": [
+    { "desc": "v-select bcd", "keys": ["l", "v", "l", "l"], "mode": "select" },
+    { "desc": "delete char range", "keys": ["d"], "after": ["aef", "ghijkl"], "cursor": [0, 1], "mode": "normal" }
+  ]
+}

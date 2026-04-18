@@ -1,0 +1,7 @@
+{
+  "desc": ":w with no filename returns to normal mode",
+  "before": ["hello"],
+  "keys": [":", "w", "enter"],
+  "mode": "normal",
+  "after": ["hello"]
+}

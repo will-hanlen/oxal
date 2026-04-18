@@ -1,0 +1,10 @@
+{
+  "desc": "search for a line, delete it, paste it elsewhere",
+  "before": ["alpha", "beta", "gamma", "delta"],
+  "frames": [
+    { "desc": "search for gamma", "keys": ["/", "g", "a", "m", "m", "a", "enter"], "cursor": [2, 0], "mode": "normal" },
+    { "desc": "delete the found line", "keys": ["d"], "after": ["alpha", "beta", "delta"], "cursor": [2, 0] },
+    { "desc": "go to top", "keys": ["g"], "cursor": [0, 0] },
+    { "desc": "paste gamma after alpha", "keys": ["p"], "after": ["alpha", "gamma", "beta", "delta"], "cursor": [1, 0] }
+  ]
+}

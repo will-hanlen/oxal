@@ -1,0 +1,18 @@
+{
+  "desc": "Backspace deletes behind cursor in command prompt",
+  "before": ["hello"],
+  "frames": [
+    {
+      "desc": "Type 'abc'",
+      "keys": [":", "a", "b", "c"],
+      "commandBuf": "abc",
+      "promptCol": 3
+    },
+    {
+      "desc": "Move left, backspace deletes 'b'",
+      "keys": ["left", "backspace"],
+      "commandBuf": "ac",
+      "promptCol": 1
+    }
+  ]
+}

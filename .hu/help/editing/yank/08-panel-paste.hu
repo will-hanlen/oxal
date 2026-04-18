@@ -1,0 +1,8 @@
+{
+  "desc": "yank panel: open with quote, paste with p pastes below",
+  "before": ["alpha", "bravo", "charlie"],
+  "frames": [
+    { "desc": "yank line bravo", "keys": ["j", "y"], "cursor": [1, 0] },
+    { "desc": "move to charlie, open panel, paste", "keys": ["j", "\"", "p"], "after": ["alpha", "bravo", "charlie", "bravo"], "cursor": [3, 0] }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "desc": "F folds all foldable lines at cursor indent, E expands all",
+  "lineComment": "::",
+  "before": ["header1", "  :: child1", "header2", "  :: child2", "  child3"],
+  "frames": [
+    { "desc": "fold all at indent 0 with F", "keys": ["F"], "folds": [0, 2] },
+    { "desc": "expand all with E", "keys": ["E"], "folds": [] }
+  ]
+}

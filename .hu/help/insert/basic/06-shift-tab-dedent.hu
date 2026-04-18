@@ -1,0 +1,30 @@
+{
+  "desc": "shift+tab in insert mode dedents by two spaces",
+  "frames": [
+    {
+      "desc": "enter insert mode at end of line",
+      "keys": ["A"],
+      "mode": "insert",
+      "cursor": [0, 9]
+    },
+    {
+      "desc": "shift+tab removes two spaces of indent, cursor adjusts",
+      "keys": ["S-tab"],
+      "after": ["  hello"],
+      "cursor": [0, 7]
+    },
+    {
+      "desc": "shift+tab removes remaining indent",
+      "keys": ["S-tab"],
+      "after": ["hello"],
+      "cursor": [0, 5]
+    },
+    {
+      "desc": "shift+tab on unindented line does nothing",
+      "keys": ["S-tab"],
+      "after": ["hello"],
+      "cursor": [0, 5]
+    }
+  ],
+  "before": ["    hello"]
+}

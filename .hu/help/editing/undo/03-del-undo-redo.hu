@@ -1,0 +1,9 @@
+{
+  "desc": "delete a line, undo it, redo it",
+  "before": ["aa", "bb", "cc"],
+  "frames": [
+    { "desc": "delete middle line", "keys": ["j", "d"], "after": ["aa", "cc"], "cursor": [1, 0] },
+    { "desc": "undo brings it back", "keys": ["u"], "after": ["aa", "bb", "cc"], "cursor": [1, 0] },
+    { "desc": "redo deletes again", "keys": ["r"], "after": ["aa", "cc"], "cursor": [1, 0] }
+  ]
+}

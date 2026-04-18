@@ -1,0 +1,32 @@
+move to own private repo and push
+
+agent move everything to abet core
+- +*  engine  ~(. ae acer our.bowl | &)
+
+mirror remote faucets via grow
+- the acer tracks which mirrors exist.
+- the acer optimizes by only holding the shortest
+  mirror path necessary. so that it can use /[remote]/some/path
+  as the real data tree.
+
+idea:
+a thread can construct its own acer (perhaps borrowing the cache).
+so that i can do cached chains and use the nice properties
+of this application model, but without having to write to the
+main tree. this is how the main thread view will work.
+everything will be statically rendered to a mast-like autism.
+but those caches don't need to go in the main data tree
+because they're just hyperspecific to a rendering state
+that might not ever exist again. that cache should dump when
+the http connection ends.
+
+idea: multi-view programs
+- a special kind of node that lives in a meta.
+- it manages views below it
+- it takes a subscription from a source and then
+  emits a view-shape below.
+- it allows programatic install/uninstall based
+  on the state of another spot in the tree.
+- this is what gets shipped as full experiences
+- should these just be long-running threads?
+  so that they can manage pokes too?1

@@ -1,0 +1,17 @@
+{
+  "desc": "P pastes yanked line above cursor",
+  "frames": [
+    {
+      "desc": "yank line bb",
+      "keys": ["j", "y"],
+      "cursor": [1, 0]
+    },
+    {
+      "desc": "move to cc and paste above",
+      "keys": ["j", "P"],
+      "after": ["aa", "bb", "bb", "cc"],
+      "cursor": [2, 0]
+    }
+  ],
+  "before": ["aa", "bb", "cc"]
+}

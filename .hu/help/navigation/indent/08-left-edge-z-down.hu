@@ -1,0 +1,26 @@
+{
+  "desc": "z walks down the left edge finding less-indented lines below",
+  "before": [
+    "      deep",
+    "    mid",
+    "  shallow",
+    "ground"
+  ],
+  "frames": [
+    {
+      "desc": "z from deep to mid (indent 4)",
+      "keys": ["z"],
+      "cursor": [1, 4]
+    },
+    {
+      "desc": "z from mid to shallow (indent 2)",
+      "keys": ["z"],
+      "cursor": [2, 2]
+    },
+    {
+      "desc": "z from shallow to ground (indent 0)",
+      "keys": ["z"],
+      "cursor": [3, 0]
+    }
+  ]
+}

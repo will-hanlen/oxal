@@ -1,0 +1,35 @@
+{
+  "name": "hoon-collapse",
+  "displayName": "Hoon Collapse",
+  "description": "Auto-fold indented :: sections in Hoon files",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "activationEvents": [
+    "onLanguage:hoon"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "hoonCollapse.collapse",
+        "title": "Hoon: Collapse Sections"
+      }
+    ],
+    "languages": [
+      {
+        "id": "hoon",
+        "extensions": [".hoon"],
+        "aliases": ["Hoon"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "hoon",
+        "scopeName": "source.hoon",
+        "path": "./hoon.tmLanguage.json"
+      }
+    ]
+  }
+}

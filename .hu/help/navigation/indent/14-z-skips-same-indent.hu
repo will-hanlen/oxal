@@ -1,0 +1,16 @@
+{
+  "desc": "z skips same-indent lines to find less-indented below",
+  "before": ["    deep", "  a", "  b", "  c", "root"],
+  "frames": [
+    {
+      "desc": "z from deep finds a (first with indent < 4)",
+      "keys": ["z"],
+      "cursor": [1, 2]
+    },
+    {
+      "desc": "z from a skips b, c and finds root (indent 0)",
+      "keys": ["z"],
+      "cursor": [4, 0]
+    }
+  ]
+}

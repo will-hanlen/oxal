@@ -1,0 +1,14 @@
+{
+  "desc": "d on folded line unfolds it before deleting",
+  "before": ["header", "  child1", "  child2", "next"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "delete the folded header line",
+      "keys": ["d"],
+      "after": ["  child1", "  child2", "next"],
+      "cursor": [0, 0],
+      "folds": []
+    }
+  ]
+}

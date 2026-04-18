@@ -1,0 +1,6 @@
+{
+  "desc": "enter splits line with auto-indent",
+  "before": ["  hello world"],
+  "keys": ["i", "right", "right", "right", "right", "right", "right", "right", "enter", "escape"],
+  "after": ["  hello", "  world"]
+}

@@ -1,0 +1,7 @@
+{
+  "desc": "/ search finds first match",
+  "before": ["alpha", "beta", "gamma", "beta2"],
+  "keys": ["/", "b", "e", "t", "a", "enter"],
+  "after": ["alpha", "beta", "gamma", "beta2"],
+  "cursor": [1, 0]
+}

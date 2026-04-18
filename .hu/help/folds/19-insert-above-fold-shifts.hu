@@ -1,0 +1,14 @@
+{
+  "desc": "inserting a line above a folded region shifts the fold",
+  "lineComment": "::",
+  "before": ["top", "header", "  :: child1", "  :: child2", "bottom"],
+  "beforeFolds": [1],
+  "frames": [
+    {
+      "desc": "open line below top (above fold header) shifts fold down",
+      "keys": ["o", "n", "e", "w", "Escape"],
+      "after": ["top", "new", "header", "  :: child1", "  :: child2", "bottom"],
+      "folds": [2]
+    }
+  ]
+}

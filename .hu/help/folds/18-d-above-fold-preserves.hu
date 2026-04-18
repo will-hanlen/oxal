@@ -1,0 +1,15 @@
+{
+  "desc": "deleting a line above a folded region preserves the fold",
+  "lineComment": "::",
+  "before": ["top", "header", "  :: child1", "  :: child2", "bottom"],
+  "beforeFolds": [1],
+  "frames": [
+    {
+      "desc": "delete line above the folded region",
+      "keys": ["d"],
+      "after": ["header", "  :: child1", "  :: child2", "bottom"],
+      "cursor": [0, 0],
+      "folds": [0]
+    }
+  ]
+}

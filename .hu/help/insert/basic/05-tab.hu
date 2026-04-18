@@ -1,0 +1,8 @@
+{
+  "desc": "tab in insert mode adds two spaces",
+  "before": ["hello"],
+  "keys": ["i", "tab", "escape"],
+  "after": ["  hello"],
+  "cursor": [0, 2],
+  "mode": "normal"
+}

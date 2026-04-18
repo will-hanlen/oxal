@@ -1,0 +1,9 @@
+{
+  "desc": "char delete spanning multiple lines joins them",
+  "before": ["hello world", "second line", "third line"],
+  "frames": [
+    { "desc": "position at col 5", "keys": ["l", "l", "l", "l", "l"], "cursor": [0, 5] },
+    { "desc": "v select, extend down to col 6", "keys": ["v", "j", "l"], "cursor": [1, 6], "mode": "select" },
+    { "desc": "delete char range across lines", "keys": ["d"], "after": ["helloline", "third line"], "cursor": [0, 5], "mode": "normal" }
+  ]
+}

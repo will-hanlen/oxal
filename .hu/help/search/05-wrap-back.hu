@@ -1,0 +1,8 @@
+{
+  "desc": "N wraps backward from top to bottom",
+  "before": ["apple", "banana", "apple"],
+  "frames": [
+    { "desc": "search for apple (finds match at cursor)", "keys": ["/", "a", "p", "p", "l", "e", "enter"], "cursor": [0, 0], "mode": "normal" },
+    { "desc": "N wraps backward to last apple", "keys": ["N"], "cursor": [2, 0] }
+  ]
+}

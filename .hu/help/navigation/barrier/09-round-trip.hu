@@ -1,0 +1,31 @@
+{
+  "desc": "H/L barrier round-trip across word boundary",
+  "before": ["  hello world  "],
+  "frames": [
+    {
+      "desc": "move to col 8 ('w', non-ws)",
+      "keys": ["l", "l", "l", "l", "l", "l", "l", "l"],
+      "cursor": [0, 8]
+    },
+    {
+      "desc": "H to col 7 (ws between words)",
+      "keys": ["H"],
+      "cursor": [0, 7]
+    },
+    {
+      "desc": "H to col 6 ('o', non-ws)",
+      "keys": ["H"],
+      "cursor": [0, 6]
+    },
+    {
+      "desc": "L to col 7 (ws)",
+      "keys": ["L"],
+      "cursor": [0, 7]
+    },
+    {
+      "desc": "L to col 8 ('w', non-ws) — back where we started",
+      "keys": ["L"],
+      "cursor": [0, 8]
+    }
+  ]
+}

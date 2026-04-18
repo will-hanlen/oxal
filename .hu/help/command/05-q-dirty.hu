@@ -1,0 +1,8 @@
+{
+  "desc": ":q on dirty buffer refuses and returns to normal",
+  "before": ["hello"],
+  "frames": [
+    { "desc": "make buffer dirty by inserting", "keys": ["i", "x", "escape"], "after": ["xhello"], "mode": "normal" },
+    { "desc": ":q refuses, returns to normal", "keys": [":", "q", "enter"], "after": ["xhello"], "mode": "normal" }
+  ]
+}

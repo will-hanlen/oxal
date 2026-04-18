@@ -1,0 +1,9 @@
+{
+  "desc": "F folds all blocks at cursor's indent level",
+  "lineComment": "::",
+  "before": ["root", "  child1", "    :: deep1", "    deep2", "  child2", "    :: deep3"],
+  "frames": [
+    { "desc": "move to child1 (indent 2) and fold with F", "keys": ["j", "F"], "folds": [1, 4] },
+    { "desc": "expand all with E", "keys": ["E"], "folds": [] }
+  ]
+}

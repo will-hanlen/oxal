@@ -1,0 +1,8 @@
+{
+  "desc": "v-select chars, yank, then p pastes inline after cursor",
+  "before": ["abcdef"],
+  "frames": [
+    { "desc": "v-select abc", "keys": ["v", "l", "l", "y"], "mode": "normal", "cursor": [0, 2] },
+    { "desc": "paste after current position (col 2)", "keys": ["p"], "after": ["abcabcdef"], "cursor": [0, 5] }
+  ]
+}

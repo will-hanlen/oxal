@@ -1,0 +1,7 @@
+{
+  "desc": "> indents selected lines by 2 spaces",
+  "before": ["aa", "bb", "cc"],
+  "keys": [" ", "j", ">"],
+  "after": ["  aa", "  bb", "cc"],
+  "mode": "select"
+}

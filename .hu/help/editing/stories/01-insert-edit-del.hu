@@ -1,0 +1,20 @@
+{
+  "desc": "write a word, delete it, write another, select and yank it",
+  "before": ["hello world", "second line", "third line"],
+  "frames": [
+    { "desc": "move to second line", "keys": ["j"], "after": ["hello world", "second line", "third line"], "cursor": [1, 0] },
+    { "desc": "delete the second line", "keys": ["d"], "after": ["hello world", "third line"], "cursor": [1, 0] },
+    { "desc": "open a new line below", "keys": ["o"], "after": ["hello world", "third line", ""], "cursor": [2, 0], "mode": "insert" },
+    { "desc": "type 'goodbye'", "keys": ["g", "o", "o", "d", "b", "y", "e"], "after": ["hello world", "third line", "goodbye"], "cursor": [2, 7], "mode": "insert" },
+    { "desc": "return to normal mode", "keys": ["escape"], "after": ["hello world", "third line", "goodbye"], "cursor": [2, 7], "mode": "normal" },
+    { "desc": "move back to first line", "keys": ["g"], "after": ["hello world", "third line", "goodbye"], "cursor": [0, 0] },
+    { "desc": "enter insert mode at cursor", "keys": ["i"], "mode": "insert" },
+    { "desc": "type 'OK '", "keys": ["O", "K", " "], "after": ["OK hello world", "third line", "goodbye"], "cursor": [0, 3], "mode": "insert" },
+    { "desc": "escape back to normal", "keys": ["escape"], "mode": "normal" },
+    { "desc": "yank the first line", "keys": ["y"] },
+    { "desc": "go to last line", "keys": ["G"], "cursor": [2, 0] },
+    { "desc": "paste after", "keys": ["p"], "after": ["OK hello world", "third line", "goodbye", "OK hello world"], "cursor": [3, 0] },
+    { "desc": "undo the paste", "keys": ["u"], "after": ["OK hello world", "third line", "goodbye"], "cursor": [2, 0] },
+    { "desc": "redo brings it back", "keys": ["r"], "after": ["OK hello world", "third line", "goodbye", "OK hello world"], "cursor": [3, 0] }
+  ]
+}

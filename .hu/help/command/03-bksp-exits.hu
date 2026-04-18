@@ -1,0 +1,7 @@
+{
+  "desc": "backspace on empty command buffer exits to normal",
+  "before": ["hello"],
+  "keys": [":", "x", "backspace", "backspace"],
+  "cursor": [0, 0],
+  "mode": "normal"
+}

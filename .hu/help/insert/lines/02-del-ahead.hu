@@ -1,0 +1,6 @@
+{
+  "desc": "delete key removes character ahead",
+  "before": ["hello"],
+  "keys": ["i", "delete", "escape"],
+  "after": ["ello"]
+}

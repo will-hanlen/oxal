@@ -1,0 +1,6 @@
+{
+  "desc": "j at last line stays put",
+  "before": ["only"],
+  "keys": ["j", "j", "j"],
+  "cursor": [0, 0]
+}

@@ -1,0 +1,9 @@
+{
+  "desc": "tab toggles fold on and off",
+  "lineComment": "::",
+  "before": ["top", "  :: child1", "  child2", "bottom"],
+  "frames": [
+    { "desc": "fold top line", "keys": ["tab"], "folds": [0] },
+    { "desc": "unfold top line", "keys": ["tab"], "folds": [] }
+  ]
+}

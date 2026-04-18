@@ -1,0 +1,22 @@
+{
+  "desc": "J skips short lines and goes one past barrier to preserve column",
+  "before": [
+    "    hello",
+    "hi",
+    "yo",
+    "      world",
+    "    bye"
+  ],
+  "frames": [
+    {
+      "desc": "move to col 4 ('h', non-ws)",
+      "keys": ["l", "l", "l", "l"],
+      "cursor": [0, 4]
+    },
+    {
+      "desc": "J skips short lines, crosses barrier, lands one past on 'bye'",
+      "keys": ["J"],
+      "cursor": [4, 4]
+    }
+  ]
+}

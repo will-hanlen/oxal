@@ -1,0 +1,10 @@
+{
+  "desc": "Space in char select transitions to line select",
+  "before": ["aa", "bb", "cc"],
+  "frames": [
+    { "desc": "v enters char select", "keys": ["v"], "mode": "select" },
+    { "desc": "space transitions to line select", "keys": [" "], "mode": "select" },
+    { "desc": "extend down works in line mode", "keys": ["j"], "mode": "select" },
+    { "desc": "y yanks lines", "keys": ["y"], "mode": "normal" }
+  ]
+}

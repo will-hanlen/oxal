@@ -1,0 +1,7 @@
+{
+  "desc": ":N goes to line number N",
+  "before": ["aa", "bb", "cc", "dd", "ee"],
+  "keys": [":", "3", "enter"],
+  "after": ["aa", "bb", "cc", "dd", "ee"],
+  "cursor": [2, 0]
+}

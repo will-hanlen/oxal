@@ -1,0 +1,9 @@
+:~
+  title+'oxal'
+  info+'tree-shaped spreadsheet'
+  color+0x4e.70a1
+  version+[25 9 30]
+  website+'https://hawk.computer/~~/'
+  license+'karma'
+  site+/oxal
+==

@@ -1,0 +1,8 @@
+{
+  "desc": "Home key moves to beginning of line in insert mode",
+  "before": ["hello world"],
+  "keys": ["A", "home", "!", "escape"],
+  "after": ["!hello world"],
+  "cursor": [0, 1],
+  "mode": "normal"
+}

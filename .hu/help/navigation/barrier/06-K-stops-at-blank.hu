@@ -1,0 +1,21 @@
+{
+  "desc": "K from non-blank stops at blank; K from blank skips all blanks",
+  "before": ["foo", "", "", "", "hello", "world"],
+  "frames": [
+    {
+      "desc": "move to last line",
+      "keys": ["G"],
+      "cursor": [5, 0]
+    },
+    {
+      "desc": "K stops at last blank line",
+      "keys": ["K"],
+      "cursor": [3, 0]
+    },
+    {
+      "desc": "K from blank skips all blanks, lands on foo",
+      "keys": ["K"],
+      "cursor": [0, 0]
+    }
+  ]
+}

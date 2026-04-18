@@ -1,0 +1,21 @@
+{
+  "desc": "b moves backward by non-whitespace groups",
+  "before": ["foo bar  baz"],
+  "frames": [
+    {
+      "desc": "move to baz with w",
+      "keys": ["w", "w"],
+      "cursor": [0, 9]
+    },
+    {
+      "desc": "b jumps back to bar",
+      "keys": ["b"],
+      "cursor": [0, 4]
+    },
+    {
+      "desc": "b jumps back to foo",
+      "keys": ["b"],
+      "cursor": [0, 0]
+    }
+  ]
+}

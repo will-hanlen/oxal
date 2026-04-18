@@ -1,0 +1,16 @@
+{
+  "desc": "J from non-blank stops at blank; J from blank skips all blanks",
+  "before": ["hello", "world", "", "", "", "foo"],
+  "frames": [
+    {
+      "desc": "J stops at first blank line",
+      "keys": ["J"],
+      "cursor": [2, 0]
+    },
+    {
+      "desc": "J from blank skips all blanks, lands on foo",
+      "keys": ["J"],
+      "cursor": [5, 0]
+    }
+  ]
+}

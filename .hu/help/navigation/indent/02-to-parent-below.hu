@@ -1,0 +1,16 @@
+{
+  "desc": "} goes to nearest less-indented line below",
+  "before": ["top", "  child", "    grandchild", "  back", "end"],
+  "frames": [
+    {
+      "desc": "from grandchild, } finds less-indented line below",
+      "keys": ["j", "j", "z"],
+      "cursor": [3, 2]
+    },
+    {
+      "desc": "} again finds even less-indented line",
+      "keys": ["z"],
+      "cursor": [4, 0]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "desc": "escape cancels selection",
+  "before": ["aa", "bb"],
+  "keys": [" ", "escape"],
+  "after": ["aa", "bb"],
+  "mode": "normal"
+}

@@ -1,0 +1,9 @@
+{
+  "desc": "selection can extend upward from anchor",
+  "before": ["line-a", "line-b", "line-c"],
+  "frames": [
+    { "desc": "move to last line, start select", "keys": ["j", "j", " "], "cursor": [2, 0], "mode": "select" },
+    { "desc": "extend up two lines", "keys": ["k", "k"], "cursor": [0, 0], "mode": "select" },
+    { "desc": "delete all selected", "keys": ["d"], "after": [""], "mode": "normal" }
+  ]
+}

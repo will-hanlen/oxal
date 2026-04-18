@@ -1,0 +1,16 @@
+{
+  "desc": "H from non-ws scans left to first ws char",
+  "before": ["  hello"],
+  "frames": [
+    {
+      "desc": "move to col 4 ('l', non-ws)",
+      "keys": ["l", "l", "l", "l"],
+      "cursor": [0, 4]
+    },
+    {
+      "desc": "H lands on col 1 (first ws going left)",
+      "keys": ["H"],
+      "cursor": [0, 1]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "desc": "n finds next search match",
+  "before": ["alpha", "beta", "gamma", "beta2"],
+  "keys": ["/", "b", "e", "t", "a", "enter", "n"],
+  "after": ["alpha", "beta", "gamma", "beta2"],
+  "cursor": [3, 0]
+}

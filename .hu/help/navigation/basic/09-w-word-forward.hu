@@ -1,0 +1,21 @@
+{
+  "desc": "w moves forward by non-whitespace groups",
+  "before": ["foo bar  baz"],
+  "frames": [
+    {
+      "desc": "w from start jumps to bar",
+      "keys": ["w"],
+      "cursor": [0, 4]
+    },
+    {
+      "desc": "w again jumps to baz",
+      "keys": ["w"],
+      "cursor": [0, 9]
+    },
+    {
+      "desc": "w at last group goes to end of line",
+      "keys": ["w"],
+      "cursor": [0, 12]
+    }
+  ]
+}

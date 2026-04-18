@@ -1,0 +1,14 @@
+{
+  "desc": "Delete at end of folded line unfolds before joining",
+  "before": ["header", "  child1", "  child2", "next"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "enter insert at end of folded header, press delete to join",
+      "keys": ["A", "delete"],
+      "after": ["header  child1", "  child2", "next"],
+      "mode": "insert",
+      "folds": []
+    }
+  ]
+}

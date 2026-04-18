@@ -1,0 +1,13 @@
+{
+  "desc": "c clears to end of line and enters insert mode",
+  "before": ["hello world", "second line"],
+  "frames": [
+    {
+      "desc": "c at col 5 clears rest of line",
+      "keys": ["l", "l", "l", "l", "l", "c"],
+      "after": ["hello", "second line"],
+      "cursor": [0, 5],
+      "mode": "insert"
+    }
+  ]
+}

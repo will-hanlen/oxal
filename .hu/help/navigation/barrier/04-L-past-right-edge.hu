@@ -1,0 +1,16 @@
+{
+  "desc": "L from ws scans right to first non-ws char",
+  "before": ["hello  world"],
+  "frames": [
+    {
+      "desc": "move to col 5 (space, ws)",
+      "keys": ["l", "l", "l", "l", "l"],
+      "cursor": [0, 5]
+    },
+    {
+      "desc": "L lands on col 7 ('w', first non-ws going right)",
+      "keys": ["L"],
+      "cursor": [0, 7]
+    }
+  ]
+}

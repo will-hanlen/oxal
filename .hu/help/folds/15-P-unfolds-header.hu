@@ -1,0 +1,20 @@
+{
+  "desc": "P on folded line preserves the fold (paste goes above)",
+  "before": ["header", "  child1", "  child2", "next"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "move to next and yank it",
+      "keys": ["j", "y"],
+      "cursor": [1, 0],
+      "folds": [0]
+    },
+    {
+      "desc": "move back to folded header and paste above — fold stays",
+      "keys": ["k", "P"],
+      "after": ["next", "header", "  child1", "  child2", "next"],
+      "cursor": [0, 0],
+      "folds": [1]
+    }
+  ]
+}

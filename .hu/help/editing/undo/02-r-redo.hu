@@ -1,0 +1,6 @@
+{
+  "desc": "r redoes after undo",
+  "before": ["aa", "bb", "cc"],
+  "keys": ["j", "d", "u", "r"],
+  "after": ["aa", "cc"]
+}

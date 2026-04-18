@@ -1,0 +1,14 @@
+{
+  "desc": "splitting a line (Enter in insert mode) above a fold shifts the fold",
+  "lineComment": "::",
+  "before": ["top", "header", "  :: child1", "  :: child2", "bottom"],
+  "beforeFolds": [1],
+  "frames": [
+    {
+      "desc": "enter insert at end of line 0, press Enter to split, escape",
+      "keys": ["A", "enter", "Escape"],
+      "after": ["top", "", "header", "  :: child1", "  :: child2", "bottom"],
+      "folds": [2]
+    }
+  ]
+}

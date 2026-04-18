@@ -1,0 +1,18 @@
+{
+  "desc": "Typing inserts at cursor position, not just at end",
+  "before": ["hello"],
+  "frames": [
+    {
+      "desc": "Type 'ac' in command",
+      "keys": [":", "a", "c"],
+      "commandBuf": "ac",
+      "promptCol": 2
+    },
+    {
+      "desc": "Move cursor left and insert 'b'",
+      "keys": ["left", "b"],
+      "commandBuf": "abc",
+      "promptCol": 2
+    }
+  ]
+}

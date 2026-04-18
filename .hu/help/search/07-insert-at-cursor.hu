@@ -1,0 +1,18 @@
+{
+  "desc": "Typing inserts at cursor position in search prompt",
+  "before": ["hello world"],
+  "frames": [
+    {
+      "desc": "Type 'hlo'",
+      "keys": ["/", "h", "l", "o"],
+      "searchBuf": "hlo",
+      "promptCol": 3
+    },
+    {
+      "desc": "Move left twice, insert 'el'",
+      "keys": ["left", "left", "e", "l"],
+      "searchBuf": "hello",
+      "promptCol": 3
+    }
+  ]
+}

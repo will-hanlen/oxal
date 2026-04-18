@@ -1,0 +1,8 @@
+{
+  "desc": "> indents current line by 2 spaces",
+  "before": ["aa", "bb", "cc"],
+  "keys": [">"],
+  "after": ["  aa", "bb", "cc"],
+  "cursor": [0, 2],
+  "mode": "normal"
+}

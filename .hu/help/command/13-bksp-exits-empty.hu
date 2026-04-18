@@ -1,0 +1,25 @@
+{
+  "desc": "Backspace on empty command prompt exits to normal",
+  "before": ["hello"],
+  "frames": [
+    {
+      "desc": "Enter command, type 'a'",
+      "keys": [":", "a"],
+      "mode": "prompt",
+      "commandBuf": "a",
+      "promptCol": 1
+    },
+    {
+      "desc": "Backspace clears",
+      "keys": ["backspace"],
+      "commandBuf": "",
+      "promptCol": 0,
+      "mode": "prompt"
+    },
+    {
+      "desc": "Another backspace exits",
+      "keys": ["backspace"],
+      "mode": "normal"
+    }
+  ]
+}

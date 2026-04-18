@@ -1,0 +1,21 @@
+{
+  "desc": "o on folded line unfolds it so new line is visible",
+  "before": ["header", "  child1", "  child2", "next"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "cursor on folded header",
+      "keys": [],
+      "cursor": [0, 0],
+      "folds": [0]
+    },
+    {
+      "desc": "o unfolds header, inserts line below",
+      "keys": ["o"],
+      "after": ["header", "", "  child1", "  child2", "next"],
+      "cursor": [1, 0],
+      "mode": "insert",
+      "folds": []
+    }
+  ]
+}

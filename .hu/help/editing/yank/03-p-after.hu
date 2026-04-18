@@ -1,0 +1,6 @@
+{
+  "desc": "p pastes yanked line below",
+  "before": ["aa", "bb", "cc"],
+  "keys": ["j", "y", "p"],
+  "after": ["aa", "bb", "bb", "cc"]
+}

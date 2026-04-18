@@ -1,0 +1,38 @@
+{
+  "desc": "deep nesting: q repeatedly climbs indent levels, cursor follows left edge",
+  "before": [
+    "top",
+    "  a",
+    "    b",
+    "      c",
+    "        d",
+    "  e"
+  ],
+  "frames": [
+    {
+      "desc": "start at deepest line d",
+      "keys": ["j", "j", "j", "j"],
+      "cursor": [4, 0]
+    },
+    {
+      "desc": "q to c (indent 6)",
+      "keys": ["q"],
+      "cursor": [3, 6]
+    },
+    {
+      "desc": "q to b (indent 4)",
+      "keys": ["q"],
+      "cursor": [2, 4]
+    },
+    {
+      "desc": "q to a (indent 2)",
+      "keys": ["q"],
+      "cursor": [1, 2]
+    },
+    {
+      "desc": "q to top (indent 0)",
+      "keys": ["q"],
+      "cursor": [0, 0]
+    }
+  ]
+}

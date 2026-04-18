@@ -1,0 +1,6 @@
+{
+  "desc": "{ skips blank lines to find parent",
+  "before": ["top", "", "  child"],
+  "keys": ["j", "j", "q"],
+  "cursor": [0, 0]
+}

@@ -1,0 +1,10 @@
+{
+  "desc": "cursor moves correctly around folded regions",
+  "before": ["line-a", "  hidden1", "  hidden2", "line-b", "  hidden3", "line-c"],
+  "beforeFolds": [0, 3],
+  "frames": [
+    { "desc": "j goes to line-b (skips hidden)", "keys": ["j"], "cursor": [1, 0] },
+    { "desc": "j goes to line-c (skips hidden3)", "keys": ["j"], "cursor": [2, 0] },
+    { "desc": "k goes back to line-b", "keys": ["k"], "cursor": [1, 0] }
+  ]
+}

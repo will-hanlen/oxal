@@ -1,0 +1,20 @@
+{
+  "desc": "p on folded line unfolds it so pasted content is visible",
+  "before": ["header", "  child1", "  child2", "next"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "move to next and yank it",
+      "keys": ["j", "y"],
+      "cursor": [1, 0],
+      "folds": [0]
+    },
+    {
+      "desc": "move back to folded header and paste below",
+      "keys": ["k", "p"],
+      "after": ["header", "next", "  child1", "  child2", "next"],
+      "cursor": [1, 0],
+      "folds": []
+    }
+  ]
+}

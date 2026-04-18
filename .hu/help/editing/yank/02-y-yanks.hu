@@ -1,0 +1,7 @@
+{
+  "desc": "y yanks current line",
+  "before": ["aa", "bb", "cc"],
+  "keys": ["j", "y"],
+  "after": ["aa", "bb", "cc"],
+  "cursor": [1, 0]
+}

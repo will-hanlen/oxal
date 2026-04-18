@@ -1,0 +1,8 @@
+{
+  "desc": "m merges current line with previous, space-separated",
+  "before": ["hello", "world"],
+  "frames": [
+    { "desc": "move to second line", "keys": ["j"], "cursor": [1, 0], "mode": "normal" },
+    { "desc": "merge with previous", "keys": ["m"], "after": ["hello world"], "cursor": [0, 5] }
+  ]
+}

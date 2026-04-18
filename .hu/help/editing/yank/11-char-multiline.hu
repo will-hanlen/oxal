@@ -1,0 +1,17 @@
+{
+  "desc": "char yank across lines, paste inserts multiline inline",
+  "before": ["hello world", "foo bar", "end"],
+  "frames": [
+    {
+      "desc": "v-select from col 6 on line 0 across to line 1",
+      "keys": ["l", "l", "l", "l", "l", "l", "v", "j", "y"],
+      "mode": "normal"
+    },
+    {
+      "desc": "move to end line, paste multiline after cursor",
+      "keys": ["j", "j", "l", "p"],
+      "after": ["hello world", "foo bar", "endworld", "foo bar"],
+      "cursor": [3, 7]
+    }
+  ]
+}

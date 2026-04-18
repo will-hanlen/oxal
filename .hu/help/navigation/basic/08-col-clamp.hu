@@ -1,0 +1,8 @@
+{
+  "desc": "column clamps when moving to shorter line",
+  "before": ["long line here", "hi"],
+  "frames": [
+    { "desc": "move to end of first line", "keys": ["l", "l", "l", "l", "l", "l", "l", "l", "l", "l"], "cursor": [0, 10] },
+    { "desc": "move down, col clamps to shorter line length", "keys": ["j"], "cursor": [1, 2] }
+  ]
+}

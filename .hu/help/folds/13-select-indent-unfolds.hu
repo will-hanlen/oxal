@@ -1,0 +1,19 @@
+{
+  "desc": "Selection indent unfolds fold that would swallow lines",
+  "before": ["header", "  child1", "  child2", "peer1", "peer2"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "select peer1 and peer2",
+      "keys": ["j", " ", "j"],
+      "cursor": [2, 0],
+      "folds": [0]
+    },
+    {
+      "desc": "indent selection — fold unfolds since lines move into its range",
+      "keys": [">"],
+      "after": ["header", "  child1", "  child2", "  peer1", "  peer2"],
+      "folds": []
+    }
+  ]
+}

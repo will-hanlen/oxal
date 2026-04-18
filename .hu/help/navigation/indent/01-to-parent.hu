@@ -1,0 +1,7 @@
+{
+  "desc": "q goes to parent indent level",
+  "before": ["top", "  child", "    grandchild"],
+  "keys": ["j", "j", "q"],
+  "after": ["top", "  child", "    grandchild"],
+  "cursor": [1, 2]
+}

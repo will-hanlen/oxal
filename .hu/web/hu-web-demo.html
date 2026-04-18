@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>hu web demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #111;
+      color: #ccc;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      height: 100vh;
+    }
+    h1 { font-size: 18px; margin-bottom: 8px; color: #888; font-weight: normal; }
+    p { font-size: 13px; color: #555; margin-bottom: 16px; }
+    #event-log {
+      font-size: 12px;
+      color: #4ec9b0;
+      margin-top: 8px;
+      height: 20px;
+    }
+    h-edit {
+      width: 900px;
+      height: 600px;
+      font: 14px/1 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Consolas', monospace;
+      border: 1px solid #333;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>h-edit web component</h1>
+  <p>Click the editor to focus. Vim-style keys: j/k move, i insert, Esc normal, :w save, Tab fold</p>
+
+  <h-edit>
+    <script type="text/plain" data-path="example.hoon">
+::  example hoon file
+::
+|%
+++  add
+  |=  [a=@ b=@]
+  ^-  @
+  ?:  =(0 a)
+    b
+  $(a (dec a), b +(b))
+::
+++  sub
+  |=  [a=@ b=@]
+  ^-  @
+  ?:  =(0 b)
+    a
+  $(a (dec a), b (dec b))
+::
+++  mul
+  |=  [a=@ b=@]
+  ^-  @
+  ?:  =(0 b)
+    0
+  (add a $(b (dec b)))
+::
+++  fib
+  |=  n=@
+  ^-  @
+  ?:  (lth n 2)
+    n
+  (add $(n (dec n)) $(n (sub n 2)))
+--
+    </script>
+    <script type="text/plain" data-path="app.py">
+# A simple Python file for testing non-hoon highlighting
+def fibonacci(n):
+  if n < 2:
+    return n
+  return fibonacci(n - 1) + fibonacci(n - 2)
+
+class Calculator:
+  def __init__(self):
+    self.history = []
+
+  def add(self, a, b):
+    result = a + b
+    self.history.append(('add', a, b, result))
+    return result
+
+  def multiply(self, a, b):
+    result = a * b
+    self.history.append(('mul', a, b, result))
+    return result
+
+if __name__ == '__main__':
+  calc = Calculator()
+  print(calc.add(2, 3))
+  print(fibonacci(10))
+    </script>
+  </h-edit>
+
+  <div id="event-log"></div>
+
+  <script src="hu-web.js"></script>
+  <script>
+    const editor = document.querySelector('h-edit');
+    const log = document.getElementById('event-log');
+
+    editor.addEventListener('save', (e) => {
+      log.textContent = `Saved: ${e.detail.filename} (${e.detail.content.length} bytes)`;
+    });
+
+    editor.addEventListener('quit', () => {
+      log.textContent = 'Quit event received';
+    });
+  </script>
+</body>
+</html>

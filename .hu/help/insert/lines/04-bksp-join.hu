@@ -1,0 +1,8 @@
+{
+  "desc": "backspace at column 0 joins with previous line",
+  "before": ["hello", "world"],
+  "frames": [
+    { "desc": "move to second line and enter insert", "keys": ["j", "i"], "cursor": [1, 0], "mode": "insert" },
+    { "desc": "backspace joins lines", "keys": ["backspace"], "after": ["helloworld"], "cursor": [0, 5] }
+  ]
+}

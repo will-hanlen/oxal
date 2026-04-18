@@ -1,0 +1,8 @@
+{
+  "desc": "A enters insert mode at line end",
+  "before": ["hello"],
+  "keys": ["A", "!", "escape"],
+  "after": ["hello!"],
+  "cursor": [0, 6],
+  "mode": "normal"
+}

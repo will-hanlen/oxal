@@ -1,0 +1,7 @@
+{
+  "desc": "k moves cursor up",
+  "before": ["aa", "bb", "cc"],
+  "keys": ["j", "j", "k"],
+  "after": ["aa", "bb", "cc"],
+  "cursor": [1, 0]
+}

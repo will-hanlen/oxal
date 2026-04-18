@@ -1,0 +1,8 @@
+{
+  "desc": "search wraps from bottom to top",
+  "before": ["apple", "banana", "cherry"],
+  "frames": [
+    { "desc": "move to last line", "keys": ["G"], "cursor": [2, 0] },
+    { "desc": "search for apple", "keys": ["/", "a", "p", "p", "l", "e", "enter"], "cursor": [0, 0], "mode": "normal" }
+  ]
+}

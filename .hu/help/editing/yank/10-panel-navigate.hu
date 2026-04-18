@@ -1,0 +1,10 @@
+{
+  "desc": "yank panel: save to register then paste from it",
+  "before": ["line one", "line two", "line three"],
+  "frames": [
+    { "desc": "yank first line", "keys": ["y"], "cursor": [0, 0] },
+    { "desc": "save to register and close panel", "keys": ["\"", "s", "r", "e", "g", "enter", "escape"], "cursor": [0, 0] },
+    { "desc": "yank second line (overwrite default)", "keys": ["j", "y"], "cursor": [1, 0] },
+    { "desc": "go to line 3, open panel, nav to saved reg, paste", "keys": ["j", "\"", "j", "p"], "after": ["line one", "line two", "line three", "line one"], "cursor": [3, 0] }
+  ]
+}

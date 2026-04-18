@@ -1,0 +1,6 @@
+{
+  "desc": "} skips blank lines to find less-indented below",
+  "before": ["  indented", "", "top"],
+  "keys": ["z"],
+  "cursor": [2, 0]
+}

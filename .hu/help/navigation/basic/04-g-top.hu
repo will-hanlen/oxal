@@ -1,0 +1,7 @@
+{
+  "desc": "g jumps to top of file",
+  "before": ["aa", "bb", "cc", "dd"],
+  "keys": ["j", "j", "j", "g"],
+  "after": ["aa", "bb", "cc", "dd"],
+  "cursor": [0, 0]
+}

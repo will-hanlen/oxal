@@ -1,0 +1,7 @@
+{
+  "desc": "h/l move cursor left and right",
+  "before": ["hello"],
+  "keys": ["l", "l", "l"],
+  "after": ["hello"],
+  "cursor": [0, 3]
+}

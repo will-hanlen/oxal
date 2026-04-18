@@ -1,0 +1,9 @@
+{
+  "desc": "I enters insert mode at first non-whitespace",
+  "before": ["  hello world"],
+  "frames": [
+    { "desc": "move cursor to middle", "keys": ["l", "l", "l", "l"], "cursor": [0, 4] },
+    { "desc": "I moves to first non-whitespace in insert mode", "keys": ["I"], "cursor": [0, 2], "mode": "insert" },
+    { "desc": "type at first non-whitespace", "keys": ["X", "escape"], "after": ["  Xhello world"], "cursor": [0, 3], "mode": "normal" }
+  ]
+}

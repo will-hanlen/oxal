@@ -1,0 +1,7 @@
+{
+  "desc": "y in select mode yanks without deleting",
+  "before": ["aa", "bb", "cc", "dd"],
+  "keys": ["j", " ", "j", "y"],
+  "after": ["aa", "bb", "cc", "dd"],
+  "mode": "normal"
+}

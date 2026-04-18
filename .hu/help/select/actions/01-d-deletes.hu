@@ -1,0 +1,7 @@
+{
+  "desc": "d in select mode deletes selected lines",
+  "before": ["aa", "bb", "cc", "dd"],
+  "keys": ["j", " ", "j", "d"],
+  "after": ["aa", "dd"],
+  "mode": "normal"
+}

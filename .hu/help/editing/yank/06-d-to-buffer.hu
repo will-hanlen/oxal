@@ -1,0 +1,8 @@
+{
+  "desc": "d yanks deleted line, p can paste it",
+  "before": ["first", "second", "third"],
+  "frames": [
+    { "desc": "delete first line", "keys": ["d"], "after": ["second", "third"], "cursor": [0, 0] },
+    { "desc": "paste deleted line below", "keys": ["p"], "after": ["second", "first", "third"], "cursor": [1, 0] }
+  ]
+}

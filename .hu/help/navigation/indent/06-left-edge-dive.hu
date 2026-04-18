@@ -1,0 +1,29 @@
+{
+  "desc": "navigate the left edge: barrier nav and outdent trace code structure",
+  "before": [
+    "root",
+    "  branch-a",
+    "    leaf-1",
+    "    leaf-2",
+    "  branch-b",
+    "    leaf-3",
+    "other-root"
+  ],
+  "frames": [
+    {
+      "desc": "j to branch-a",
+      "keys": ["j"],
+      "cursor": [1, 0]
+    },
+    {
+      "desc": "J barrier at col 0: ws runs from branch-a to leaf-3, stops at other-root",
+      "keys": ["J"],
+      "cursor": [6, 0]
+    },
+    {
+      "desc": "q from other-root (no parent) stays",
+      "keys": ["q"],
+      "cursor": [6, 0]
+    }
+  ]
+}

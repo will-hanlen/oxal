@@ -1,0 +1,15 @@
+{
+  "desc": "Enter in insert mode on folded line unfolds it",
+  "before": ["header", "  child1", "  child2", "next"],
+  "beforeFolds": [0],
+  "frames": [
+    {
+      "desc": "enter insert mode on folded header then press Enter",
+      "keys": ["A", "enter"],
+      "after": ["header", "", "  child1", "  child2", "next"],
+      "cursor": [1, 0],
+      "mode": "insert",
+      "folds": []
+    }
+  ]
+}

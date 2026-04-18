@@ -1,0 +1,22 @@
+{
+  "desc": "K skips short lines and goes one past barrier to preserve column",
+  "before": [
+    "    bye",
+    "      world",
+    "hi",
+    "yo",
+    "    hello"
+  ],
+  "frames": [
+    {
+      "desc": "move to last line col 4 ('h', non-ws)",
+      "keys": ["G", "l", "l", "l", "l"],
+      "cursor": [4, 4]
+    },
+    {
+      "desc": "K skips short lines, crosses barrier, lands one past on 'bye'",
+      "keys": ["K"],
+      "cursor": [0, 4]
+    }
+  ]
+}

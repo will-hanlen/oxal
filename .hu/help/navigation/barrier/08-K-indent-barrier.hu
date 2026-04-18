@@ -1,0 +1,16 @@
+{
+  "desc": "K stops at ws/non-ws transition at cursor column",
+  "before": ["  aa", "  bb", "    cc", "  dd"],
+  "frames": [
+    {
+      "desc": "move to row 3 col 2",
+      "keys": ["j", "j", "j", "l", "l"],
+      "cursor": [3, 2]
+    },
+    {
+      "desc": "K from row 3 col 2 - stops at row 2 where col 2 is whitespace",
+      "keys": ["K"],
+      "cursor": [2, 2]
+    }
+  ]
+}

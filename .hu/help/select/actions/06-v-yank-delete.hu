@@ -1,0 +1,10 @@
+{
+  "desc": "char yank and delete operations",
+  "before": ["hello world", "second line", "third line"],
+  "frames": [
+    { "desc": "v select then yank 'hel'", "keys": ["v", "l", "l", "y"], "after": ["hello world", "second line", "third line"], "mode": "normal", "cursor": [0, 2] },
+    { "desc": "go to start of line 2", "keys": ["j", "I"], "cursor": [1, 0], "mode": "insert" },
+    { "desc": "back to normal", "keys": ["escape"], "mode": "normal", "cursor": [1, 0] },
+    { "desc": "paste inline at col 0", "keys": ["p"], "after": ["hello world", "shelecond line", "third line"], "cursor": [1, 3] }
+  ]
+}

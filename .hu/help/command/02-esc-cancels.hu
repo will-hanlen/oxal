@@ -1,0 +1,7 @@
+{
+  "desc": "escape cancels command mode",
+  "before": ["hello"],
+  "keys": [":", "1", "escape"],
+  "cursor": [0, 0],
+  "mode": "normal"
+}

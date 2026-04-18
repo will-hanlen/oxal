@@ -1,0 +1,9 @@
+{
+  "scopeName": "source.hoon",
+  "patterns": [
+    {
+      "name": "comment.line.hoon",
+      "match": "::.*$"
+    }
+  ]
+}

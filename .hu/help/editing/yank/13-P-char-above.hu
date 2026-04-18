@@ -1,0 +1,8 @@
+{
+  "desc": "P pastes char content inline before cursor position",
+  "before": ["hello world"],
+  "frames": [
+    { "desc": "yank 'wor' with char select", "keys": ["l", "l", "l", "l", "l", "l", "v", "l", "l", "y"], "mode": "normal" },
+    { "desc": "move to col 0 and P pastes before cursor", "keys": ["g", "P"], "after": ["worhello world"], "cursor": [0, 2] }
+  ]
+}

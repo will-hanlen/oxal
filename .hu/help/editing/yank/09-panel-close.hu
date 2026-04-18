@@ -1,0 +1,8 @@
+{
+  "desc": "yank panel: escape closes without action",
+  "before": ["alpha", "bravo", "charlie"],
+  "frames": [
+    { "desc": "yank line alpha", "keys": ["y"], "cursor": [0, 0] },
+    { "desc": "open panel and close with escape", "keys": ["\"", "escape"], "after": ["alpha", "bravo", "charlie"], "cursor": [0, 0], "mode": "normal" }
+  ]
+}

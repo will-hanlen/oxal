@@ -1,0 +1,6 @@
+{
+  "desc": "z from blank line (indent 0) stays put — no less-indented line below",
+  "before": ["  child", "", "  sibling"],
+  "keys": ["j", "z"],
+  "cursor": [1, 0]
+}

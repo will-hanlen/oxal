@@ -1,0 +1,9 @@
+{
+  "desc": "yank multi-line selection then paste it",
+  "before": ["aaa", "bbb", "ccc"],
+  "frames": [
+    { "desc": "select first two lines", "keys": [" ", "j"], "mode": "select" },
+    { "desc": "yank selection", "keys": ["y"], "mode": "normal" },
+    { "desc": "go to last line and paste", "keys": ["G", "p"], "after": ["aaa", "bbb", "ccc", "aaa", "bbb"], "cursor": [3, 0] }
+  ]
+}

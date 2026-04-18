@@ -1,0 +1,8 @@
+{
+  "desc": "Space enters visual select mode",
+  "before": ["aa", "bb", "cc"],
+  "keys": [" "],
+  "after": ["aa", "bb", "cc"],
+  "cursor": [0, 0],
+  "mode": "select"
+}

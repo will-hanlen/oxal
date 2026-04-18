@@ -1,0 +1,16 @@
+{
+  "desc": "q skips lines at the same indent to find a less-indented one",
+  "before": ["root", "  a", "  b", "  c", "    deep"],
+  "frames": [
+    {
+      "desc": "start at deep",
+      "keys": ["j", "j", "j", "j"],
+      "cursor": [4, 0]
+    },
+    {
+      "desc": "q skips c, b, a (all indent 2) and lands on c (first with indent < 4)",
+      "keys": ["q"],
+      "cursor": [3, 2]
+    }
+  ]
+}

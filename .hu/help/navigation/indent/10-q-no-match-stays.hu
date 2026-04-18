@@ -1,0 +1,6 @@
+{
+  "desc": "q at indent 0 stays put",
+  "before": ["first", "second", "  child"],
+  "keys": ["j", "q"],
+  "cursor": [1, 0]
+}

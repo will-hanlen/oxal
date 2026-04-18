@@ -1,0 +1,16 @@
+{
+  "desc": "J stops at ws/non-ws transition at cursor column",
+  "before": ["  aa", "  bb", "    cc", "  dd"],
+  "frames": [
+    {
+      "desc": "move cursor to col 2 (first non-ws char)",
+      "keys": ["l", "l"],
+      "cursor": [0, 2]
+    },
+    {
+      "desc": "J from row 0 col 2 - stops at row 2 where col 2 is whitespace",
+      "keys": ["J"],
+      "cursor": [2, 2]
+    }
+  ]
+}

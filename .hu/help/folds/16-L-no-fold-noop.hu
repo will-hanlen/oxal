@@ -1,0 +1,8 @@
+{
+  "desc": "> indent without folds works normally (no regression)",
+  "before": ["aa", "bb", "cc"],
+  "keys": ["j", ">"],
+  "after": ["aa", "  bb", "cc"],
+  "cursor": [1, 2],
+  "folds": []
+}

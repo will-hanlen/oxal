@@ -1,0 +1,6 @@
+{
+  "desc": "backspace removes character behind cursor",
+  "before": ["hello"],
+  "keys": ["i", "l", "l", "l", "backspace", "escape"],
+  "after": ["llhello"]
+}

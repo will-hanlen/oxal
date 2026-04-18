@@ -1,0 +1,8 @@
+{
+  "desc": "End key moves to end of line in insert mode",
+  "before": ["hello world"],
+  "keys": ["i", "end", "!", "escape"],
+  "after": ["hello world!"],
+  "cursor": [0, 12],
+  "mode": "normal"
+}

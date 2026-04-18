@@ -1,0 +1,29 @@
+{
+  "desc": "Arrow keys move cursor within command prompt",
+  "before": ["hello"],
+  "frames": [
+    {
+      "desc": "Enter command mode and type 'abc'",
+      "keys": [":", "a", "b", "c"],
+      "mode": "prompt",
+      "commandBuf": "abc",
+      "promptCol": 3
+    },
+    {
+      "desc": "Left arrow moves cursor back",
+      "keys": ["left"],
+      "commandBuf": "abc",
+      "promptCol": 2
+    },
+    {
+      "desc": "Left again",
+      "keys": ["left"],
+      "promptCol": 1
+    },
+    {
+      "desc": "Right arrow moves cursor forward",
+      "keys": ["right"],
+      "promptCol": 2
+    }
+  ]
+}
