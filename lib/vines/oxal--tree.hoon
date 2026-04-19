@@ -2,12 +2,15 @@
 ::
 /+  *vineio, *zozo
 ::
-=<
+=;  render
 ::
 =/  m  (strand ,vase)
 ;<  bowl=http-bowl  bind:m  init
 =/  vio  ~(. server bowl)
 ^-  form:m
+::
+=/  rr  ~(. render (welp [prefix rest]:bowl))
+=,  rr
 ::
 ;<  =acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
 =/  rest-pith=pith  (pave rest.bowl)
@@ -24,6 +27,10 @@
   (pure:m !>(~))
 ::
 =/  scoped-file=file  (~(dip fe file.acer) scope-pax)
+::
+=/  init-beneath=?
+  =/  c=code  code.file.acer
+  ?=(^ (~(abo ox c) scope-pax |=(m=_c &(?=(^ leaf.m) ?=(^ view.u.leaf.m)))))
 ::
 =/  hymn=manx
   ::
@@ -44,9 +51,21 @@
       ==
     ==
     ;body.p5.fc.g4(style "padding-bottom: 80vh;")
-      ;h1: {(pate rest-pith)}
+      ;nav.fr.g2.ac
+        ;a.p-2.br2.bd1.b2.hover(href (trip (spat prefix.bowl))): /
+        ;*
+        =<  p
+        %^  spin  rest-pith  *pith
+        |=  [i=iota acc=pith]
+        =.  acc  (snoc acc i)
+        =/  url=tape  (trip (spat (welp prefix.bowl (pout acc))))
+        :_  acc
+        ;a.p-2.br2.bd1.b2.hover(href url)
+          ;-  (print-node-strict i)
+        ==
+      ==
       ;div
-        ;+  (render-tree scoped-file rest-pith)
+        ;+  (render-tree scoped-file rest-pith init-beneath)
       ==
     ==
   ==
@@ -60,13 +79,13 @@
   (en-xml:html hymn)
 (pure:m !>(~))
 ::
-|%
+|_  =stem
 ++  render-tree
   ::
   ::  recursive tree render; .rest-pith is the scope (bare, user-facing),
   ::  each rendered node accumulates its relative pith off .rest-pith.
   ::
-  |=  [root=file rest-pith=pith]
+  |=  [root=file rest-pith=pith beneath=?]
   ^-  manx
   =|  rel=pith
   =|  sug=(unit iota)
@@ -78,16 +97,25 @@
   =/  nude  leaf.data.f
   =/  has-node  ?=(^ nude)
   =/  has-view  ?=(^ view.meta)
+  =/  at-or-below  |(beneath has-view)
   ;div.fc
-    ;+  %^  add-class-if  &(=(0 case.meta) !has-view)  "o2"
+    ;+  %^  add-class-if  beneath  "f-3"
+        %+  add-class
+          ?:  &(=(0 case.meta) !has-view)  "o2"
+          ?:  beneath  "o5"
+          ""
     ;details.bdb1
-      ;+  (render-summary sug nude data.f meta)
-      ;div.bdt1.fc.bbv.o6.pl5
-        ;+  (render-section (render-view bare-pax meta))
+      ;+  (render-summary rel sug nude data.f meta)
+      ;div.bdt1.fc.bbv.o6.px5
+        ;+  ?:  &(beneath !has-view)  ;/  ""
+            (render-section (render-view bare-pax meta))
         ;+  (render-section (render-meta-forms bare-pax meta))
-        ;+  (render-section (render-leaf-form bare-pax nude))
-        ;+  (render-section (render-create-node-form bare-pax))
-        ;+  (render-section (render-create-view-form bare-pax))
+        ;+  ?:  at-or-below  ;/  ""
+            (render-section (render-leaf-form bare-pax nude))
+        ;+  ?:  at-or-below  ;/  ""
+            (render-section (render-create-node-form bare-pax))
+        ;+  ?:  at-or-below  ;/  ""
+            (render-section (render-create-view-form bare-pax))
         ;+  (render-section (render-subs subs.meta))
         ;+  (render-section (render-logs logs.meta))
       ==
@@ -96,7 +124,7 @@
       ;*
       %+  turn  ~(kid-list fe f)
       |=  [=iota =file]
-      ^$(f file, rel (snoc rel iota), sug `iota)
+      ^$(f file, rel (snoc rel iota), sug `iota, beneath at-or-below)
     ==
   ==
 ::
@@ -463,18 +491,13 @@
           ;span.fs-2: {<n>}
     ==
   =/  bod=marl
-    ;=
-      ;div.p2.fc.g2
-        ;*
-        =;  =marl  ?^  marl  marl
-          ;=
-            ;div.fs-2: none
-          ==
-        %+  turn  ~(tap in set)
-        |=  =pith
-        ;div.mono.f5: {(pate pith)}
+    =;  =marl  ?^  marl  marl
+      ;=
+        ;div: none
       ==
-    ==
+    %+  turn  ~(tap in set)
+    |=  =pith
+    ;div.mono.f5: {(pate pith)}
   [sum bod]
 ::
 ++  render-logs
@@ -496,17 +519,22 @@
     ;=
       ;div.fc.g5
         ;*
-        %+  turn  list
-        |=  =move
-        ;div
-          ;*
-          %+  turn   ~(tap in move)
-          |=  =chng
+        =<  p
+        %^  spin  list  0
+        |=  [=move a=@]
+        :_  +(a)
+        ;div.fr.g4.as
+          ;div.f5: {<a>}
           ;div
-            ;-
-            ?-  -.chng
-              %ins  "%ins {(pate pith.chng)} {(print-aura node.chng)}"
-              %del  "%del {(pate pith.chng)}"
+            ;*
+            %+  turn   ~(tap in move)
+            |=  =chng
+            ;div
+              ;-
+              ?-  -.chng
+                %ins  "%ins {(pate pith.chng)}  - {(print-aura node.chng)}"
+                %del  "%del {(pate pith.chng)}"
+              ==
             ==
           ==
         ==
@@ -619,7 +647,7 @@
 ::
 ++  render-summary
   ::
-  |=  [sug=(unit iota) nude=(unit node) dat=data =meta]
+  |=  [where=pith sug=(unit iota) nude=(unit node) dat=data =meta]
   ^-  manx
   =/  has-node  ?=(^ nude)
   =/  has-kids  ?=(^ kids.dat)
@@ -637,7 +665,7 @@
         ?~  sug  ;/  "/"
         ?@  u.sug  ;span.bold: {(trip u.sug)}
         ;span
-          ;span.fs-1.f4
+          ;span.fs-1.o7
             ;-  (print-aura u.sug)
             ;-  ":"
           ==
@@ -650,7 +678,7 @@
         ;span.f-3: •
     ;+
       ?.  has-node  ;/  ""
-      ;span.f4
+      ;span.o7
         ;*
         =/  =node  (need nude)
         ?@  node
@@ -658,7 +686,7 @@
             ;-  (welp "%" (trip node))
           ==
         ;=
-          ;span.fs-2.f3: {(print-aura node)}:
+          ;span.fs-2: {(print-aura node)}:
           ;-  (print-node (need nude))
         ==
       ==
@@ -679,6 +707,10 @@
       ;-  <life.meta>
       ;-  "/"
       ;-  <case.meta>
+    == 
+    ;a.px2.mono
+      =href  (pate (welp stem where))
+      ; >
     ==
   ==
 ::
