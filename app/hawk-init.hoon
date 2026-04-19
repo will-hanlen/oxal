@@ -12,7 +12,6 @@
 /*  feather-1-textarea             %js    /lib/web/feather-1/textarea/js
 /*  feather-1-slide-panels         %js    /lib/web/feather-1/slide-panels/js
 /*  feather-1-datastar             %js    /lib/web/feather-1/datastar/js
-/*  feather-1-datastar-new         %js    /lib/web/feather-1/datastar-new/js
 /*  feather-1-datastar-inspector   %js    /lib/web/feather-1/datastar-inspector/js
 ::
 /*  favicon-egg  %png  /lib/web/assets/egg/png
@@ -25,7 +24,6 @@
   ?+  name  !!
     %datastar            ['text/javascript' feather-1-datastar]
     %datastar            ['text/javascript' feather-1-datastar]
-    %datastar-new        ['text/javascript' feather-1-datastar-new]
     %datastar-inspector  ['text/javascript' feather-1-datastar-inspector]
     %lit                 ['text/javascript' feather-1-lit]
     %da-ta               ['text/javascript' feather-1-da-ta]
