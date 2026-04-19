@@ -1,9 +1,4 @@
 
-the %intall poke should take in only a [source-code sourc-ref].
-the acer engine should set the rest of the values to be default
-according to the correct value that is requied for that part of the tree.
-
-
 mirror remote faucets via grow
 - the acer tracks which mirrors exist.
 - the acer optimizes by only holding the shortest

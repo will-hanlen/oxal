@@ -30,9 +30,20 @@
   ;html
     ;head
       ;title: oxal
+      ;meta(charset "utf-8");
       ;link(rel "stylesheet", href "/hawk-init/feather/1/style");
+      ;script(type "module", src "/hawk-init/feather/1/textarea");
+      ;script(type "module", src "/hawk-init/feather/1/text-editor");
+      ;style
+        ;-  %-  trip
+        '''
+        details[open] > summary {
+          filter: invert(15%);
+        }
+        '''
+      ==
     ==
-    ;body.p5.fc.g9.pb15
+    ;body.p5.fc.g4(style "padding-bottom: 80vh;")
       ;h1: {(pate rest-pith)}
       ;div
         ;+  (render-tree scoped-file rest-pith)
@@ -69,9 +80,9 @@
   =/  has-view  ?=(^ view.meta)
   ;div.fc
     ;+  %^  add-class-if  &(=(0 case.meta) !has-view)  "o2"
-    ;details.br2.bd1.scroll-none
+    ;details.bdb1
       ;+  (render-summary sug nude data.f meta)
-      ;div.bdt1.fc.bbv.o7
+      ;div.bdt1.fc.bbv.o6.pl5
         ;+  (render-section (render-view bare-pax meta))
         ;+  (render-section (render-meta-forms bare-pax meta))
         ;+  (render-section (render-leaf-form bare-pax nude))
@@ -81,7 +92,7 @@
         ;+  (render-section (render-logs logs.meta))
       ==
     ==
-    ;div.pl5.fc.pt3
+    ;div.ml5.bdl1.fc
       ;*
       %+  turn  ~(kid-list fe f)
       |=  [=iota =file]
@@ -100,7 +111,7 @@
     ;summary.fr.g2.ac.p2.b1.hover
       ;*  sum
     ==
-    ;div.p3.pl6.bdt1
+    ;div.p3.pl5.bdt1
       ;*  bod
     ==
   ==
@@ -448,7 +459,6 @@
   =/  sum=marl
     ;=
       ;span.bold: subs
-      ;span.grow;
       ;+  ?:  =(0 n)  ;/  ""
           ;span.fs-2: {<n>}
     ==
@@ -475,27 +485,32 @@
   =/  sum=marl
     ;=
       ;span.bold: logs
-      ;span.grow;
       ;+  ?:  =(0 n)  ;/  ""
           ;span.fs-2: {<n>}
     ==
   =/  bod=marl
+    =;  =marl  ?^  marl  marl
+      ;=
+        ;div.fs-2: none
+      ==
     ;=
-      ;div.p2
+      ;div.fc.g5
         ;*
-        =;  =marl  ?^  marl  marl
-          ;=
-            ;div.fs-2: none
-          ==
         %+  turn  list
         |=  =move
-        ;div.f5
+        ;div
           ;*
           %+  turn   ~(tap in move)
           |=  =chng
-          ;div: {<chng>}
+          ;div
+            ;-
+            ?-  -.chng
+              %ins  "%ins {(pate pith.chng)} {(print-aura node.chng)}"
+              %del  "%del {(pate pith.chng)}"
+            ==
+          ==
         ==
-      ==
+      ==  
     ==
   [sum bod]
 ::
@@ -540,59 +555,56 @@
     ==
   =/  bod=marl
     ;=
-      ;div.p3.fc.g3
-        ;+  ?~  view.meta  ;/  ""  (render-error u.view.meta)
-        ;form.fc.g2(method "post")
-          ;input(type "hidden", name "op", value "install");
-          ;input(type "hidden", name "pax", value (trip pax-t));
-          ;label.fc.g2
-            ;span: code
-            ;textarea.p3.pre.mono.br2.bd1.fs-2
-              =name  "code"
-              =rows  "10"
-              =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
-              =required  ""
-              =spellcheck  "false"
-              ;-  code-t
-            ==
-          ==
-          ;label.fr.g2.ac
-            ;span: dep ship
-            ;input.p-2.br2.bd1.mono.grow
-              =type  "text"
-              =name  "dep-ship"
-              =placeholder  "~zod"
-              =required  ""
-              =spellcheck  "false"
-              =value  dep-ship-t
-              ;*  ~
-            ==
-          ==
-          ;label.fr.g2.ac
-            ;span: dep pith
-            ;input.p-2.br2.bd1.mono.grow
-              =type  "text"
-              =name  "dep-pith"
-              =placeholder  "/some/pith"
-              =required  ""
-              =spellcheck  "false"
-              =value  dep-pith-t
-              ;*  ~
-            ==
-          ==
-          ;div.fr.g2
-            ;button.p-2.br2.bd1.b2.hover
-              ;-  btn-label
-            ==
+      ;+  ?~  view.meta  ;/  ""  (render-error u.view.meta)
+      ;form.fc.g2(method "post")
+        ;input(type "hidden", name "op", value "install");
+        ;input(type "hidden", name "pax", value (trip pax-t));
+        ;label.fc.g2
+          ;span: code
+          ;feather-text-editor.p3.mono.br2.bd1.fs-1
+            =name  "code"
+            =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+            =required  ""
+            =auto-indent  ""
+            ;-  code-t
           ==
         ==
-        ;+  ?.  has-view  ;/  ""
-            ;form.fr.g2(method "post")
-              ;input(type "hidden", name "op", value "uninstall");
-              ;input(type "hidden", name "pax", value (trip pax-t));
-              ;button.p-2.br2.bd1.b2.hover: uninstall view
-            ==
+        ;label.fr.g2.ac
+          ;span: dep ship
+          ;input.p-2.br2.bd1.mono.grow
+            =type  "text"
+            =name  "dep-ship"
+            =placeholder  "~zod"
+            =required  ""
+            =spellcheck  "false"
+            =value  dep-ship-t
+            ;*  ~
+          ==
+        ==
+        ;label.fr.g2.ac
+          ;span: dep pith
+          ;input.p-2.br2.bd1.mono.grow
+            =type  "text"
+            =name  "dep-pith"
+            =placeholder  "/some/pith"
+            =required  ""
+            =spellcheck  "false"
+            =value  dep-pith-t
+            ;*  ~
+          ==
+        ==
+        ;div.fr.g2
+          ;button.p-2.br2.bd1.b2.hover
+            ;-  btn-label
+          ==
+        ==
       ==
+      ;+  ?.  has-view  ;/  ""
+          ;form.fr.g2(method "post")
+            ;input(type "hidden", name "op", value "uninstall");
+            ;input(type "hidden", name "pax", value (trip pax-t));
+            ;button.p-2.br2.bd1.b2.hover: uninstall view
+          ==
     ==
   [sum bod]
 ::
@@ -612,7 +624,7 @@
   =/  has-node  ?=(^ nude)
   =/  has-kids  ?=(^ kids.dat)
   =/  has-view  ?=(^ view.meta)
-  ;summary.p3.b2.fr.g3.hover
+  ;summary.p3.b1.fr.g3.hover
     ;+  %+  add-class
         ?.  has-view
           ?.  |(has-kids has-node)  "o5"
@@ -620,15 +632,25 @@
         =/  source  (need view.meta)
         ?^  err.source  "f-1"
         "f-3"
-    ;span.bold
-      ;-
-        ?~  sug  "/"
-        %+  welp  "/"
-        (print-node u.sug)
+    ;span
+      ;+
+        ?~  sug  ;/  "/"
+        ?@  u.sug  ;span.bold: {(trip u.sug)}
+        ;span
+          ;span.fs-1.f4
+            ;-  (print-aura u.sug)
+            ;-  ":"
+          ==
+          ;span.bold
+            ;-  (print-node u.sug)
+          ==
+        ==
     ==
+    ;+  ?~  subs.meta  ;/  ""
+        ;span.f-3: •
     ;+
       ?.  has-node  ;/  ""
-      ;span
+      ;span.f4
         ;*
         =/  =node  (need nude)
         ?@  node
@@ -653,17 +675,10 @@
           ;-  "eyre="
           ;-  (print-auth u.eyre.meta)
         ==
-    ;span.o6
-      ;-  "L"
+    ;span.o6.mono
       ;-  <life.meta>
-    ==
-    ;span.o6
-      ;-  "C"
+      ;-  "/"
       ;-  <case.meta>
-    ==
-    ;span.o6
-      ;-  "#S"
-      ;-  <~(wyt in subs.meta)>
     ==
   ==
 ::
