@@ -689,7 +689,6 @@
   ++  run
     ::
     ::  transform & filter kids, in place
-    ::xx bookkeep cases
     ::
     |=  g=$-([iota xal] (unit xal))
     ^+  fat
@@ -719,6 +718,27 @@
     ?~  try  marl
     [u.try marl]
   ::
+  ++  tur
+    ::
+    |*  g=gate
+    ::
+    =/  a  tap
+    |-
+    ?~  a  ~
+    [i=(g -.a) t=$(a +.a)]
+    ::
+  ::
+  ++  mur
+    ::
+    |*  g=gate
+    ::
+    =/  a  tap
+    |-
+    ?~  a  ~
+    =/  x  (g -.a)
+    ?~  x  $(a +.a)
+    [i=+.x t=$(a +.a)]
+    ::
   --
 ::
 ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
@@ -817,7 +837,7 @@
     =;  =coin  (coin-to-node coin)
     %+  fall
       (rush i nuck:so)
-    ?:  =('.__' i)  [%many ~]  :: XX upstream
+    ?:  =('.__' i)  [%many ~]
     ?:  =('' i)     [%$ %tas %$]
     [%$ %t (@t i)]
   i
@@ -1172,6 +1192,8 @@
   ++  rom  rom:ox
   ++  mol  mol:ox
   ++  mox  mox:ox
+  ++  tur  tur:ox
+  ++  mur  mur:ox
   ::
   ++  peb
     ::
@@ -1229,6 +1251,7 @@
     ::
     |*  [sam=node pax=pith]
     (make-gut (get:ox pax) ?@(sam %tas -.sam) sam)
+    ::
   --
   ::
 ::

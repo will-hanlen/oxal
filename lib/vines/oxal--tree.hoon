@@ -34,20 +34,6 @@
     ==
     ;body.p5.fc.g9.pb15
       ;h1: {(pate rest-pith)}
-      ;details
-        ;summary: transformers
-        ;div
-          ;*
-          %+  turn  ~(tap in ~(key by xfms.acer))
-          |=  =cord
-          ;div
-            ;-  (trip cord)
-          ==
-        ==
-      ==
-      ;+  render-top-insert-form
-      ;+  render-top-install-form
-      ;+  render-top-form
       ;div
         ;+  (render-tree scoped-file rest-pith)
       ==
@@ -64,189 +50,6 @@
 (pure:m !>(~))
 ::
 |%
-++  render-top-insert-form
-  ::
-  ::  top-of-page form for inserting a single node into the data tree
-  ::  at an arbitrary pith.  pax is user-facing (bare).
-  ::
-  ^-  manx
-  ;details
-    ;summary: insert node
-    ;div.fc.g3.p2
-      ;form.fc.g2(method "post")
-        ;input(type "hidden", name "op", value "put-leaf");
-        ;label.fr.g2.ac
-          ;span: pith
-          ;input.p-2.br2.bd1.mono.grow
-            =type  "text"
-            =name  "pax"
-            =placeholder  "/some/pith"
-            =required  ""
-            =spellcheck  "false"
-            =value  "/"
-            ;*  ~
-          ==
-        ==
-        ;label.fc.g2
-          ;span: node
-          ;textarea.p3.pre.mono.br2.bd1.fs-2
-            =name  "node"
-            =rows  "6"
-            =placeholder  "hoon for a node, e.g.  ud+12"
-            =required  ""
-            ;*  ~
-          ==
-        ==
-        ;div.fr.g2
-          ;button.p-2.br2.bd1.b2.hover: insert
-        ==
-      ==
-    ==
-  ==
-::
-++  render-top-install-form
-  ::
-  ::  top-of-page form for %install: fields match the poke shape
-  ::  [pax=pith code=source-code dep=source-ref].  code is the @t
-  ::  variant (raw hoon source); dep is split into ship and pith.
-  ::
-  ^-  manx
-  ;details
-    ;summary: install view
-    ;div.fc.g3.p2
-      ;form.fc.g2(method "post")
-        ;input(type "hidden", name "op", value "install");
-        ;label.fr.g2.ac
-          ;span: pax
-          ;input.p-2.br2.bd1.mono.grow
-            =type  "text"
-            =name  "pax"
-            =placeholder  "/my-app"
-            =required  ""
-            =spellcheck  "false"
-            =value  "/"
-            ;*  ~
-          ==
-        ==
-        ;label.fc.g2
-          ;span: code
-          ;textarea.p3.pre.mono.br2.bd1.fs-2
-            =name  "code"
-            =rows  "10"
-            =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
-            =required  ""
-            =spellcheck  "false"
-            ;*  ~
-          ==
-        ==
-        ;label.fr.g2.ac
-          ;span: dep ship
-          ;input.p-2.br2.bd1.mono.grow
-            =type  "text"
-            =name  "dep-ship"
-            =placeholder  "~zod"
-            =required  ""
-            =spellcheck  "false"
-            ;*  ~
-          ==
-        ==
-        ;label.fr.g2.ac
-          ;span: dep pith
-          ;input.p-2.br2.bd1.mono.grow
-            =type  "text"
-            =name  "dep-pith"
-            =placeholder  "/some/pith"
-            =required  ""
-            =spellcheck  "false"
-            =value  "/"
-            ;*  ~
-          ==
-        ==
-        ;div.fr.g2
-          ;button.p-2.br2.bd1.b2.hover: install
-        ==
-      ==
-    ==
-  ==
-::
-++  render-top-form
-  ::
-  ::  top-of-page form: accepts raw hoon for a cage, used for install and
-  ::  arbitrary %do-move pokes at any pith.  preset buttons fill templates.
-  ::
-  ^-  manx
-  ;details
-    ;summary: poke
-    ;div.fc.g3.p2
-      ;form.br3.bd1.mono.relative(method "post")
-        ;input(type "hidden", name "op", value "raw");
-        ;textarea.pre.p3.fs-1.pb5.wf.focus.br3
-          =id  "command"
-          =name  "command"
-          =spellcheck  "false"
-          =rows  "10"
-          =placeholder  "cage to poke %oxal, e.g.  :- %install !> ..."
-          =required  ""
-          ;*  ~
-        ==
-        ;div.absolute
-          =style  "bottom: 12px; right: 12px;"
-          ;button.p3.b2.hover.tc.fs1.br3.bd2.wfc.focus
-            ; send
-          ==
-        ==
-      ==
-      ;div.frw.g2
-        ;*
-        %+  turn
-          ^-  (list (pair @t @t))
-          :~  :-  'install'
-              '''
-              :-  %install  !>
-              :+  /my-app
-              \0'''
-              |=  [snap=data did=move life=@ud case=@ud]
-              ^-  move
-              ?.  =(~ did)  did
-              %-  silt
-              %+  turn  ~(tap do snap)
-              |=  [pax=pith nod=node]
-              ^-  chng
-              [%ins pax nod]
-              \0'''
-              [~walrus-migrev-dolseg /bing/bong]
-              '''
-            ::
-              :-  'do-move ins'
-              '''
-              :-  %do-move  !>
-              %-  sy
-              :~
-                :+  %ins  /some/pith  ud+12
-              ==
-              '''
-            ::
-              :-  'do-move del'
-              '''
-              :-  %do-move  !>
-              %-  sy
-              :~
-                :-  %del  /some/pith
-              ==
-              '''
-            ::
-              :-  'clear'  ''
-          ==
-        |=  [label=@t code=@t]
-        ;button.br2.bd1.p-2.b2.hover.focus
-          =type  "button"
-          =onclick  "document.getElementById('command').value = `{(trip code)}`"
-          ;-  (trip label)
-        ==
-      ==
-    ==
-  ==
-::
 ++  render-tree
   ::
   ::  recursive tree render; .rest-pith is the scope (bare, user-facing),
@@ -268,16 +71,17 @@
     ;+  %^  add-class-if  &(=(0 case.meta) !has-view)  "o2"
     ;details.br2.bd1.scroll-none
       ;+  (render-summary sug nude data.f meta)
-      ;div.p2.bdt1.fc.g3
-        ;+  (render-view bare-pax meta)
-        ;+  (render-bound meta)
-        ;+  (render-meta-forms bare-pax meta)
-        ;+  (render-leaf-form bare-pax nude)
-        ;+  (render-subs subs.meta)
-        ;+  (render-logs logs.meta)
+      ;div.bdt1.fc.bbv.o7
+        ;+  (render-section (render-view bare-pax meta))
+        ;+  (render-section (render-meta-forms bare-pax meta))
+        ;+  (render-section (render-leaf-form bare-pax nude))
+        ;+  (render-section (render-create-node-form bare-pax))
+        ;+  (render-section (render-create-view-form bare-pax))
+        ;+  (render-section (render-subs subs.meta))
+        ;+  (render-section (render-logs logs.meta))
       ==
     ==
-    ;div.pl4.fc.pt2
+    ;div.pl5.fc.pt3
       ;*
       %+  turn  ~(kid-list fe f)
       |=  [=iota =file]
@@ -285,16 +89,43 @@
     ==
   ==
 ::
+++  render-section
+  ::
+  ::  wrap a section's [summary-contents body-contents] pair in the
+  ::  standard <details>/<summary> frame.
+  ::
+  |=  [sum=marl bod=marl]
+  ^-  manx
+  ;details
+    ;summary.fr.g2.ac.p2.b1.hover
+      ;*  sum
+    ==
+    ;div.p3.pl6.bdt1
+      ;*  bod
+    ==
+  ==
+::
 ++  render-meta-forms
   ::
-  ::  per-node controls over meta: grow, eyre, gall, bump, uninstall.
+  ::  per-node controls over meta: grow, eyre, gall, bump.
+  ::  install / uninstall of the view live in render-view.
   ::
   |=  [pax=pith =meta]
-  ^-  manx
+  ^-  [marl marl]
   =/  pax-t=@t  (crip (pate pax))
-  ;details
-    ;summary: meta
-    ;div.p2.fc.g3
+  =/  sum=marl
+    ;=
+      ;span.bold: meta
+      ;span.grow;
+      ;+  ?.  grow.meta  ;/  ""
+          ;span.fs-2: grow
+      ;+  ?~  eyre.meta  ;/  ""
+          ;span.fs-2: eyre={(trip kind.u.eyre.meta)}
+      ;+  ?~  gall.meta  ;/  ""
+          ;span.fs-2: gall={(trip kind.u.gall.meta)}
+    ==
+  =/  bod=marl
+    ;=
       ::  grow
       ::
       ;form.fr.g2.ac(method "post")
@@ -333,16 +164,8 @@
         ;input(type "hidden", name "pax", value (trip pax-t));
         ;button.p-2.br2.bd1.b2.hover: bump life
       ==
-      ::  uninstall (only when a view is installed)
-      ::
-      ;+  ?~  view.meta  ;/  ""
-          ;form.fr.g2.ac(method "post")
-            ;input(type "hidden", name "op", value "uninstall");
-            ;input(type "hidden", name "pax", value (trip pax-t));
-            ;button.p-2.br2.bd1.b2.hover: uninstall view
-          ==
     ==
-  ==
+  [sum bod]
 ::
 ++  auth-select
   ::
@@ -377,14 +200,26 @@
   ::  print-strict.  submit sets the leaf by ins; clear sends a del.
   ::
   |=  [pax=pith nude=(unit node)]
-  ^-  manx
+  ^-  [marl marl]
   =/  pax-t=@t  (crip (pate pax))
   =/  strict-t=tape
     ?~  nude  ""
     (fall (print-strict u.nude) "")
-  ;details
-    ;summary: data
-    ;div.p2.fc.g3
+  =/  summary-t=tape
+    ?:  (gth (lent strict-t) 60)
+      (weld (scag 60 strict-t) "...")
+    strict-t
+  =/  sum=marl
+    ;=
+      ;span.bold: data
+      ;span.grow;
+      ;+  ?~  nude  ;/  ""
+          ;span.fs-2.mono
+            ;-  summary-t
+          ==
+    ==
+  =/  bod=marl
+    ;=
       ;form.fc.g2(method "post")
         ;input(type "hidden", name "op", value "put-leaf");
         ;input(type "hidden", name "pax", value (trip pax-t));
@@ -405,7 +240,133 @@
             ;button.p-2.br2.bd1.b2.hover: clear leaf
           ==
     ==
-  ==
+  [sum bod]
+::
+++  render-create-node-form
+  ::
+  ::  per-node form for inserting a leaf somewhere in this subtree.
+  ::  pax is the current node's bare pith; the pith input is
+  ::  prefilled to pax+"/" so the user fills the remainder.
+  ::
+  |=  pax=pith
+  ^-  [marl marl]
+  =/  prefill=tape
+    ?~  pax  "/"
+    (weld (pate pax) "/")
+  =/  sum=marl
+    ;=
+      ;span.bold: create node below
+      ;span.grow;
+    ==
+  =/  bod=marl
+    ;=
+      ;div.fc.g3.p2
+        ;form.fc.g2(method "post")
+          ;input(type "hidden", name "op", value "put-leaf");
+          ;label.fr.g2.ac
+            ;span: pith
+            ;input.p-2.br2.bd1.mono.grow
+              =type  "text"
+              =name  "pax"
+              =placeholder  "/some/pith"
+              =required  ""
+              =spellcheck  "false"
+              =value  prefill
+              ;*  ~
+            ==
+          ==
+          ;label.fc.g2
+            ;span: node
+            ;textarea.p3.pre.mono.br2.bd1.fs-2
+              =name  "node"
+              =rows  "6"
+              =placeholder  "hoon for a node, e.g.  ud+12"
+              =required  ""
+              ;*  ~
+            ==
+          ==
+          ;div.fr.g2
+            ;button.p-2.br2.bd1.b2.hover: insert
+          ==
+        ==
+      ==
+    ==
+  [sum bod]
+::
+++  render-create-view-form
+  ::
+  ::  per-node form for installing a view somewhere in this subtree.
+  ::  pax is the current node's bare pith; the pax input is prefilled
+  ::  to pax+"/" so the user fills the remainder.
+  ::
+  |=  pax=pith
+  ^-  [marl marl]
+  =/  prefill=tape
+    ?~  pax  "/"
+    (weld (pate pax) "/")
+  =/  sum=marl
+    ;=
+      ;span.bold: create view below
+      ;span.grow;
+    ==
+  =/  bod=marl
+    ;=
+      ;div.fc.g3.p2
+        ;form.fc.g2(method "post")
+          ;input(type "hidden", name "op", value "install");
+          ;label.fr.g2.ac
+            ;span: pax
+            ;input.p-2.br2.bd1.mono.grow
+              =type  "text"
+              =name  "pax"
+              =placeholder  "/my-app"
+              =required  ""
+              =spellcheck  "false"
+              =value  prefill
+              ;*  ~
+            ==
+          ==
+          ;label.fc.g2
+            ;span: code
+            ;textarea.p3.pre.mono.br2.bd1.fs-2
+              =name  "code"
+              =rows  "10"
+              =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+              =required  ""
+              =spellcheck  "false"
+              ;*  ~
+            ==
+          ==
+          ;label.fr.g2.ac
+            ;span: dep ship
+            ;input.p-2.br2.bd1.mono.grow
+              =type  "text"
+              =name  "dep-ship"
+              =placeholder  "~zod"
+              =required  ""
+              =spellcheck  "false"
+              ;*  ~
+            ==
+          ==
+          ;label.fr.g2.ac
+            ;span: dep pith
+            ;input.p-2.br2.bd1.mono.grow
+              =type  "text"
+              =name  "dep-pith"
+              =placeholder  "/some/pith"
+              =required  ""
+              =spellcheck  "false"
+              =value  "/"
+              ;*  ~
+            ==
+          ==
+          ;div.fr.g2
+            ;button.p-2.br2.bd1.b2.hover: install
+          ==
+        ==
+      ==
+    ==
+  [sum bod]
 ::
 ++  body-to-cage
   ::
@@ -414,18 +375,6 @@
   |=  [body=(map @t @t) now=@da]
   ^-  cage
   =/  op=@t  (fall (~(get by body) 'op') 'noop')
-  ?:  =(op 'raw')
-    =/  command=@t
-      (fix-newlines (cat 3 (~(got by body) 'command') '\0a\0a'))
-    =;  =(each cage tang)
-      ?:  ?=(%.y -.each)  p.each
-      %-  (slog p.each)
-      =/  =move  (sy ~[[%ins /error da+now]])
-      [%do-move !>(move)]
-    %-  mule  |.
-    !<  cage
-    %+  slap  !>(.)
-    (ream command)
   ?:  =(op 'set-grow')
     =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
     =/  val=?  =('true' (~(got by body) 'val'))
@@ -494,90 +443,159 @@
 ++  render-subs
   ::
   |=  =(set pith)
-  ^-  manx
-  ;div
-    ;strong: subs
-    ;div
-      ;*
-      =;  =marl  ?^  marl  marl
-        ;=
-          ;div: none
-        ==
-      %+  turn  ~(tap in set)
-      |=  =pith
-      ;div: {(pate pith)}
+  ^-  [marl marl]
+  =/  n  ~(wyt in set)
+  =/  sum=marl
+    ;=
+      ;span.bold: subs
+      ;span.grow;
+      ;+  ?:  =(0 n)  ;/  ""
+          ;span.fs-2: {<n>}
     ==
-  ==
+  =/  bod=marl
+    ;=
+      ;div.p2.fc.g2
+        ;*
+        =;  =marl  ?^  marl  marl
+          ;=
+            ;div.fs-2: none
+          ==
+        %+  turn  ~(tap in set)
+        |=  =pith
+        ;div.mono.f5: {(pate pith)}
+      ==
+    ==
+  [sum bod]
+::
 ++  render-logs
   ::
   |=  =(list move)
-  ;details
-    ;summary: logs
-    ;div
-      ;*
-      =;  =marl  ?^  marl  marl
-        ;=
-          ;div: none
-        ==
-      %+  turn  list
-      |=  =move
-      ;div.f5
+  ^-  [marl marl]
+  =/  n  (lent list)
+  =/  sum=marl
+    ;=
+      ;span.bold: logs
+      ;span.grow;
+      ;+  ?:  =(0 n)  ;/  ""
+          ;span.fs-2: {<n>}
+    ==
+  =/  bod=marl
+    ;=
+      ;div.p2
         ;*
-        %+  turn   ~(tap in move)
-        |=  =chng
-        ;div: {<chng>}
+        =;  =marl  ?^  marl  marl
+          ;=
+            ;div.fs-2: none
+          ==
+        %+  turn  list
+        |=  =move
+        ;div.f5
+          ;*
+          %+  turn   ~(tap in move)
+          |=  =chng
+          ;div: {<chng>}
+        ==
       ==
     ==
-  ==
-++  render-bound
-  ::
-  |=  =meta
-  ^-  manx
-  ;div.frw.g2.f5
-    ;strong.f0: bound
-    ;div: grow {<grow.meta>}
-    ;div: eyre {<eyre.meta>}
-    ;div: gall {<gall.meta>}
-  ==
+  [sum bod]
+::
 ++  render-view
   ::
+  ::  per-node view controls: install / edit (re-install) / uninstall.
+  ::  when a view exists, fields are prefilled from its source; a
+  ::  linked (%link) view prefills empty since the textarea expects
+  ::  raw hoon.
+  ::
   |=  [pax=pith =meta]
-  ^-  manx
-  ;details
-    ;summary
-      ; view
+  ^-  [marl marl]
+  =/  pax-t=@t    (crip (pate pax))
+  =/  has-view    ?=(^ view.meta)
+  =/  code-t=tape
+    ?~  view.meta  ""
+    ?@  code.u.view.meta
+      (trip code.u.view.meta)
+    ""
+  =/  dep-ship-t=tape
+    ?~  view.meta  ""
+    (scow %p ship.dep.u.view.meta)
+  =/  dep-pith-t=tape
+    ?~  view.meta  "/"
+    (pate pith.dep.u.view.meta)
+  =/  btn-label=tape  ?:(has-view "save view" "install view")
+  =/  sum=marl
+    ;=
+      ;span.bold: view
+      ;span.grow;
       ;+  ?~  view.meta  ;/  ""
-          ;span
-            ;span.bold.px2
+          ;span.fr.g2.ac.fs-2
+            ;span.mono
               ;-  (scow %p ship.dep.u.view.meta)
             ==
-            ;span.bold.px2
+            ;span.mono
               ;-  (pate pith.dep.u.view.meta)
             ==
-            ;span.f4.p2
-              ;-  <lyf.u.view.meta>
-            ==
-            ;span.px2
-              ;-  <cas.u.view.meta>
-            ==
+            ;span: L{<lyf.u.view.meta>}
+            ;span: C{<cas.u.view.meta>}
           ==
     ==
-    ;div.p3.fc.g3
-      ;+  ?~  view.meta  ;/  ""  (render-error u.view.meta)
-      ;div.fc.g2
-        ;textarea.p3.pre.mono.br2.bd1.fs-2
-          =rows  "8"
-          =readonly  ""
-          =placeholder  ?^(view.meta "there was a view here" "no view yere")
-          ;-  ?~  view.meta  ""
-              ?@  code.u.view.meta
-                (trip code.u.view.meta)
-              %+  weld  "> "
-              (pate (ref-to-pith source-ref.code.u.view.meta))
+  =/  bod=marl
+    ;=
+      ;div.p3.fc.g3
+        ;+  ?~  view.meta  ;/  ""  (render-error u.view.meta)
+        ;form.fc.g2(method "post")
+          ;input(type "hidden", name "op", value "install");
+          ;input(type "hidden", name "pax", value (trip pax-t));
+          ;label.fc.g2
+            ;span: code
+            ;textarea.p3.pre.mono.br2.bd1.fs-2
+              =name  "code"
+              =rows  "10"
+              =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+              =required  ""
+              =spellcheck  "false"
+              ;-  code-t
+            ==
+          ==
+          ;label.fr.g2.ac
+            ;span: dep ship
+            ;input.p-2.br2.bd1.mono.grow
+              =type  "text"
+              =name  "dep-ship"
+              =placeholder  "~zod"
+              =required  ""
+              =spellcheck  "false"
+              =value  dep-ship-t
+              ;*  ~
+            ==
+          ==
+          ;label.fr.g2.ac
+            ;span: dep pith
+            ;input.p-2.br2.bd1.mono.grow
+              =type  "text"
+              =name  "dep-pith"
+              =placeholder  "/some/pith"
+              =required  ""
+              =spellcheck  "false"
+              =value  dep-pith-t
+              ;*  ~
+            ==
+          ==
+          ;div.fr.g2
+            ;button.p-2.br2.bd1.b2.hover
+              ;-  btn-label
+            ==
+          ==
         ==
+        ;+  ?.  has-view  ;/  ""
+            ;form.fr.g2(method "post")
+              ;input(type "hidden", name "op", value "uninstall");
+              ;input(type "hidden", name "pax", value (trip pax-t));
+              ;button.p-2.br2.bd1.b2.hover: uninstall view
+            ==
       ==
     ==
-  ==
+  [sum bod]
+::
 ++  render-error
   ::
   |=  =source
@@ -586,6 +604,7 @@
     ;+  ?~  err.source  ;/  ""
         (render-tang err.source)
   ==
+::
 ++  render-summary
   ::
   |=  [sug=(unit iota) nude=(unit node) dat=data =meta]
@@ -593,7 +612,7 @@
   =/  has-node  ?=(^ nude)
   =/  has-kids  ?=(^ kids.dat)
   =/  has-view  ?=(^ view.meta)
-  ;summary.p2.b2.fr.g3
+  ;summary.p3.b2.fr.g3.hover
     ;+  %+  add-class
         ?.  has-view
           ?.  |(has-kids has-node)  "o5"
@@ -647,7 +666,9 @@
       ;-  <~(wyt in subs.meta)>
     ==
   ==
+::
 ++  print-auth
+  ::
   |=  =auth
   ^-  tape
   ;:  welp
