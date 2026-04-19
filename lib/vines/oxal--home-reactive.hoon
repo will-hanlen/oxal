@@ -63,7 +63,7 @@
   %-  ~(ingress-install ae [local our.bowl | |])
   =-  [/rendered - [our.bowl /home]]
   '''
-  |=  [snap=data =move *]
+  |=  [mine=data snap=data =move *]
   ^+  move
   %-  silt
   :~  :+  %ins  /

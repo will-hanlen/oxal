@@ -14,23 +14,26 @@
       |=  [body=(map @t @t) now=@da]
       ^-  cage
       =/  op=@t  (fall (~(get by body) 'op') 'noop')
+      =/  pax=pith
+        =/  =cord  (~(got by body) 'pax')
+        =/  try=(unit pith)
+          %-  mole  |.
+          (cord-to-pith cord)
+        ?^  try  u.try
+        !<  pith
+        (slap !>(..onan) (ream cord))
       ?:  =(op 'set-grow')
-        =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
         =/  val=?  =('true' (~(got by body) 'val'))
         [%set-grow !>([pax val])]
       ?:  =(op 'set-eyre')
-        =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
         =/  val=(unit auth)  (parse-auth (~(got by body) 'kind'))
         [%set-eyre !>([pax val])]
       ?:  =(op 'set-gall')
-        =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
         =/  val=(unit auth)  (parse-auth (~(got by body) 'kind'))
         [%set-gall !>([pax val])]
       ?:  =(op 'bump')
-        =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
         [%bump !>(pax)]
       ?:  =(op 'install')
-        =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
         =/  code=source-code
           =/  raw  (fix-newlines (~(got by body) 'code'))
           =/  try=(unit source-code)
@@ -44,14 +47,11 @@
           (cord-to-pith (~(got by body) 'dep-pith'))
         [%install !>([pax code dep])]
       ?:  =(op 'uninstall')
-        =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
         [%uninstall !>(pax)]
       ?:  =(op 'del-leaf')
-        =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
         =/  =move  (sy ~[[%del pax]])
         [%do-move !>(move)]
       ?:  =(op 'put-leaf')
-        =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
         =/  src=@t  (fix-newlines (~(got by body) 'node'))
         =/  trimmed=@t  ?:(=(src '') '~' src)
         =/  parsed=(each node tang)
@@ -132,6 +132,7 @@
 ++  scoped-file  ^-  file  (~(dip fe file.ax) scope-pax)
 ::
 ++  init-beneath
+  ::
   ^-  ?
   =/  c=code  code.file.ax
   ?=(^ (~(abo ox c) scope-pax |=(m=_c &(?=(^ leaf.m) ?=(^ view.u.leaf.m)))))
@@ -198,6 +199,7 @@
   =/  nude  leaf.data.f
   =/  has-node  ?=(^ nude)
   =/  has-view  ?=(^ view.meta)
+  =/  has-view-below  ?=(^ (~(views-below fe f) /))
   =/  has-kids  ?=(^ kids.data.f)
   =/  at-or-below  |(beneath has-view)
   =/  nid  (uid bare-pax)
@@ -206,10 +208,10 @@
     ^-  (list (list [tape marl marl]))
     :~
       :::
-      ~[(render-node-form at-or-below bare-pax nude)]
-      ::
       ?:  &(beneath !has-view)  ~
       ~[(render-view bare-pax meta)]
+      ::
+      ~[(render-node-form at-or-below bare-pax nude)]
       ::
       ~[(render-meta-forms bare-pax meta)]
       ::
@@ -226,38 +228,47 @@
   ;div.fc
     =id  "tree{nid}"
     ;+  %^  add-class-if  beneath  "f-3"
-    ;div.bdb1
+    ;div
       =id  "treeleaf{nid}"
       =data-signals  "\{'_details{nid}': false}"
       ;+
         %+  add-attribute  ['data-on:click' "$_details{nid} = !$_details{nid}"]
         %+  add-attribute  ['data-class:active' "$_details{nid}"]
-        (render-summary rel sug nude data.f meta)
+        (render-summary rel sug nude data.f code.f)
       ;+
-        %^  add-class-if  !|(has-kids has-node has-view)  "hidden"
+        %^  add-class-if  !|(has-kids has-node has-view has-view-below)  "hidden"
       ;div.bdt1.fc.b2.ml4.bdl1.bdr1
+        =style  hid
         =data-show  "$_details{nid}"
         =data-signals  "\{'_sec{nid}': '{-:(head sections)}'}"
-        ;div.fr.bbh
+        ;div.fr.bbh.bdb1
           ;*
           %+  turn  sections
           |=  [=tape *]
-          ;button.p-2.b2.hover.ok
+          ;button.p-2.b2.hover
             =data-on_click  "$_sec{nid} = '{tape}'"
             =data-class_toggled  "$_sec{nid} == '{tape}'"
             ;-  tape
           ==
+          ;div.grow;
+          ;+  ?~  eyre.meta  ;/  ""
+              ;a.p-2.b2.hover.f-4
+                =href  (pate :(welp #/['-'] rest.bowl rel))
+                =target  "_blank"
+                ; open
+              ==
         ==
         ;*
         %+  turn  sections
         |=  [=tape marl contents=marl]
-        ;div.bdt1.p3
+        ;div.p3.fc.g3
+          =style  "hid"
           =data-show  "$_sec{nid} == '{tape}'"
           ;*  contents
         ==
       ==
     ==
-    ;div.ml5.fc
+    ;div.ml2.pl3.fc.bdl1
       =id  "treekids{nid}"
       ;*
       %+  turn  ~(kid-list fe f)
@@ -304,6 +315,7 @@
     ==
   =/  bod=marl
     ;=
+      ;span: {(pate pax)}
       ::  open via eyre
       ::
       ;+  ?~  eyre.meta  ;/  ""
@@ -394,24 +406,25 @@
   =/  strict-t=tape
     ?~  nude  ""
     (fall (print-strict u.nude) "")
-  =/  summary-t=tape
-    ?:  (gth (lent strict-t) 60)
-      (weld (scag 60 strict-t) "...")
-    strict-t
   =/  sum=marl
     ;=
       ;span.bold: data
-      ;span.grow;
-      ;+  ?~  nude  ;/  ""
-          ;span.fs-2.mono
-            ;-  summary-t
-          ==
     ==
   =/  bod=marl
     ?:  locked
       ;=
         ;div.mono.fs-1.pre
-          ;-  strict-t
+          ;div.fs-2.o5: data locked because within $view
+          ;+
+          ?~  nude     ;span: none
+          ?+  u.nude   ;span: no rendering
+            aota       ;div: {(print-node u.nude)}
+            [%pith *]  ;div: {(pate u.nude)}
+            [%tang *]
+              ;div.pre.mono
+                ;-  (print-tang tang.u.nude)
+              ==
+          ==
         ==
       ==
     ;=
@@ -421,15 +434,17 @@
           =data-indicator  "_loadnode{nid}"
           ;input(type "hidden", name "op", value "put-leaf");
           ;input(type "hidden", name "pax", value (trip pax-t));
-          ;feather-textarea.mono.fs-1
+          ;feather-textarea.mono.fs-1.focus.p2
             =name  "node"
+            =required  ""
             =rows  "6"
             =placeholder  "hoon for a node, e.g.  ud+12"
+            =spellcheck  "false"
             ;-  strict-t
           ==
         ==
         ;div.absolute.right0.bottom0.pr4.pb4.z1.fr.g3
-          ;button.p-2.br2.bd1.b3.hover
+          ;button.p-2.br2.bd1.b3.hover.focus
             =data-class_pulse  "$_loadnode{nid}"
             =type  "submit"
             =form  "nodeform{nid}"
@@ -439,7 +454,7 @@
               ;form.fr(data-on_submit post)
                 ;input(type "hidden", name "op", value "del-leaf");
                 ;input(type "hidden", name "pax", value (trip pax-t));
-                ;button.p-2.br2.bd1.b3.hover: clear leaf
+                ;button.p-2.br2.bd1.b3.hover.focus: clear leaf
               ==
         ==
       ==
@@ -487,6 +502,7 @@
               =rows  "6"
               =placeholder  "hoon for a node, e.g.  ud+12"
               =required  ""
+              =spellcheck  "false"
               ;*  ~
             ==
           ==
@@ -537,10 +553,11 @@
             ;feather-textarea.p3.mono.br2.bd1.fs-2
               =name  "code"
               =rows  "10"
-              =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+              =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
               =required  ""
               =spellcheck  "false"
-              ;*  ~
+              =value  "[%link {(scow %p our.bowl)} /path-to-code]"
+              ;-  "[%link {(scow %p our.bowl)} /path-to-code]"
             ==
           ==
           ;label.fr.g2.ac
@@ -549,6 +566,7 @@
               =type  "text"
               =name  "dep-ship"
               =placeholder  "~zod"
+              =value  (scow %p our.bowl)
               =required  ""
               =spellcheck  "false"
               ;*  ~
@@ -562,7 +580,7 @@
               =placeholder  "/some/pith"
               =required  ""
               =spellcheck  "false"
-              =value  "/"
+              =value  (pate rest.bowl)
               ;*  ~
             ==
           ==
@@ -616,12 +634,13 @@
     ;=
       ;div.fc.bbv
         ;*
+        %-  flop
         =<  p
         %^  spin  list  0
         |=  [=move a=@]
         :_  +(a)
-        ;div.fr.g4.as
-          ;div.f5: {<a>}
+        ;div.fr.g4.as.p1
+          ;div.f5.w7: {<a>}
           ;div
             ;*
             %+  turn   ~(tap in move)
@@ -629,7 +648,7 @@
             ;div
               ;-
               ?-  -.chng
-                %ins  "%ins {(pate pith.chng)}  - {(print-aura node.chng)}"
+                %ins  "%ins {(pate pith.chng)}  - {"%"}{(print-aura node.chng)}"
                 %del  "%del {(pate pith.chng)}"
               ==
             ==
@@ -686,42 +705,42 @@
         =data-on_submit  post
         ;input(type "hidden", name "op", value "install");
         ;input(type "hidden", name "pax", value (trip pax-t));
-        ;label.fc.g2
-          ;span: code
-          ;feather-textarea.p3.mono.br2.bd1.fs-1
-            =name  "code"
-            =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
-            =required  ""
-            =auto-indent  ""
-            ;-  code-t
-          ==
+        ;feather-textarea.p3.mono.br2.bd1.fs-1
+          =name  "code"
+          =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+          =required  ""
+          =auto-indent  ""
+          =spellcheck  "false"
+          ;-  code-t
         ==
-        ;label.fr.g2.ac
-          ;span: dep ship
-          ;input.p-2.br2.bd1.mono.grow
-            =type  "text"
-            =name  "dep-ship"
-            =placeholder  "~zod"
-            =required  ""
-            =spellcheck  "false"
-            =value  dep-ship-t
-            ;*  ~
+        ;div.fr
+          ;label.fc.grow
+            ;span.p1.fs-2.f5: dep ship
+            ;input.p-2.br2.bd1.mono.grow
+              =type  "text"
+              =name  "dep-ship"
+              =placeholder  "~zod"
+              =required  ""
+              =spellcheck  "false"
+              =value  dep-ship-t
+              ;*  ~
+            ==
           ==
-        ==
-        ;label.fr.g2.ac
-          ;span: dep pith
-          ;input.p-2.br2.bd1.mono.grow
-            =type  "text"
-            =name  "dep-pith"
-            =placeholder  "/some/pith"
-            =required  ""
-            =spellcheck  "false"
-            =value  dep-pith-t
-            ;*  ~
+          ;label.fc.grow
+            ;span.p1.fs-2.f5: dep pith
+            ;input.p-2.br2.bd1.mono.grow
+              =type  "text"
+              =name  "dep-pith"
+              =placeholder  "/some/pith"
+              =required  ""
+              =spellcheck  "false"
+              =value  dep-pith-t
+              ;*  ~
+            ==
           ==
         ==
         ;div.fr.g2
-          ;button.p-2.br2.bd1.b2.hover
+          ;button.p-2.br2.bd1.b2.hover.focus
             ;-  btn-label
           ==
         ==
@@ -730,7 +749,7 @@
           ;form.fr.g2(data-on_submit post)
             ;input(type "hidden", name "op", value "uninstall");
             ;input(type "hidden", name "pax", value (trip pax-t));
-            ;button.p-2.br2.bd1.b2.hover: uninstall view
+            ;button.p-2.br2.bd1.b2.hover.focus: uninstall view
           ==
     ==
   [sum bod]
@@ -750,12 +769,14 @@
 ::
 ++  render-summary
   ::
-  |=  [where=pith sug=(unit iota) nude=(unit node) dat=data =meta]
+  |=  [where=pith sug=(unit iota) nude=(unit node) dat=data cod=code]
   ^-  manx
+  =/  meta  (fall leaf.cod *meta)
   =/  has-node  ?=(^ nude)
   =/  has-kids  ?=(^ kids.dat)
   =/  has-view  ?=(^ view.meta)
-  %^  add-class-if  !|(has-kids has-node has-view)  "hidden"
+  =/  has-view-below  ?=(^ (~(views-below fe [dat cod]) /))
+  %^  add-class-if  !|(has-kids has-node has-view has-view-below)  "hidden"
   ;button.p-1.b1.fr.g3.hover.wf
     ;+  %+  add-class
         ?.  has-view
@@ -778,8 +799,10 @@
           ==
         ==
     ==
-    ;+  ?~  subs.meta  ;/  ""
-        ;span.f-3: •
+    ;+  ?:  =(~ subs.meta)  ;/  ""
+        ;span.f-3.bold: [{<~(wyt in subs.meta)>}]
+    ;+  ?:  =(~ view-subs.meta)  ;/  ""
+        ;span.f-4.bold: [{<~(wyt in view-subs.meta)>}]
     ;+
       ?.  has-node  ;/  ""
       ;span.o7
@@ -808,9 +831,9 @@
           ;-  (print-auth u.eyre.meta)
         ==
     ;span.o6.mono
-      ;-  <life.meta>
-      ;-  ":"
       ;-  <case.meta>
+      ;-  ":"
+      ;-  <life.meta>
     == 
   ==
 ::

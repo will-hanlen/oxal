@@ -64,5 +64,19 @@
     |=  pax=pith
     ~(. fe (dip pax))
   ::
+  ++  views-below
+    ::
+    ::  set of installed views below
+    ::
+    |=  pax=pith
+    ^-  (set pith)
+    =.  fil  (dip pax)
+    %-  silt
+    ^-  (list pith)
+    %-  ~(mur ox cod)
+    |=  [=pith =meta]
+    ?~  view.meta  ~
+    `(welp pax pith)
+    ::
   --
 --

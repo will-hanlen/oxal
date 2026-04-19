@@ -202,7 +202,7 @@
       [%del =pith]
   ==
 +$  move  (set chng)
-+$  transformer  $-([snap=data =move life=@ case=@] move)
++$  transformer  $-([mine=data snap=data =move life=@ case=@] move)
 ::
 ++  ref-to-pith
   ::
@@ -814,17 +814,12 @@
   ++  swot  |=(n=nail (;~(pfix fas (more fas spot)) n))
   ::
   ++  spot
-    %+  sear  (soft iota)
-    %-  stew
-    ^.  stet  ^.  limo
-    :~  :-  'a'^'z'  sym                    :: PATCHED here!
-        :-  '$'      (cold [%tas %$] buc)
-        :-  '0'^'9'  bisk:so
-        :-  '-'      tash:so
-        :-  '.'      ;~(pfix dot zust:so)   :: PATCHED here!
-        :-  '~'      ;~(pfix sig ;~(pose crub:so (easy [%n ~])))
-        :-  '\''     (stag %t qut)
-    ==
+    %+  sear
+      |=  txt=tape
+      ^-  (unit iota)
+      ?~  cn=(slay (crip txt))  ~
+      `(coin-to-node u.cn)
+    (plus ;~(less fas next))
   --
 ::
 ++  pave
@@ -1292,7 +1287,7 @@
 ++  easy-transform
   |=  ec=easy-core
   ^-  transformer
-  |=  [snap=data =move *]
+  |=  [mine=data snap=data =move *]
   ^+  move
   %-  silt
   ^-  (list chng)

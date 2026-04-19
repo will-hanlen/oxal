@@ -10,7 +10,17 @@ which means we might need to scry everything all the time.
 
 idea: delete meta if no subdata and all lifes below are 0
 
+bug: nonlink views don't get their transformers cached
+
+before attempting to optimize the acer engine, test it fully
+
+transformer cache stores a (set pith) of refs so that it
+can remove caches once no views are installing from it anymore
+
+idea: inherited metadata. it's cumbersome to make a full subtree available over http
+
 mirror remote faucets via grow
+- calculate indexes and publish them
 - the acer tracks which mirrors exist.
 - the acer optimizes by only holding the shortest
   mirror path necessary. so that it can use /[remote]/some/path

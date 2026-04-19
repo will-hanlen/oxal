@@ -379,7 +379,7 @@
             ;textarea.p3.pre.mono.br2.bd1.fs-2
               =name  "code"
               =rows  "10"
-              =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+              =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
               =required  ""
               =spellcheck  "false"
               ;*  ~
@@ -600,7 +600,7 @@
           ;span: code
           ;feather-text-editor.p3.mono.br2.bd1.fs-1
             =name  "code"
-            =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+            =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
             =required  ""
             =auto-indent  ""
             ;-  code-t

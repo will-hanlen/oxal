@@ -575,11 +575,13 @@
 ++  fix-newlines
   ::
   |=  c=cord
-  %+  rap  3
-  %+  murn  (rip 3 c)
-  |=  char=@t
-  ?:  =(char '\0d')  ~
-  `char
+  %^  cat  3
+    %+  rap  3
+    %+  murn  (rip 3 c)
+    |=  char=@t
+    ?:  =(char '\0d')  ~
+    `char
+  '\0a'
 ::
 ++  map-to-json
   ::

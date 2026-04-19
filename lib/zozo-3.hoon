@@ -102,15 +102,15 @@
     ::  again, so there is nothing to memoize.
     ::
     |=  src=@t
-    ^-  (each transformer tang)
+    ^-  [(each transformer tang) _cor]
     =/  cached  (~(get by xfms.ax) src)
-    ?^  cached  [%& u.cached]
+    ?^  cached  [[%& u.cached] cor]
     =/  result=(each transformer tang)
       (mule |.(!<(transformer (slap !>(.) (ream src)))))
     ?-  -.result
       %&  =.  xfms.ax  (~(put by xfms.ax) src p.result)
-          result
-      %|  result
+          [result cor]
+      %|  [result cor]
     ==
   ::
   ++  resolve-code
@@ -414,12 +414,13 @@
     |=  [sub=pith =source met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^+  cor
     =.  cor  (vlog "ae: run-xfm at {(pate sub)}")
-    =/  xfm-res=(each transformer tang)  (get-xfm (resolve-code source))
+    =^  xfm-res=(each transformer tang)  cor  (get-xfm (resolve-code source))
     ?:  ?=(%| -.xfm-res)
       (suspend-view sub source met p.xfm-res)
     =/  xfm=transformer  p.xfm-res
+    =/  mine=data  (~(dip do dat) sub)
     =/  result=(each move tang)
-      (mule |.((xfm [snap mov lyf cas])))
+      (mule |.((xfm [mine snap mov lyf cas])))
     ?-  -.result
       %&
         =.  cod
@@ -749,12 +750,13 @@
     |=  [sub=pith =source met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^-  [(unit move) _cor]
     =.  cor  (vlog "ae: fire xfm at {(pate sub)}")
-    =/  xfm-res=(each transformer tang)  (get-xfm (resolve-code source))
+    =^  xfm-res=(each transformer tang)  cor  (get-xfm (resolve-code source))
     ?:  ?=(%| -.xfm-res)
       [~ (suspend-view sub source met p.xfm-res)]
     =/  xfm=transformer  p.xfm-res
+    =/  mine=data  (~(dip do dat) sub)
     =/  result=(each move tang)
-      (mule |.((xfm [snap mov lyf cas])))
+      (mule |.((xfm [mine snap mov lyf cas])))
     ?-  -.result
       %&
         =.  cod
