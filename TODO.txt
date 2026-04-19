@@ -1,4 +1,13 @@
 
+big issue with rendering reactively.
+we don't get notified when the code tree changes.
+which means we might need to scry everything all the time.
+
+  maybe there's a gall subscription to subscribe to code changes
+  that is available locally only. i'm not sure.
+
+  /home/raw -> the subtree of home's raw data
+
 mirror remote faucets via grow
 - the acer tracks which mirrors exist.
 - the acer optimizes by only holding the shortest

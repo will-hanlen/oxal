@@ -1,24 +1,25 @@
-::  /ted/http-oxal--tree  :  tree rendering of a $file, scoped to rest.bowl
+::  /ted/http-oxal--home  :  reactive renderer
 ::
 /+  *vineio, *zozo
 ::
-=;  render
+=;  reng
 ::
 =/  m  (strand ,vase)
 ;<  bowl=http-bowl  bind:m  init
 =/  vio  ~(. server bowl)
 ^-  form:m
 ::
-=/  rr  ~(. render (welp [prefix rest]:bowl))
-=,  rr
 ::
 ;<  =acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+::
+=/  render  ~(. reng acer bowl)
+::
 =/  rest-pith=pith  (pave rest.bowl)
 =/  scope-pax=pith  [p+our.bowl rest-pith]
 ::
 ?:  =('POST' method.bowl)
   =/  body  formencoded-body:vio
-  =/  =cage  (body-to-cage body now.bowl)
+  =/  =cage  (body-to-cage:render body now.bowl)
   ;<  ~  bind:m  (poke-our:vio cage)
   ;<  ~  bind:m
     %+  send-simple-payload:vio
@@ -65,7 +66,7 @@
         ==
       ==
       ;div
-        ;+  (render-tree scoped-file rest-pith init-beneath)
+        ;+  (render-tree:render scoped-file rest-pith init-beneath)
       ==
     ==
   ==
@@ -79,7 +80,8 @@
   (en-xml:html hymn)
 (pure:m !>(~))
 ::
-|_  =stem
+|_  [ax=acer bowl=http-bowl]
+::
 ++  render-tree
   ::
   ::  recursive tree render; .rest-pith is the scope (bare, user-facing),
@@ -102,7 +104,7 @@
     ;+  %^  add-class-if  beneath  "f-3"
         %+  add-class
           ?:  &(=(0 case.meta) !has-view)  "o2"
-          ?:  beneath  "o7"
+          ?:  beneath  "o5"
           ""
     ;details.bdb1
       ;+  (render-summary rel sug nude data.f meta)
@@ -718,7 +720,7 @@
       ;-  <case.meta>
     == 
     ;a.px2.mono
-      =href  (pate (welp stem where))
+      =href  (pate where)
       ; >
     ==
   ==
