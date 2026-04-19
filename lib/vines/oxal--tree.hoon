@@ -165,6 +165,15 @@
     ==
   =/  bod=marl
     ;=
+      ::  open via eyre
+      ::
+      ;+  ?~  eyre.meta  ;/  ""
+          ;a.p-2.br2.bd1.b2.hover
+            =href    (weld "/-" (pate pax))
+            =target  "_blank"
+            =rel     "noopener"
+            ; open
+          ==
       ::  grow
       ::
       ;form.fr.g2.ac(method "post")

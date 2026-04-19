@@ -174,6 +174,9 @@
           %+  welp  "<!doctype html>"
           (en m)
         ::
+        ::  %feather is a bad idea. going to cause bad caches
+        ::  xx remove me
+        ::
         %feather
           :-  'text/html'
           %-  octt
@@ -196,6 +199,7 @@
                 ;-  %+  fall  (get-attribute %title m)
                     "feather document"
               ==
+              ;link(rel "icon", href "data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\"/>");
               ;link(rel "stylesheet", href "/hawk-init/feather/1/style");
             ==
             ;+  m(n.g %body)
