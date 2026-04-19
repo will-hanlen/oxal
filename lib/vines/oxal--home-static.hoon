@@ -5,6 +5,7 @@
 ::
 /+  *vineio
 ::
+!:
 =>  |%
     ++  body-to-cage
       ::
@@ -30,7 +31,14 @@
         [%bump !>(pax)]
       ?:  =(op 'install')
         =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
-        =/  code=source-code  (fix-newlines (~(got by body) 'code'))
+        =/  code=source-code
+          =/  raw  (fix-newlines (~(got by body) 'code'))
+          =/  try=(unit source-code)
+            %-  mole  |.
+            !<  source-code
+            (slap !>(.) (ream raw))
+          ?~  try  raw
+          u.try
         =/  dep=source-ref
           :-  (slav %p (~(got by body) 'dep-ship'))
           (cord-to-pith (~(got by body) 'dep-pith'))
@@ -161,6 +169,15 @@
 ++  bod
   ::
   ;div#tree
+    ;details
+      ;summary: create node
+      ;*  +7:(render-create-node-form rest.bowl)
+    ==
+    ;details
+      ;summary: create view
+      ;*  +7:(render-create-view-form rest.bowl)
+    ==
+    ;div.h7;
     ;+  (render-tree scoped-file rest-pith init-beneath)
   ==
 ::
@@ -196,11 +213,11 @@
       ::
       ~[(render-meta-forms bare-pax meta)]
       ::
-      ?:  at-or-below  ~
-      ~[(render-create-node-form bare-pax)]
-      ::
-      ?:  at-or-below  ~
-      ~[(render-create-view-form bare-pax)]
+      :: ?:  at-or-below  ~
+      :: ~[(render-create-node-form bare-pax)]
+      :: ::
+      :: ?:  at-or-below  ~
+      :: ~[(render-create-view-form bare-pax)]
       ::
       ~[(render-subs subs.meta)]
       ::
@@ -216,7 +233,7 @@
         %+  add-attribute  ['data-on:click' "$_details{nid} = !$_details{nid}"]
         %+  add-attribute  ['data-class:active' "$_details{nid}"]
         (render-summary rel sug nude data.f meta)
-      ;div.bdt1.fc.b2.ml4
+      ;div.bdt1.fc.b2.ml4.bdl1.bdr1
         =data-show  "$_details{nid}"
         =data-signals  "\{'_sec{nid}': '{-:(head sections)}'}"
         ;div.fr.bbh
@@ -232,7 +249,7 @@
         ;*
         %+  turn  sections
         |=  [=tape marl contents=marl]
-        ;div.p2.bdt1
+        ;div.bdt1
           =data-show  "$_sec{nid} == '{tape}'"
           ;*  contents
         ==
@@ -370,6 +387,7 @@
   |=  [pax=pith nude=(unit node)]
   :-  "node"
   ^-  [marl marl]
+  =/  nid  (uid pax)
   =/  pax-t=@t  (crip (pate pax))
   =/  strict-t=tape
     ?~  nude  ""
@@ -389,25 +407,34 @@
     ==
   =/  bod=marl
     ;=
-      ;form.fc.g2(data-on_submit post)
-        ;input(type "hidden", name "op", value "put-leaf");
-        ;input(type "hidden", name "pax", value (trip pax-t));
-        ;feather-textarea.p3.mono.br2.bd1.fs-2
-          =name  "node"
-          =rows  "6"
-          =placeholder  "hoon for a node, e.g.  ud+12"
-          ;-  strict-t
+      ;div.fc.relative
+        ;form.fc(data-on_submit post)
+          =id  "nodeform{nid}"
+          =data-indicator  "_loadnode{nid}"
+          ;input(type "hidden", name "op", value "put-leaf");
+          ;input(type "hidden", name "pax", value (trip pax-t));
+          ;feather-textarea.p3.mono.fs-1
+            =name  "node"
+            =rows  "6"
+            =placeholder  "hoon for a node, e.g.  ud+12"
+            ;-  strict-t
+          ==
         ==
-        ;div.fr.g2
-          ;button.p-2.br2.bd1.b2.hover: save
+        ;div.absolute.right0.bottom0.pr4.pb4.z1.fr.g3
+          ;button.p-2.br2.bd1.b3.hover
+            =data-class_pulse  "$_loadnode{nid}"
+            =type  "submit"
+            =form  "nodeform{nid}"
+            ; save
+          ==
+          ;+  ?~  nude  ;/  ""
+              ;form.fr(data-on_submit post)
+                ;input(type "hidden", name "op", value "del-leaf");
+                ;input(type "hidden", name "pax", value (trip pax-t));
+                ;button.p-2.br2.bd1.b3.hover: clear leaf
+              ==
         ==
       ==
-      ;+  ?~  nude  ;/  ""
-          ;form.fr.g2(data-on_submit post)
-            ;input(type "hidden", name "op", value "del-leaf");
-            ;input(type "hidden", name "pax", value (trip pax-t));
-            ;button.p-2.br2.bd1.b2.hover: clear leaf
-          ==
     ==
   [sum bod]
 ::

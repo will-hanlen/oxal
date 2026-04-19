@@ -8,6 +8,8 @@ which means we might need to scry everything all the time.
 
   /home/raw -> the subtree of home's raw data
 
+idea: delete meta if no subdata and all lifes below are 0
+
 mirror remote faucets via grow
 - the acer tracks which mirrors exist.
 - the acer optimizes by only holding the shortest
