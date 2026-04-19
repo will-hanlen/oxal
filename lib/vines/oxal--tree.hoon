@@ -1,4 +1,4 @@
-::  /ted/http-oxal  :  tree rendering of a $file
+::  /ted/http-oxal--tree  :  tree rendering of a $file, scoped to rest.bowl
 ::
 /+  *vineio, *zozo
 ::
@@ -9,22 +9,13 @@
 =/  vio  ~(. server bowl)
 ^-  form:m
 ::
+;<  =acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+=/  rest-pith=pith  (pave rest.bowl)
+=/  scope-pax=pith  [p+our.bowl rest-pith]
+::
 ?:  =('POST' method.bowl)
   =/  body  formencoded-body:vio
-  =/  command  (fix-newlines (cat 3 (~(got by body) 'command') '\0a\0a'))
-  =/  =cage
-    =;  =(each cage tang)
-      ?:  ?=(%.y -.each)  p.each
-      %-  (slog p.each)
-      :-  %do-move
-      !>
-      %-  silt
-      :~  [%ins /error da+now.bowl]
-      ==
-    %-  mule  |.
-    !<  cage
-    %+  slap  !>(.)
-    (ream command)
+  =/  =cage  (body-to-cage body now.bowl)
   ;<  ~  bind:m  (poke-our:vio cage)
   ;<  ~  bind:m
     %+  send-simple-payload:vio
@@ -32,7 +23,7 @@
     ~
   (pure:m !>(~))
 ::
-;<  =acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+=/  scoped-file=file  (~(dip fe file.acer) scope-pax)
 ::
 =/  hymn=manx
   ::
@@ -42,7 +33,7 @@
       ;link(rel "stylesheet", href "/hawk-init/feather/1/style");
     ==
     ;body.p5.fc.g9.pb15
-      ;h1: {(pate rest.bowl)}
+      ;h1: {(pate rest-pith)}
       ;details
         ;summary: transformers
         ;div
@@ -54,34 +45,11 @@
           ==
         ==
       ==
-      ;+  form-command
+      ;+  render-top-insert-form
+      ;+  render-top-install-form
+      ;+  render-top-form
       ;div
-        ;+
-        =/  root-file  file.acer :: (~(dip fe file.acer) /[p+our.bowl])
-        =|  sug=(unit iota)
-        |-
-        =/  meta  (fall leaf.code.root-file *meta)
-        =/  nude  leaf.data.root-file
-        =/  has-node  ?=(^ nude)
-        =/  has-view  ?=(^ view.meta)
-        ;div.fc
-          ;+  %^  add-class-if  &(=(0 case.meta) !has-view)  "o2"
-          ;details.br2.bd1.scroll-none
-            ;+  (render-summary sug nude data.root-file meta)
-            ;div.p2.bdt1.fc.g3
-              ;+  (render-view meta)
-              ;+  (render-bound meta)
-              ;+  (render-subs subs.meta)
-              ;+  (render-logs logs.meta)
-            ==
-          ==
-          ;div.pl4.fc.pt2
-            ;*
-            %+  turn  ~(kid-list fe root-file)
-            |=  [=iota =file]
-            ^$(root-file file, sug `iota)
-          ==
-        ==
+        ;+  (render-tree scoped-file rest-pith)
       ==
     ==
   ==
@@ -96,6 +64,433 @@
 (pure:m !>(~))
 ::
 |%
+++  render-top-insert-form
+  ::
+  ::  top-of-page form for inserting a single node into the data tree
+  ::  at an arbitrary pith.  pax is user-facing (bare).
+  ::
+  ^-  manx
+  ;details
+    ;summary: insert node
+    ;div.fc.g3.p2
+      ;form.fc.g2(method "post")
+        ;input(type "hidden", name "op", value "put-leaf");
+        ;label.fr.g2.ac
+          ;span: pith
+          ;input.p-2.br2.bd1.mono.grow
+            =type  "text"
+            =name  "pax"
+            =placeholder  "/some/pith"
+            =required  ""
+            =spellcheck  "false"
+            =value  "/"
+            ;*  ~
+          ==
+        ==
+        ;label.fc.g2
+          ;span: node
+          ;textarea.p3.pre.mono.br2.bd1.fs-2
+            =name  "node"
+            =rows  "6"
+            =placeholder  "hoon for a node, e.g.  ud+12"
+            =required  ""
+            ;*  ~
+          ==
+        ==
+        ;div.fr.g2
+          ;button.p-2.br2.bd1.b2.hover: insert
+        ==
+      ==
+    ==
+  ==
+::
+++  render-top-install-form
+  ::
+  ::  top-of-page form for %install: fields match the poke shape
+  ::  [pax=pith code=source-code dep=source-ref].  code is the @t
+  ::  variant (raw hoon source); dep is split into ship and pith.
+  ::
+  ^-  manx
+  ;details
+    ;summary: install view
+    ;div.fc.g3.p2
+      ;form.fc.g2(method "post")
+        ;input(type "hidden", name "op", value "install");
+        ;label.fr.g2.ac
+          ;span: pax
+          ;input.p-2.br2.bd1.mono.grow
+            =type  "text"
+            =name  "pax"
+            =placeholder  "/my-app"
+            =required  ""
+            =spellcheck  "false"
+            =value  "/"
+            ;*  ~
+          ==
+        ==
+        ;label.fc.g2
+          ;span: code
+          ;textarea.p3.pre.mono.br2.bd1.fs-2
+            =name  "code"
+            =rows  "10"
+            =placeholder  "|=  [snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+            =required  ""
+            =spellcheck  "false"
+            ;*  ~
+          ==
+        ==
+        ;label.fr.g2.ac
+          ;span: dep ship
+          ;input.p-2.br2.bd1.mono.grow
+            =type  "text"
+            =name  "dep-ship"
+            =placeholder  "~zod"
+            =required  ""
+            =spellcheck  "false"
+            ;*  ~
+          ==
+        ==
+        ;label.fr.g2.ac
+          ;span: dep pith
+          ;input.p-2.br2.bd1.mono.grow
+            =type  "text"
+            =name  "dep-pith"
+            =placeholder  "/some/pith"
+            =required  ""
+            =spellcheck  "false"
+            =value  "/"
+            ;*  ~
+          ==
+        ==
+        ;div.fr.g2
+          ;button.p-2.br2.bd1.b2.hover: install
+        ==
+      ==
+    ==
+  ==
+::
+++  render-top-form
+  ::
+  ::  top-of-page form: accepts raw hoon for a cage, used for install and
+  ::  arbitrary %do-move pokes at any pith.  preset buttons fill templates.
+  ::
+  ^-  manx
+  ;details
+    ;summary: poke
+    ;div.fc.g3.p2
+      ;form.br3.bd1.mono.relative(method "post")
+        ;input(type "hidden", name "op", value "raw");
+        ;textarea.pre.p3.fs-1.pb5.wf.focus.br3
+          =id  "command"
+          =name  "command"
+          =spellcheck  "false"
+          =rows  "10"
+          =placeholder  "cage to poke %oxal, e.g.  :- %install !> ..."
+          =required  ""
+          ;*  ~
+        ==
+        ;div.absolute
+          =style  "bottom: 12px; right: 12px;"
+          ;button.p3.b2.hover.tc.fs1.br3.bd2.wfc.focus
+            ; send
+          ==
+        ==
+      ==
+      ;div.frw.g2
+        ;*
+        %+  turn
+          ^-  (list (pair @t @t))
+          :~  :-  'install'
+              '''
+              :-  %install  !>
+              :+  /my-app
+              \0'''
+              |=  [snap=data did=move life=@ud case=@ud]
+              ^-  move
+              ?.  =(~ did)  did
+              %-  silt
+              %+  turn  ~(tap do snap)
+              |=  [pax=pith nod=node]
+              ^-  chng
+              [%ins pax nod]
+              \0'''
+              [~walrus-migrev-dolseg /bing/bong]
+              '''
+            ::
+              :-  'do-move ins'
+              '''
+              :-  %do-move  !>
+              %-  sy
+              :~
+                :+  %ins  /some/pith  ud+12
+              ==
+              '''
+            ::
+              :-  'do-move del'
+              '''
+              :-  %do-move  !>
+              %-  sy
+              :~
+                :-  %del  /some/pith
+              ==
+              '''
+            ::
+              :-  'clear'  ''
+          ==
+        |=  [label=@t code=@t]
+        ;button.br2.bd1.p-2.b2.hover.focus
+          =type  "button"
+          =onclick  "document.getElementById('command').value = `{(trip code)}`"
+          ;-  (trip label)
+        ==
+      ==
+    ==
+  ==
+::
+++  render-tree
+  ::
+  ::  recursive tree render; .rest-pith is the scope (bare, user-facing),
+  ::  each rendered node accumulates its relative pith off .rest-pith.
+  ::
+  |=  [root=file rest-pith=pith]
+  ^-  manx
+  =|  rel=pith
+  =|  sug=(unit iota)
+  =/  f  root
+  |-
+  ^-  manx
+  =/  bare-pax  (welp rest-pith rel)
+  =/  meta  (fall leaf.code.f *meta)
+  =/  nude  leaf.data.f
+  =/  has-node  ?=(^ nude)
+  =/  has-view  ?=(^ view.meta)
+  ;div.fc
+    ;+  %^  add-class-if  &(=(0 case.meta) !has-view)  "o2"
+    ;details.br2.bd1.scroll-none
+      ;+  (render-summary sug nude data.f meta)
+      ;div.p2.bdt1.fc.g3
+        ;+  (render-view bare-pax meta)
+        ;+  (render-bound meta)
+        ;+  (render-meta-forms bare-pax meta)
+        ;+  (render-leaf-form bare-pax nude)
+        ;+  (render-subs subs.meta)
+        ;+  (render-logs logs.meta)
+      ==
+    ==
+    ;div.pl4.fc.pt2
+      ;*
+      %+  turn  ~(kid-list fe f)
+      |=  [=iota =file]
+      ^$(f file, rel (snoc rel iota), sug `iota)
+    ==
+  ==
+::
+++  render-meta-forms
+  ::
+  ::  per-node controls over meta: grow, eyre, gall, bump, uninstall.
+  ::
+  |=  [pax=pith =meta]
+  ^-  manx
+  =/  pax-t=@t  (crip (pate pax))
+  ;details
+    ;summary: meta
+    ;div.p2.fc.g3
+      ::  grow
+      ::
+      ;form.fr.g2.ac(method "post")
+        ;input(type "hidden", name "op", value "set-grow");
+        ;input(type "hidden", name "pax", value (trip pax-t));
+        ;input(type "hidden", name "val", value ?:(grow.meta "false" "true"));
+        ;span: {?:(grow.meta "grow: on" "grow: off")}
+        ;button.p-2.br2.bd1.b2.hover: toggle
+      ==
+      ::  eyre
+      ::
+      ;form.fr.g2.ac(method "post")
+        ;input(type "hidden", name "op", value "set-eyre");
+        ;input(type "hidden", name "pax", value (trip pax-t));
+        ;label.fr.g2.ac
+          ;span: eyre
+          ;+  (auth-select "kind" eyre.meta)
+        ==
+        ;button.p-2.br2.bd1.b2.hover: set
+      ==
+      ::  gall
+      ::
+      ;form.fr.g2.ac(method "post")
+        ;input(type "hidden", name "op", value "set-gall");
+        ;input(type "hidden", name "pax", value (trip pax-t));
+        ;label.fr.g2.ac
+          ;span: gall
+          ;+  (auth-select "kind" gall.meta)
+        ==
+        ;button.p-2.br2.bd1.b2.hover: set
+      ==
+      ::  bump
+      ::
+      ;form.fr.g2.ac(method "post")
+        ;input(type "hidden", name "op", value "bump");
+        ;input(type "hidden", name "pax", value (trip pax-t));
+        ;button.p-2.br2.bd1.b2.hover: bump life
+      ==
+      ::  uninstall (only when a view is installed)
+      ::
+      ;+  ?~  view.meta  ;/  ""
+          ;form.fr.g2.ac(method "post")
+            ;input(type "hidden", name "op", value "uninstall");
+            ;input(type "hidden", name "pax", value (trip pax-t));
+            ;button.p-2.br2.bd1.b2.hover: uninstall view
+          ==
+    ==
+  ==
+::
+++  auth-select
+  ::
+  ::  <select> element for a (unit auth) meta field
+  ::
+  |=  [name=tape cur=(unit auth)]
+  ^-  manx
+  =/  cur-kind=@t
+    ?~  cur  'none'
+    kind.u.cur
+  =/  opts=(list [@t tape])
+    :~  ['none' "none"]
+        ['white' "white"]
+        ['black' "black"]
+        ['black-moon' "black-moon"]
+        ['black-planet' "black-planet"]
+        ['black-star' "black-star"]
+        ['black-galaxy' "black-galaxy"]
+    ==
+  ;select.br2.bd1.p-2
+    =name  name
+    ;*
+    %+  turn  opts
+    |=  [k=@t label=tape]
+    %^  add-attribute-if  =(k cur-kind)  selected+""
+    ;option  =value  (trip k)  ;-  label  ==
+  ==
+::
+++  render-leaf-form
+  ::
+  ::  per-node textarea for leaf.data: renders the current node via
+  ::  print-strict.  submit sets the leaf by ins; clear sends a del.
+  ::
+  |=  [pax=pith nude=(unit node)]
+  ^-  manx
+  =/  pax-t=@t  (crip (pate pax))
+  =/  strict-t=tape
+    ?~  nude  ""
+    (fall (print-strict u.nude) "")
+  ;details
+    ;summary: data
+    ;div.p2.fc.g3
+      ;form.fc.g2(method "post")
+        ;input(type "hidden", name "op", value "put-leaf");
+        ;input(type "hidden", name "pax", value (trip pax-t));
+        ;textarea.p3.pre.mono.br2.bd1.fs-2
+          =name  "node"
+          =rows  "6"
+          =placeholder  "hoon for a node, e.g.  ud+12"
+          ;-  strict-t
+        ==
+        ;div.fr.g2
+          ;button.p-2.br2.bd1.b2.hover: save
+        ==
+      ==
+      ;+  ?~  nude  ;/  ""
+          ;form.fr.g2(method "post")
+            ;input(type "hidden", name "op", value "del-leaf");
+            ;input(type "hidden", name "pax", value (trip pax-t));
+            ;button.p-2.br2.bd1.b2.hover: clear leaf
+          ==
+    ==
+  ==
+::
+++  body-to-cage
+  ::
+  ::  build a cage from a decoded form body keyed by 'op'.
+  ::
+  |=  [body=(map @t @t) now=@da]
+  ^-  cage
+  =/  op=@t  (fall (~(get by body) 'op') 'noop')
+  ?:  =(op 'raw')
+    =/  command=@t
+      (fix-newlines (cat 3 (~(got by body) 'command') '\0a\0a'))
+    =;  =(each cage tang)
+      ?:  ?=(%.y -.each)  p.each
+      %-  (slog p.each)
+      =/  =move  (sy ~[[%ins /error da+now]])
+      [%do-move !>(move)]
+    %-  mule  |.
+    !<  cage
+    %+  slap  !>(.)
+    (ream command)
+  ?:  =(op 'set-grow')
+    =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
+    =/  val=?  =('true' (~(got by body) 'val'))
+    [%set-grow !>([pax val])]
+  ?:  =(op 'set-eyre')
+    =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
+    =/  val=(unit auth)  (parse-auth (~(got by body) 'kind'))
+    [%set-eyre !>([pax val])]
+  ?:  =(op 'set-gall')
+    =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
+    =/  val=(unit auth)  (parse-auth (~(got by body) 'kind'))
+    [%set-gall !>([pax val])]
+  ?:  =(op 'bump')
+    =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
+    [%bump !>(pax)]
+  ?:  =(op 'install')
+    =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
+    =/  code=source-code  (fix-newlines (~(got by body) 'code'))
+    =/  dep=source-ref
+      :-  (slav %p (~(got by body) 'dep-ship'))
+      (cord-to-pith (~(got by body) 'dep-pith'))
+    [%install !>([pax code dep])]
+  ?:  =(op 'uninstall')
+    =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
+    [%uninstall !>(pax)]
+  ?:  =(op 'del-leaf')
+    =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
+    =/  =move  (sy ~[[%del pax]])
+    [%do-move !>(move)]
+  ?:  =(op 'put-leaf')
+    =/  pax=pith  (cord-to-pith (~(got by body) 'pax'))
+    =/  src=@t  (fix-newlines (~(got by body) 'node'))
+    =/  trimmed=@t  ?:(=(src '') '~' src)
+    =/  parsed=(each node tang)
+      %-  mule  |.
+      !<  node
+      %+  slap  !>(.)
+      (ream (cat 3 trimmed '\0a\0a'))
+    ?:  ?=(%.y -.parsed)
+      =/  =move  (sy ~[[%ins pax p.parsed]])
+      [%do-move !>(move)]
+    %-  (slog p.parsed)
+    =/  =move  (sy ~[[%ins (snoc pax %error) da+now]])
+    [%do-move !>(move)]
+  ~|  bad-op+op
+  !!
+::
+++  parse-auth
+  ::
+  ::  parse an auth-kind selection into a (unit auth); 'none' means ~.
+  ::
+  |=  kind=@t
+  ^-  (unit auth)
+  ?:  =(kind 'none')  ~
+  =;  k=auth-kind
+    `[k ~]
+  ?:  =(kind 'white')         %white
+  ?:  =(kind 'black')         %black
+  ?:  =(kind 'black-moon')    %black-moon
+  ?:  =(kind 'black-planet')  %black-planet
+  ?:  =(kind 'black-star')    %black-star
+  ?:  =(kind 'black-galaxy')  %black-galaxy
+  ~|  bad-auth-kind+kind
+  !!
+::
 ++  render-subs
   ::
   |=  =(set pith)
@@ -146,7 +541,7 @@
   ==
 ++  render-view
   ::
-  |=  =meta
+  |=  [pax=pith =meta]
   ^-  manx
   ;details
     ;summary
@@ -169,19 +564,16 @@
     ==
     ;div.p3.fc.g3
       ;+  ?~  view.meta  ;/  ""  (render-error u.view.meta)
-      ;form.fc.g2
+      ;div.fc.g2
         ;textarea.p3.pre.mono.br2.bd1.fs-2
-          =name  "source"
           =rows  "8"
+          =readonly  ""
           =placeholder  ?^(view.meta "there was a view here" "no view yere")
           ;-  ?~  view.meta  ""
               ?@  code.u.view.meta
                 (trip code.u.view.meta)
               %+  weld  "> "
               (pate (ref-to-pith source-ref.code.u.view.meta))
-        ==
-        ;button.p2.br2.bd1.b2.hover
-          ; save
         ==
       ==
     ==
@@ -253,157 +645,6 @@
     ;span.o6
       ;-  "#S"
       ;-  <~(wyt in subs.meta)>
-    ==
-  ==
-++  form-command
-  ::
-  ;div.fc.g3
-    ;form.br3.bd1.mono.relative(method "post")
-      ;textarea.pre.p3.fs-1.pb5.wf.focus.br3
-        =id  "command"
-        =name  "command"
-        =spellcheck  "false"
-        =rows  "10"
-        =placeholder  "cage to poke to %oxal"
-        =required  ""
-        ;*  ~
-      ==
-      ;div.absolute
-        =style  "bottom: 12px; right: 12px;"
-        ;button.p3.b2.hover.tc.fs1.br3.bd2.wfc.focus
-          ; send
-        ==
-      ==
-    ==
-    ;div.frw.g2
-      ;*
-      %+  turn
-        ^-  (list (pair @t @t))
-        :~  :-  'do-move'
-            '''
-            :-  %do-move  !>
-            %-  sy
-            :~
-              :+  %ins  /beep  ud+12
-            ==
-            '''
-          ::
-            :-  'install'
-            '''
-            :-  %install  !>
-            :-  /my-app
-            ^-  source
-            :-
-            \0'''
-            |=  [snap=data did=move life=@ud case=@ud]
-            ^-  move
-            ?.  =(~ did)  did
-            %-  silt
-            %+  turn  ~(tap do snap)
-            |=  [pax=pith nod=node]
-            ^-  chng
-            [%ins pax nod]
-            \0'''
-            :*  dep=[~walrus-migrev-dolseg /bing/bong]
-                lyf=0
-                cas=0
-                err=~
-            ==
-            '''
-          ::
-            :-  'install doubler'
-            '''
-            :-  %install  !>
-            :-  /my-app
-            ^-  source
-            :-
-            \0'''
-            |=  [snap=data did=move life=@ud case=@ud]
-            ^-  move
-            =/  src=move
-              ?.  =(~ did)  did
-              %-  silt
-              %+  turn  ~(tap do snap)
-              |=  [pax=pith nod=node]
-              ^-  chng
-              [%ins pax nod]
-            %-  silt
-            %+  murn  ~(tap in src)
-            |=  =chng
-            ?-  -.chng
-              %del  [~ chng]
-              %ins
-                ?.  ?=([%ud *] node.chng)  ~
-                [~ chng(node ud+(mul 2 ud.node.chng))]
-            ==
-            \0'''
-            :*  dep=[~walrus-migrev-dolseg /bing/bong]
-                lyf=0
-                cas=0
-                err=~
-            ==
-            '''
-          ::
-            :-  'uninstall'
-            '''
-            :-  %uninstall  !>
-            ^-  pith
-            /my-app
-            '''
-          ::
-            :-  'bump'
-            '''
-            :-  %bump  !>
-            ^-  pith
-            /bing
-            '''
-          ::
-            :-  'set-grow'
-            '''
-            :-  %set-grow  !>
-            ^-  [pith ?]
-            :-  /my-path
-            %.y
-            '''
-          ::
-            :-  'set-eyre'
-            '''
-            :-  %set-eyre  !>
-            ^-  [pith (unit auth)]
-            :-  /my-path
-            [~ %white ~]
-            '''
-          ::
-            :-  'set-gall'
-            '''
-            :-  %set-gall  !>
-            ^-  [pith (unit auth)]
-            :-  /my-path
-            [~ %white ~]
-            '''
-          ::
-            :-  'hear-move'
-            '''
-            :-  %hear-move  !>
-            ^-  [=ship pax=pith snap=data =move =life =case]
-            :*  ~zod
-                /boop
-                %+  ~(put do *data)  /yeet  ud+99
-                [%ins /yeet ud+99]
-                0
-                1
-            ==
-            '''
-          ::
-            :-  'wipe'  ':-  %wipe  !>(~)'
-            :-  'clear'  ''
-        ==
-      |=  [label=@t code=@t]
-      ;button.br2.bd1.p-2.b2.hover.focus
-        =type  "button"
-        =onclick  "document.getElementById('command').value = `{(trip code)}`"
-        ;-  (trip label)
-      ==
     ==
   ==
 ++  print-auth

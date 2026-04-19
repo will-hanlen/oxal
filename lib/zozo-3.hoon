@@ -255,7 +255,7 @@
       ::  install re-qualifies internally, so strip the head iota.
       ::
       =/  bare-pax=pith  ?>(?=(^ i.views) t.i.views)
-      =.  cor  (ingress-install bare-pax u.view.vmet)
+      =.  cor  (ingress-install bare-pax code.u.view.vmet dep.u.view.vmet)
       $(views t.views)
     $(chs t.chs)
   ::
@@ -277,7 +277,7 @@
     ::  since ingress-install re-qualifies internally.
     ::
     =/  bare-pax=pith  ?>(?=(^ i.subs-list) t.i.subs-list)
-    =.  cor  (ingress-install bare-pax u.view.smet)
+    =.  cor  (ingress-install bare-pax code.u.view.smet dep.u.view.smet)
     $(subs-list t.subs-list)
   ::
   ++  apply-changes
@@ -424,9 +424,12 @@
     ::
     ::  install a view: store source in code tree, wipe data subtree.
     ::  pax is user-facing (bare, relative to /[our]); qualify it.
+    ::  caller supplies only code and dep; lyf/cas/err default to
+    ::  initial values (run-xfm overwrites lyf/cas on first fire).
     ::
-    |=  [pax=pith =source]
+    |=  [pax=pith code=source-code dep=source-ref]
     ^+  cor
+    =/  =source  [code dep lyf=0 cas=0 err=~]
     =/  full-pax  (under-our pax)
     =/  full-dep  (ref-to-pith dep.source)
     =.  cor  (vlog "ae: install at {(pate full-pax)}")

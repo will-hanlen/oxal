@@ -180,9 +180,9 @@
       ::
     %install
       ::
-      =+  !<  [pax=pith =source]  vase
+      =+  !<  [pax=pith code=source-code dep=source-ref]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-install:engine pax source)
+        abet:(ingress-install:engine pax code dep)
       (emil cz)
       ::
     %uninstall

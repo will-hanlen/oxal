@@ -17,6 +17,7 @@
       %+  turn
         ^-  (list path)
         :~  /tree
+            /author
             /gall/sky
             /gall/sup
             /eyre/cache
