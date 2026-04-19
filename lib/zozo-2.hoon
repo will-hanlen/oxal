@@ -13,18 +13,41 @@
   ::
   ++  kid-list
     ::
-    ::  children as files, merging data and code tree kids
+    ::  the first layer of children across both data and code trees,
+    ::  merged by iota. produces a list of [iota file] pairs.
     ::
-    ^-  (list (pair iota file))
-    =/  dk=(map iota data)  (malt kid-list:de)
-    =/  ck=(map iota code)  (malt kid-list:ce)
-    =/  all=(set iota)
-      (~(uni in ~(key by dk)) ~(key by ck))
-    %+  turn  ~(tap in all)
-    |=  =iota
-    :-  iota
-    :-  (fall (~(get by dk) iota) *data)
-    (fall (~(get by ck) iota) *code)
+    =|  out=(list [iota file])
+    =/  dk  kids.dat
+    =/  ck  kids.cod
+    |-
+    ^+  out
+    ?:  =(~ dk)
+      %+  welp  out
+      %+  turn  (tap:moci ck)
+      |=  [=iota *]
+      [iota (dip #/[iota])]
+    ?:  =(~ ck)
+      %+  welp  out
+      %+  turn  (tap:modi dk)
+      |=  [=iota *]
+      [iota (dip #/[iota])]
+    =/  [[fd=iota fdata=data] restd=_dk]  (pop:modi dk)
+    =/  [[fc=iota fcode=code] restc=_ck]  (pop:moci ck)
+    ?:  =(fd fc)
+      %=  $
+        out  (snoc out [fd [fdata fcode]])
+        dk   restd
+        ck   restc
+      ==
+    ?:  (comp-nodes fd fc)
+      %=  $
+        out  (snoc out [fd [fdata *code]])
+        dk   restd
+      ==
+    %=  $
+      out  (snoc out [fc [*data fcode]])
+      ck   restc
+    ==
   ::
   ++  dip
     ::

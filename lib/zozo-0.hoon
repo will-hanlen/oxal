@@ -163,6 +163,7 @@
   ==
 +$  auth       [kind=auth-kind exceptions=(set ship)]
 ++  check-auth
+  ::
   |=  [=auth our=ship who=ship]
   ^-  ?
   ?:  =(our who)  &
@@ -1270,4 +1271,37 @@
       ?=(~ err.u.view.u.leaf)
   ==
   ::
+::
++$  easy-core  $+  easy-core
+  $_  ^&
+  |%
+  ++  ins
+    ::
+    ^*
+    $-  [pith node]
+    (unit chng)
+    ::
+  ++  del
+    ::
+    ^*
+    $-  pith
+    (unit chng)
+    ::
+  --
+::
+++  easy-transform
+  |=  ec=easy-core
+  ^-  transformer
+  |=  [snap=data =move *]
+  ^+  move
+  %-  silt
+  ^-  (list chng)
+  ?:  =(~ move)  (~(mur do snap) ins:ec)
+  %+  murn  ~(tap in move)
+  |=  =chng
+  ^-  (unit _chng)
+  ?-  -.chng
+    %del  (del:ec pith.chng)
+    %ins  (ins:ec pith.chng node.chng)
+  ==
 --

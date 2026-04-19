@@ -95,16 +95,23 @@
   ::
   ++  get-xfm
     ::
-    ::  get transformer from cache, or compile and cache it
+    ::  get transformer from cache, or compile and cache it.
+    ::  returns [%| tang] on parse/type failure so callers can
+    ::  suspend the view instead of crashing the whole op.
+    ::  failed compiles are not cached: the same cord would fail
+    ::  again, so there is nothing to memoize.
     ::
     |=  src=@t
-    ^-  transformer
+    ^-  (each transformer tang)
     =/  cached  (~(get by xfms.ax) src)
-    ?^  cached  u.cached
-    =/  compiled=transformer
-      !<(transformer (slap !>(.) (ream src)))
-    =.  xfms.ax  (~(put by xfms.ax) src compiled)
-    compiled
+    ?^  cached  [%& u.cached]
+    =/  result=(each transformer tang)
+      (mule |.(!<(transformer (slap !>(.) (ream src)))))
+    ?-  -.result
+      %&  =.  xfms.ax  (~(put by xfms.ax) src p.result)
+          result
+      %|  result
+    ==
   ::
   ++  resolve-code
     ::
@@ -407,7 +414,10 @@
     |=  [sub=pith =source met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^+  cor
     =.  cor  (vlog "ae: run-xfm at {(pate sub)}")
-    =/  xfm=transformer  (get-xfm (resolve-code source))
+    =/  xfm-res=(each transformer tang)  (get-xfm (resolve-code source))
+    ?:  ?=(%| -.xfm-res)
+      (suspend-view sub source met p.xfm-res)
+    =/  xfm=transformer  p.xfm-res
     =/  result=(each move tang)
       (mule |.((xfm [snap mov lyf cas])))
     ?-  -.result
@@ -739,7 +749,10 @@
     |=  [sub=pith =source met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^-  [(unit move) _cor]
     =.  cor  (vlog "ae: fire xfm at {(pate sub)}")
-    =/  xfm=transformer  (get-xfm (resolve-code source))
+    =/  xfm-res=(each transformer tang)  (get-xfm (resolve-code source))
+    ?:  ?=(%| -.xfm-res)
+      [~ (suspend-view sub source met p.xfm-res)]
+    =/  xfm=transformer  p.xfm-res
     =/  result=(each move tang)
       (mule |.((xfm [snap mov lyf cas])))
     ?-  -.result

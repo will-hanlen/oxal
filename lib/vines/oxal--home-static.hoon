@@ -198,6 +198,7 @@
   =/  nude  leaf.data.f
   =/  has-node  ?=(^ nude)
   =/  has-view  ?=(^ view.meta)
+  =/  has-kids  ?=(^ kids.data.f)
   =/  at-or-below  |(beneath has-view)
   =/  nid  (uid bare-pax)
   =/  sections=(list [tape marl marl])
@@ -205,8 +206,7 @@
     ^-  (list (list [tape marl marl]))
     :~
       :::
-      ?:  at-or-below  ~
-      ~[(render-node-form bare-pax nude)]
+      ~[(render-node-form at-or-below bare-pax nude)]
       ::
       ?:  &(beneath !has-view)  ~
       ~[(render-view bare-pax meta)]
@@ -233,6 +233,8 @@
         %+  add-attribute  ['data-on:click' "$_details{nid} = !$_details{nid}"]
         %+  add-attribute  ['data-class:active' "$_details{nid}"]
         (render-summary rel sug nude data.f meta)
+      ;+
+        %^  add-class-if  !|(has-kids has-node has-view)  "hidden"
       ;div.bdt1.fc.b2.ml4.bdl1.bdr1
         =data-show  "$_details{nid}"
         =data-signals  "\{'_sec{nid}': '{-:(head sections)}'}"
@@ -240,7 +242,7 @@
           ;*
           %+  turn  sections
           |=  [=tape *]
-          ;button.p-2.b2.hover
+          ;button.p-2.b2.hover.ok
             =data-on_click  "$_sec{nid} = '{tape}'"
             =data-class_toggled  "$_sec{nid} == '{tape}'"
             ;-  tape
@@ -249,7 +251,7 @@
         ;*
         %+  turn  sections
         |=  [=tape marl contents=marl]
-        ;div.bdt1
+        ;div.bdt1.p3
           =data-show  "$_sec{nid} == '{tape}'"
           ;*  contents
         ==
@@ -384,7 +386,7 @@
   ::  per-node textarea for leaf.data: renders the current node via
   ::  print-strict.  submit sets the leaf by ins; clear sends a del.
   ::
-  |=  [pax=pith nude=(unit node)]
+  |=  [locked=? pax=pith nude=(unit node)]
   :-  "node"
   ^-  [marl marl]
   =/  nid  (uid pax)
@@ -406,6 +408,12 @@
           ==
     ==
   =/  bod=marl
+    ?:  locked
+      ;=
+        ;div.mono.fs-1.pre
+          ;-  strict-t
+        ==
+      ==
     ;=
       ;div.fc.relative
         ;form.fc(data-on_submit post)
@@ -413,7 +421,7 @@
           =data-indicator  "_loadnode{nid}"
           ;input(type "hidden", name "op", value "put-leaf");
           ;input(type "hidden", name "pax", value (trip pax-t));
-          ;feather-textarea.p3.mono.fs-1
+          ;feather-textarea.mono.fs-1
             =name  "node"
             =rows  "6"
             =placeholder  "hoon for a node, e.g.  ud+12"
@@ -585,7 +593,7 @@
       ==
     %+  turn  ~(tap in set)
     |=  =pith
-    ;div.mono.f5: {(pate pith)}
+    ;div.mono.f5.fs-1: {(pate pith)}
   [sum bod]
 ::
 ++  render-logs
@@ -647,7 +655,7 @@
     ?~  view.meta  ""
     ?@  code.u.view.meta
       (trip code.u.view.meta)
-    ""
+    <code.u.view.meta>
   =/  dep-ship-t=tape
     ?~  view.meta  ""
     (scow %p ship.dep.u.view.meta)
@@ -747,6 +755,7 @@
   =/  has-node  ?=(^ nude)
   =/  has-kids  ?=(^ kids.dat)
   =/  has-view  ?=(^ view.meta)
+  %^  add-class-if  !|(has-kids has-node has-view)  "hidden"
   ;button.p-1.b1.fr.g3.hover.wf
     ;+  %+  add-class
         ?.  has-view
