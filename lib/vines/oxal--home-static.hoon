@@ -485,7 +485,7 @@
           ;input(type "hidden", name "op", value "put-leaf");
           ;label.fr.g2.ac
             ;span: pith
-            ;input.p-2.br2.bd1.mono.grow
+            ;input.p-2.br2.bd1.mono.grow.focus
               =type  "text"
               =name  "pax"
               =placeholder  "/some/pith"
@@ -497,7 +497,7 @@
           ==
           ;label.fc.g2
             ;span: node
-            ;feather-textarea.p3.mono.br2.bd1.fs-2
+            ;feather-textarea.p3.mono.br2.bd1.fs-2.focus
               =name  "node"
               =rows  "6"
               =placeholder  "hoon for a node, e.g.  ud+12"
@@ -507,7 +507,7 @@
             ==
           ==
           ;div.fr.g2
-            ;button.p-2.br2.bd1.b2.hover: insert
+            ;button.p-2.br2.bd1.b2.hover.focus: insert
           ==
         ==
       ==
@@ -538,7 +538,7 @@
           ;input(type "hidden", name "op", value "install");
           ;label.fr.g2.ac
             ;span: pax
-            ;input.p-2.br2.bd1.mono.grow
+            ;input.p-2.br2.bd1.mono.grow.focus
               =type  "text"
               =name  "pax"
               =placeholder  "/my-app"
@@ -550,7 +550,7 @@
           ==
           ;label.fc.g2
             ;span: code
-            ;feather-textarea.p3.mono.br2.bd1.fs-2
+            ;feather-textarea.p3.mono.br2.bd1.fs-2.focus
               =name  "code"
               =rows  "10"
               =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
@@ -562,7 +562,7 @@
           ==
           ;label.fr.g2.ac
             ;span: dep ship
-            ;input.p-2.br2.bd1.mono.grow
+            ;input.p-2.br2.bd1.mono.grow.focus
               =type  "text"
               =name  "dep-ship"
               =placeholder  "~zod"
@@ -574,7 +574,7 @@
           ==
           ;label.fr.g2.ac
             ;span: dep pith
-            ;input.p-2.br2.bd1.mono.grow
+            ;input.p-2.br2.bd1.mono.grow.focus
               =type  "text"
               =name  "dep-pith"
               =placeholder  "/some/pith"
@@ -585,7 +585,7 @@
             ==
           ==
           ;div.fr.g2
-            ;button.p-2.br2.bd1.b2.hover: install
+            ;button.p-2.br2.bd1.b2.hover.focus: install
           ==
         ==
       ==
