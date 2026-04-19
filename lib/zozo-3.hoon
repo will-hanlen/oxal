@@ -596,7 +596,7 @@
     =.  cor  (vlog "ae: hear-remote from {<ship>} at {(pate full-pax)}")
     ?.  (meta-allowed full-pax)  (reject-shallow "hear-remote" full-pax)
     =/  met=meta  (gut-meta full-pax)
-    =?  cor  (gth life life.met)
+    =?  cor  |((gth life life.met) =(~ move))
       =.  dat  (~(rep do dat) full-pax snap)
       =.  cod
         %+  ~(put ox cod)  full-pax
