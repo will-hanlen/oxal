@@ -434,7 +434,7 @@
           =data-indicator  "_loadnode{nid}"
           ;input(type "hidden", name "op", value "put-leaf");
           ;input(type "hidden", name "pax", value (trip pax-t));
-          ;feather-textarea.mono.fs-1.focus.p2
+          ;feather-textarea.mono.focus.p2.fs-2
             =name  "node"
             =required  ""
             =rows  "6"
@@ -674,7 +674,8 @@
     ?~  view.meta  ""
     ?@  code.u.view.meta
       (trip code.u.view.meta)
-    <code.u.view.meta>
+    =,  source-ref.code.u.view.meta
+    "[%link {<ship>} {"#"}{(pate pith)}]"
   =/  dep-ship-t=tape
     ?~  view.meta  ""
     (scow %p ship.dep.u.view.meta)
@@ -705,7 +706,7 @@
         =data-on_submit  post
         ;input(type "hidden", name "op", value "install");
         ;input(type "hidden", name "pax", value (trip pax-t));
-        ;feather-textarea.p3.mono.br2.bd1.fs-1
+        ;feather-textarea.p3.mono.br2.bd1.fs-2
           =name  "code"
           =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
           =required  ""
