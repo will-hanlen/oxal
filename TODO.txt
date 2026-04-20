@@ -1,4 +1,7 @@
 
+pith printing/parsing is broken. round trips through pate can be lossy
+for the %pith case
+
 big issue with rendering reactively.
 we don't get notified when the code tree changes.
 which means we might need to scry everything all the time.

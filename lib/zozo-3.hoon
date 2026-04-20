@@ -450,6 +450,13 @@
     ?:  (beneath-view full-pax cod)
       %-  (slog leaf+"fe: rejected install at or beneath view at {(pate full-pax)}" ~)
       cor
+    ::  reject install whose faucet is the view itself or an ancestor
+    ::  of it: the view's output would flow back into its own input.
+    ::
+    ?:  (~(is-ancestor-or-same th full-pax) full-dep)
+      %-  %+  slog  leaf+"fe: rejected install at {(pate full-pax)}: faucet {(pate full-dep)} is self or ancestor"
+          ~
+      cor
     =/  old  (~(get ox cod) full-pax)
     ::  if re-installing, run uninstall cleanup first
     ::
