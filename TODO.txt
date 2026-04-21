@@ -1,22 +1,19 @@
-remove life and case from transformer gate sample
 
-pith printing/parsing is broken. round trips through pate can be lossy
-for the %pith case
+pith printing/parsing is broken. round trips
+through pate can be lossy for the %pith case
 
 idea: work on serializing $data to tarball
 
-big issue with rendering reactively.
-we don't get notified when the code tree changes.
-which means we might need to scry everything all the time.
-
-  maybe there's a gall subscription to subscribe to code changes
-  that is available locally only. i'm not sure.
-
-  /home/raw -> the subtree of home's raw data
+the %oxal-snap mark represents a change to a location in the $data tree.
+there needs to be a new mark which represents changes to the $code tree.
+whenever a part of the code tree changes, every location above it should emit
+this mark through a gall fact so that gall subscribers can correctly reconstruct
+the full $file and understand all the changes that happen to it.
+it should really only be emitted on nodes which have the gall.meta unit full.
+the path on which code changes should be emitted is /code/...
+and ther is a new subscription path /both/... which sends both %oxal-snap and the new code-change mark.
 
 idea: delete meta if no subdata and all lifes below are 0
-
-bug: nonlink views don't get their transformers cached
 
 before attempting to optimize the acer engine, test it fully
 
@@ -31,17 +28,6 @@ mirror remote faucets via grow
 - the acer optimizes by only holding the shortest
   mirror path necessary. so that it can use /[remote]/some/path
   as the real data tree.
-
-idea:
-a thread can construct its own acer (perhaps borrowing the cache).
-so that i can do cached chains and use the nice properties
-of this application model, but without having to write to the
-main tree. this is how the main thread view will work.
-everything will be statically rendered to a mast-like autism.
-but those caches don't need to go in the main data tree
-because they're just hyperspecific to a rendering state
-that might not ever exist again. that cache should dump when
-the http connection ends.
 
 idea: multi-view programs
 - a special kind of node that lives in a meta.
