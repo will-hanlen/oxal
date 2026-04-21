@@ -135,19 +135,12 @@
   ^+  local
   ~&  consuming-cage/-.fact
   ?+  p.fact  local
-      %oxal-move
-    =+  !<([=move =life =case] q.fact)
-    =<  +
-    =<  abet
-    %-  ~(ingress-hear-remote ae [local our | |])
-    [our /home/raw *data move life case]
-  ::
       %oxal-snap
-    =+  !<([snap=data =life =case] q.fact)
+    =+  !<([snap=data =move =life =case] q.fact)
     =<  +
     =<  abet
     %-  ~(ingress-hear-remote ae [local our | |])
-    [our /home/raw snap move=~ life case]
+    [our /home/raw snap move life case]
   ==
 ::
 ++  take-fact-or-wake

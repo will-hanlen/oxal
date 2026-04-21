@@ -130,22 +130,11 @@
     %-  mule  |.
     ?+  p.page  ""
       ::
-      %oxal-life
-        =/  lyf=@ud  ;;(@ud q.page)
-        "life={(scow %ud lyf)}"
-      ::
-      %oxal-data
-        =/  dat=data  ;;(data q.page)
-        =/  n=@ud  ~(wyt do dat)
-        =/  leaf-str=tape
-          ?~  leaf.dat  ""
-          (weld " leaf=" (print-aura u.leaf.dat))
-        "nodes={(scow %ud n)}{leaf-str}"
-      ::
-      %oxal-move
-        =/  mov=move  ;;(move q.page)
-        =/  n=@ud  ~(wyt in mov)
-        "chng={(scow %ud n)}"
+      %oxal-snap
+        =+  ;;([snap=data =move =life =case] q.page)
+        =/  d=@ud  ~(wyt do snap)
+        =/  m=@ud  ~(wyt in move)
+        "nodes={(scow %ud d)} chng={(scow %ud m)} life={(scow %ud life)} case={(scow %ud case)}"
     ==
   ?-  -.res
     %.y  p.res

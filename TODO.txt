@@ -1,6 +1,9 @@
+remove life and case from transformer gate sample
 
 pith printing/parsing is broken. round trips through pate can be lossy
 for the %pith case
+
+idea: work on serializing $data to tarball
 
 big issue with rendering reactively.
 we don't get notified when the code tree changes.

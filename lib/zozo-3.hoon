@@ -4,16 +4,6 @@
 |%
 ++  zozo  %400
 ::
-+$  bump
-  ::
-  ::  a node-state bump that drives effect emission.
-  ::    %case: case on this pith incremented; move is the change relative to it.
-  ::    %life: life on this pith incremented; state reset.
-  ::
-  $%  [%case =move]
-      [%life ~]
-  ==
-::
 ++  ae
   :::
   ::    acer engine
@@ -170,7 +160,7 @@
         ==
       =.  cod  (~(put ox cod) full new-met)
       =/  snap=data  (~(dip do dat) full)
-      (emit-node-effects full new-met snap [%life ~])
+      (emit-node-effects full new-met snap ~)
     $(subs t.subs)
   ::
   ++  faucet-unsub
@@ -392,7 +382,7 @@
     =/  snap=data  (~(dip do dat) anc)
     ::  fan this bump out to gall/grow/eyre channels
     ::
-    =.  cor  (emit-node-effects anc new-met snap [%case rel])
+    =.  cor  (emit-node-effects anc new-met snap rel)
     ::  fire subscribers of this ancestor, collecting their outputs
     ::
     =^  xfm-out=move  cor
@@ -492,7 +482,7 @@
     ::
     =?  cor  ?=(^ old)
       =/  snap=data  (~(dip do dat) full-pax)
-      (emit-node-effects full-pax met snap [%life ~])
+      (emit-node-effects full-pax met snap ~)
     ::  on grow children, increment life; reset case for all submetas
     ::
     =.  cor  (reset-submetas full-pax %.y)
@@ -517,7 +507,6 @@
     ::
     ::  set grow flag on meta at pax, creating meta if missing.
     ::  pax is user-facing (qualified with /[our]).
-    ::  on false->true flip, publish current /life/ and /snap/ state.
     ::
     |=  [pax=pith val=?]
     ^+  cor
@@ -526,11 +515,8 @@
     =.  cor  (vlog "ae: set-grow at {(pate full-pax)} = {?:(val "y" "n")}")
     ?.  (meta-allowed full-pax)  (reject-shallow "set-grow" full-pax)
     =/  met=meta  (gut-meta full-pax)
-    =/  new-met=meta  met(grow val)
-    =.  cod  (~(put ox cod) full-pax new-met)
-    ?.  &(val !grow.met)  cor
-    =/  snap=data  (~(dip do dat) full-pax)
-    (grow-flip-on full-pax new-met snap)
+    =.  cod  (~(put ox cod) full-pax met(grow val))
+    cor
   ::
   ++  ingress-set-eyre
     ::
@@ -632,7 +618,7 @@
       =.  cor  (reset-submetas full-pax %.y)
       =/  new-met=meta  (gut-meta full-pax)
       =/  snp=data  (~(dip do dat) full-pax)
-      =.  cor  (emit-node-effects full-pax new-met snp [%life ~])
+      =.  cor  (emit-node-effects full-pax new-met snp ~)
       (reinstall-subs full-pax)
     (apply-move-qualified (prefix-move [p+ship ~] move) %.y)
   ::
@@ -833,8 +819,8 @@
   ::  effect emission
   ::
   ::  three independent channels, each gated on one meta property:
-  ::    gall.met ≠ ~            => /sub/<pax> facts and kicks
-  ::    grow.met                => /life/, /snap/, /logs/ history facts
+  ::    gall.met ≠ ~            => /sub/<pax> facts
+  ::    grow.met                => /logs/ history facts
   ::    eyre.met ∈ {^%white ^%black}, no exceptions
   ::                            => %set-response (print-node node)
   ::
@@ -887,67 +873,28 @@
   ::
   ++  gall-channel
     ::
-    ::  /sub/ subscription effects.  case: %fact.  life: %kick.
+    ::  /sub/ subscription effects.  always emits %oxal-snap.
+    ::  an empty move signals a full-replace; otherwise incremental.
     ::  no-op if gall.met is ~.
     ::
-    |=  [full-pax=pith met=meta =bump]
+    |=  [full-pax=pith met=meta snap=data =move]
     ^+  cor
     ?~  gall.met  cor
     =/  sub-path=path  [%sub (bare-path full-pax)]
-    ?-    bump
-        [%life ~]
-      %-  emit
-      [%give %kick ~[sub-path] ~]
-    ::
-        [%case *]
-      %-  emit
-      [%give %fact ~[sub-path] %oxal-move !>([move.bump life.met case.met])]
-    ==
+    %-  emit
+    [%give %fact ~[sub-path] %oxal-snap !>([snap move life.met case.met])]
   ::
   ++  grow-channel
     ::
-    ::  /life/, /snap/, /logs/ history effects.  no-op if grow.met is false.
+    ::  /logs/ history effects.  no-op if grow.met is false.
     ::
-    |=  [full-pax=pith met=meta snap=data =bump]
+    |=  [full-pax=pith met=meta snap=data =move]
     ^+  cor
     ?.  grow.met  cor
     =/  bp=path  (bare-path full-pax)
-    ?-    bump
-        [%case *]
-      =/  snap-path=path  [(scot %ud nuke.ax) %snap (scot %ud life.met) (scot %ud case.met) bp]
-      =/  logs-path=path  [(scot %ud nuke.ax) %logs (scot %ud life.met) (scot %ud case.met) bp]
-      =.  cor
-        %-  emit
-        [%give %fact ~[snap-path] %oxal-data !>(snap)]
-      %-  emit
-      [%give %fact ~[logs-path] %oxal-move !>([move.bump life.met case.met])]
-    ::
-        [%life ~]
-      =/  life-path=path  [(scot %ud nuke.ax) %life bp]
-      =/  snap-path=path  [(scot %ud nuke.ax) %snap (scot %ud life.met) '0' bp]
-      =.  cor
-        %-  emit
-        [%give %fact ~[life-path] %oxal-life !>(life.met)]
-      %-  emit
-      [%give %fact ~[snap-path] %oxal-data !>(snap)]
-    ==
-  ::
-  ++  grow-flip-on
-    ::
-    ::  grow.met just flipped %.n -> %.y; neither life nor case bumped.
-    ::  publish current state on /life/ and /snap/<life>/<case>/ so
-    ::  fresh history subscribers have a coherent starting point.
-    ::
-    |=  [full-pax=pith met=meta snap=data]
-    ^+  cor
-    =/  bp=path  (bare-path full-pax)
-    =/  life-path=path  [(scot %ud nuke.ax) %life bp]
-    =/  snap-path=path  [(scot %ud nuke.ax) %snap (scot %ud life.met) (scot %ud case.met) bp]
-    =.  cor
-      %-  emit
-      [%give %fact ~[life-path] %oxal-life !>(life.met)]
+    =/  logs-path=path  [(scot %ud nuke.ax) %logs (scot %ud life.met) (scot %ud case.met) bp]
     %-  emit
-    [%give %fact ~[snap-path] %oxal-data !>(snap)]
+    [%give %fact ~[logs-path] %oxal-snap !>([snap move life.met case.met])]
   ::
   ++  eyre-push
     ::
@@ -981,12 +928,13 @@
   ++  emit-node-effects
     ::
     ::  fan a bump out to the three channels.
+    ::  an empty move signals a full-replace on the gall channel.
     ::
-    |=  [full-pax=pith met=meta snap=data =bump]
+    |=  [full-pax=pith met=meta snap=data =move]
     ^+  cor
     ?.  effects  cor
-    =.  cor  (gall-channel full-pax met bump)
-    =.  cor  (grow-channel full-pax met snap bump)
+    =.  cor  (gall-channel full-pax met snap move)
+    =.  cor  (grow-channel full-pax met snap move)
     (eyre-push full-pax met (~(get do dat) full-pax))
   --
 --

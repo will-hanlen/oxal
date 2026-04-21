@@ -117,10 +117,8 @@
       ?~  gall.meta  !!
       ?>  (check-auth u.gall.meta our.bowl src.bowl)
       =/  resp  (initial-watch-response:engine full-pax)
-      (emit %give %fact ~ %oxal-snap !>(resp))
+      (emit %give %fact ~ %oxal-snap !>([snap.resp ~ life.resp case.resp]))
     ::
-    [%life *]  cor
-    [%snap *]  cor
     [%logs *]  cor
   ==
 ::

@@ -16,7 +16,7 @@
       ;*
       %+  turn
         ^-  (list path)
-        :~  /tree
+        :~  /home-static
             /author
             /gall/sky
             /gall/sup
