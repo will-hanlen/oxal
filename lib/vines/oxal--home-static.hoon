@@ -68,6 +68,21 @@
       ~|  bad-op+op
       !!
     ::
+    ++  render-error-manx
+      ::
+      ::  datastar fragment that morphs into the page's #error slot.
+      ::
+      |=  =tang
+      ^-  manx
+      ;div#error.fc.g2.p3.bd1.b2.br2.f-1
+        ;div.bold: poke failed
+        ;button.p2.br2.bd1.b3.hover.focus
+          =onclick  "window.location.reload()"
+          ; refresh
+        ==
+        ;+  (render-tang tang)
+      ==
+    ::
     ++  parse-auth
       ::
       ::  parse an auth-kind selection into a (unit auth); 'none' means ~.
@@ -98,7 +113,17 @@
 ?:  =('POST' method.bowl)
   =/  body  formencoded-body:vio
   =/  =cage  (body-to-cage body now.bowl)
-  ;<  ~  bind:m  (poke-our:vio cage)
+  ;<  err=(unit tang)  bind:m  (soft-poke-our:vio cage)
+  ?^  err
+    %-  (slog u.err)
+    ;<  ~  bind:m
+      %-  send-simple-payload:vio
+      :-  [200 ['content-type' 'text/html']~]
+      :-  ~
+      %-  as-octt:mimes:html
+      %-  en-xml:html
+      (render-error-manx u.err)
+    (pure:m !>(~))
   ?:  .=  `'true'  (get-header:http 'datastar-request' header-list.bowl)
     ;<  =acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
     ;<  ~  bind:m
@@ -170,6 +195,7 @@
 ++  bod
   ::
   ;div#tree
+    ;div#error;
     ;details
       ;summary: create node
       ;*  +7:(render-create-node-form rest.bowl)
@@ -234,10 +260,10 @@
       ;+
         %+  add-attribute  ['data-on:click' "$_details{nid} = !$_details{nid}"]
         %+  add-attribute  ['data-class:active' "$_details{nid}"]
-        (render-summary rel sug nude data.f code.f)
+        (render-summary rel sug nude data.f code.f at-or-below)
       ;+
         %^  add-class-if  !|(has-kids has-node has-view has-view-below)  "hidden"
-      ;div.bdt1.fc.b2.ml4.bdl1.bdr1
+      ;div.fc.b2.ml4.bd1
         =style  hid
         =data-show  "$_details{nid}"
         =data-signals  "\{'_sec{nid}': '{-:(head sections)}'}"
@@ -245,7 +271,7 @@
           ;*
           %+  turn  sections
           |=  [=tape *]
-          ;button.p-2.b2.hover
+          ;button.p-2.b3.hover
             =data-on_click  "$_sec{nid} = '{tape}'"
             =data-class_toggled  "$_sec{nid} == '{tape}'"
             ;-  tape
@@ -413,12 +439,12 @@
   =/  bod=marl
     ?:  locked
       ;=
-        ;div.mono.fs-1.pre
+        ;div.mono.fs-1.pre.fc.g2
           ;div.fs-2.o5: data locked because within $view
           ;+
           ?~  nude     ;span: none
           ?+  u.nude   ;span: no rendering
-            aota       ;div: {(print-node u.nude)}
+            aota       ;div: {(print-aura u.nude)}: {(print-node u.nude)}
             [%pith *]  ;div: {(pate u.nude)}
             [%tang *]
               ;div.pre.mono
@@ -480,35 +506,33 @@
     ==
   =/  bod=marl
     ;=
-      ;div.fc.g3.p2
-        ;form.fc.g2(data-on_submit post)
-          ;input(type "hidden", name "op", value "put-leaf");
-          ;label.fr.g2.ac
-            ;span: pith
-            ;input.p-2.br2.bd1.mono.grow.focus
-              =type  "text"
-              =name  "pax"
-              =placeholder  "/some/pith"
-              =required  ""
-              =spellcheck  "false"
-              =value  prefill
-              ;*  ~
-            ==
+      ;form.fc.g2(data-on_submit post)
+        ;input(type "hidden", name "op", value "put-leaf");
+        ;label.fr.g2.ac
+          ;span: pith
+          ;input.p-2.br2.bd1.mono.grow.focus
+            =type  "text"
+            =name  "pax"
+            =placeholder  "/some/pith"
+            =required  ""
+            =spellcheck  "false"
+            =value  prefill
+            ;*  ~
           ==
-          ;label.fc.g2
-            ;span: node
-            ;feather-textarea.p3.mono.br2.bd1.fs-2.focus
-              =name  "node"
-              =rows  "6"
-              =placeholder  "hoon for a node, e.g.  ud+12"
-              =required  ""
-              =spellcheck  "false"
-              ;*  ~
-            ==
+        ==
+        ;label.fc.g2
+          ;span: node
+          ;feather-textarea.p3.mono.br2.bd1.fs-2.focus
+            =name  "node"
+            =rows  "6"
+            =placeholder  "hoon for a node, e.g.  ud+12"
+            =required  ""
+            =spellcheck  "false"
+            ;*  ~
           ==
-          ;div.fr.g2
-            ;button.p-2.br2.bd1.b2.hover.focus: insert
-          ==
+        ==
+        ;div.fr.g2
+          ;button.p-2.br2.bd1.b2.hover.focus: insert
         ==
       ==
     ==
@@ -553,7 +577,7 @@
             ;feather-textarea.p3.mono.br2.bd1.fs-2.focus
               =name  "code"
               =rows  "10"
-              =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+              =placeholder  "^-  transformer"
               =required  ""
               =spellcheck  "false"
               =value  "[%link {(scow %p our.bowl)} /path-to-code]"
@@ -702,22 +726,14 @@
   =/  bod=marl
     ;=
       ;+  ?~  view.meta  ;/  ""  (render-error u.view.meta)
-      ;form.fc.g2
+      ;form.fc.bbv.br2.bd1.scroll-none.fs-2
         =data-on_submit  post
         ;input(type "hidden", name "op", value "install");
         ;input(type "hidden", name "pax", value (trip pax-t));
-        ;feather-textarea.p3.mono.br2.bd1.fs-2
-          =name  "code"
-          =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
-          =required  ""
-          =auto-indent  ""
-          =spellcheck  "false"
-          ;-  code-t
-        ==
-        ;div.fr
-          ;label.fc.grow
-            ;span.p1.fs-2.f5: dep ship
-            ;input.p-2.br2.bd1.mono.grow
+        ;div.fr.bbh
+          ;label.fc
+            =style   "min-width: 100px"
+            ;input.p-2.mono.grow
               =type  "text"
               =name  "dep-ship"
               =placeholder  "~zod"
@@ -728,8 +744,7 @@
             ==
           ==
           ;label.fc.grow
-            ;span.p1.fs-2.f5: dep pith
-            ;input.p-2.br2.bd1.mono.grow
+            ;input.p-2.mono.grow
               =type  "text"
               =name  "dep-pith"
               =placeholder  "/some/pith"
@@ -740,10 +755,16 @@
             ==
           ==
         ==
-        ;div.fr.g2
-          ;button.p-2.br2.bd1.b2.hover.focus
-            ;-  btn-label
-          ==
+        ;feather-textarea.p3.mono.fs-2
+          =name  "code"
+          =placeholder  "|=  [mine=data snap=data did=move life=@ud case=@ud]  ^-  move  ..."
+          =required  ""
+          =auto-indent  ""
+          =spellcheck  "false"
+          ;-  code-t
+        ==
+        ;button.p3.b3.hover.focus.fs0
+          ;-  btn-label
         ==
       ==
       ;+  ?.  has-view  ;/  ""
@@ -770,7 +791,7 @@
 ::
 ++  render-summary
   ::
-  |=  [where=pith sug=(unit iota) nude=(unit node) dat=data cod=code]
+  |=  [where=pith sug=(unit iota) nude=(unit node) dat=data cod=code at-or-below-view=?]
   ^-  manx
   =/  meta  (fall leaf.cod *meta)
   =/  has-node  ?=(^ nude)
@@ -788,14 +809,16 @@
         "f-3"
     ;span
       ;+
-        ?~  sug  ;/  "/"
-        ?@  u.sug  ;span.bold: {(trip u.sug)}
+        %^  add-class-if  has-view  "bold"
+        %^  add-class-if  &(!has-view at-or-below-view)  "o7"
+        ?~  sug  ;span: /
+        ?@  u.sug  ;span: {(trip u.sug)}
         ;span
           ;span.fs-1.o7
             ;-  (print-aura u.sug)
             ;-  ":"
           ==
-          ;span.bold
+          ;span
             ;-  (print-node u.sug)
           ==
         ==

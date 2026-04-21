@@ -82,6 +82,16 @@
     ^-  ?
     ?=(^ (~(abo ox c) pax |=(m=_c &(?=(^ leaf.m) ?=(^ view.u.leaf.m)))))
   ::
+  ++  at-or-beneath-view
+    ::
+    ::  does pax itself have a view, or is pax beneath an existing view?
+    ::
+    |=  [pax=pith c=code]
+    ^-  ?
+    =/  met=meta  (fall (~(get ox c) pax) *meta)
+    ?:  ?=(^ view.met)  %.y
+    (beneath-view pax c)
+  ::
   ++  suspend-view
     ::
     ::  unsub from faucet and store error on view
@@ -296,15 +306,15 @@
     ^-  [data (set chng)]
     =/  d=data  dat
     =/  c=code  cod
-    =/  is-beneath-view=$-([pith code] ?)  beneath-view
+    =/  is-at-or-beneath-view=$-([pith code] ?)  at-or-beneath-view
     =/  effective=(set chng)  ~
     =/  changes=(list chng)  ~(tap in move)
     |-
     ?~  changes  [d effective]
     =/  p=pith  (pith-of-chng i.changes)
-    ?:  ?&(!allow-view-write (is-beneath-view p c))
-      %-  (slog leaf+"fe: rejected write at or beneath view at {(pate p)}" ~)
-      $(changes t.changes)
+    ?:  ?&(!allow-view-write (is-at-or-beneath-view p c))
+      ~|  "fe: rejected write at or beneath view at {(pate p)}"
+      !!
     ?-  -.i.changes
       %ins
         ?:  =(`node.i.changes (~(get do d) pith.i.changes))
