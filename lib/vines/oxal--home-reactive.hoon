@@ -27,7 +27,7 @@
     %+  node-to-simple-payload  %manx
     ;html
       ;head
-        ;title: oxal home viewer
+        ;title: oxal viewer
         ;meta(charset "utf-8");
         ;link(rel "stylesheet", href "/hawk-init/feather/1/style");
         ;script(type "module", src "/hawk-init/feather/1/textarea");
@@ -36,7 +36,7 @@
         ;link(rel "icon", href "data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\"/>");
       ==
       ;body
-        =data-init  "@get('/oxal/home2')"
+        =data-init  "@get('{(pate (welp [prefix rest]:bowl))}')"
         ;div#top
           ; initializing
         ==
@@ -46,8 +46,18 @@
   (pure:m !>(~))
 ::
 ::
-=/  sub=wire  /sub/home
-;<  ~  bind:m  (watch sub [our.bowl %oxal] sub)
+=/  sub=wire  (welp #/both rest.bowl)
+;<  nope=(unit tang)  bind:m  (soft-watch-our:vio sub sub)
+?^  nope
+  ;<  ~  bind:m
+    %+  send-simple-payload:vio  [200 ['content-type' 'text/html']~]
+    :-  ~
+    %-  as-octt:mimes:html
+    %-  en-xml:html
+    ;div#top.p5
+      ;+  (render-tang u.nope)
+    ==
+  (pure:m !>(~))
 ;<  ~  bind:m
   %+  send-head:vio  200
   :~  ['content-type' 'text/event-stream']
@@ -61,7 +71,7 @@
   =<  +
   =<  abet
   %-  ~(ingress-install ae [local our.bowl | |])
-  =-  [/rendered - [our.bowl /home]]
+  =-  [/rendered - [our.bowl /raw]]
   '''
   |=  [mine=data snap=data =move *]
   ^+  move
@@ -69,12 +79,11 @@
   :~  :+  %ins  /
         :-  %manx
         ;div
-          ;div: hallelujia
           ;div
             ;*
             =;  =marl  ?^  marl  marl
               ;=
-                ;div: no data under home
+                ;div: no file
               ==
             %+  turn  ~(tap do snap)
             |=  [=pith =node]
@@ -133,14 +142,29 @@
 ++  consume-cage
   |=  [local=acer our=@p fact=cage]
   ^+  local
-  ~&  consuming-cage/-.fact
-  ?+  p.fact  local
-      %oxal-snap
-    =+  !<([snap=data =move =life =case] q.fact)
-    =<  +
-    =<  abet
-    %-  ~(ingress-hear-remote ae [local our | |])
-    [our /home/raw snap move life case]
+  ?+    p.fact
+    :::
+      ~&  unknown-cage-to-consume/-.fact
+      local
+    ::
+    %oxal-snap
+      ::
+      =+  !<([snap=data =move =life =case] q.fact)
+      ~&  heard-oxal-snap/move
+      =<  +
+      =<  abet
+      %-  ~(ingress-hear-remote ae [local our | |])
+      [our /raw snap move life case]
+      ::
+    %oxal-code
+      ::
+      =+  !<([snap=code =meta-move =life =case] q.fact)
+      ~&  heard-oxal-code/meta-move
+      =<  +
+      =<  abet
+      %-  ~(ingress-hear-remote-code ae [local our | |])
+      [our /raw snap meta-move life case]
+      ::
   ==
 ::
 ++  take-fact-or-wake

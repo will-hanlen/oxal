@@ -39,6 +39,26 @@
       `[%done p.sign.u.in.tin]
     ==
     ::
+  ++  soft-watch-our
+    ::
+    ::  watch our own agent and return the nack tang, if any: ~ on ack,
+    ::  [~ tang] on nack.  does not crash the thread on nack, so callers
+    ::  can render an error response.
+    ::
+    |=  [=wire =path]
+    =/  m  (strand ,(unit tang))
+    ^-  form:m
+    =/  =card:agent:gall  [%pass watch+wire %agent [our dap] %watch path]
+    ;<  ~  bind:m  (send-raw-card card)
+    |=  tin=strand-input:strand
+    ?+  in.tin  `[%skip ~]
+        ~  `[%wait ~]
+        [~ %agent * %watch-ack *]
+      ?.  =(watch+wire wire.u.in.tin)
+        `[%skip ~]
+      `[%done p.sign.u.in.tin]
+    ==
+    ::
   ++  send-head
     ::
     |=  =response-header:http

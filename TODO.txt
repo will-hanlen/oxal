@@ -1,4 +1,103 @@
 
+
+
+
+----- static pals 
+
+what i initially thought:
+  the right thing to do is to use lib gossip to eagerly sync public indexes.
+
+  and use the pals targets as the set of people who you would willingly recieve
+  1on1 communication with. you will willingly sync a part of their tree that they control
+  just for you. if i'm in your targets, you'll poll for my /[source]/to/[recipient] index.
+  or maybe even the whole tree?
+
+  a pals verbiage is the right verbiage: if i target you, i will sync part of your tree.
+
+new thinking:
+
+  static namespace is simpler
+
+  /our=@p/home/context=@tas                           :: local workspaces
+
+  /our=@p/publ/context=@tas                           :: my public feeds
+         /chum/context=@tas                           :: 1on1 workspaces
+         /shut/context=@tas                           :: multiparty
+         /conf/coop/context=@tas/@p   ~               :: (set ship) allowed to read
+              /targets/publ/@p        refresh=@dr     :: remote feeds
+                      /chum/@p        refresh=@dr     :: remote dm-s
+                      /shut/@p        refresh=@dr     :: remote groupchats
+
+
+  /our=@p/eyre    :: tree of http responses bound under /-
+
+  if this is the case, then we can get rid of grow, gall, & eyre from meta.
+
+  then there's no need to really
+
+------
+
+
+
+instead of installing views and placing data manually,
+all code and data in the tree is managed by an "app".
+this is because the dataful parts of the tree are "locked"
+with either a form or a lens. forms constrain a subtree's shape
+so that user can manually place data in there. views are
+transformers that either transform the output of a form or the
+output of another view.
+
+apps have their shape governed by a gate like
+|=  [title=iota globals=data locals=data]
+^-  (map pith view)
+
+there are a list of apps.
+globals are store globally under /globals
+locals are stored globally under /apps/[title=iota]/local
+
+globals are things like "who do i generally want to sync public data from"
+
+the globals and locals are used to build the shape of the app's views.
+once the views are in place, the user interacts with the app through
+its forms.
+
+i think i want to move away from html based interfaces.
+i don't want users to be writing interfaces.
+i don't really want them thinking about sail.
+i think it will be totally possible to just have them specify %form-s and %lens-s.
+
+then in the very distant future, maybe there's some convention which
+uses some namespace convention to generate rich interfaces.
+
+but the first round of things is just done in the static-datastar model.
+no sse for now.
+
+just get the spreadsheetedness to feel really good.
+
+i think the problem that i'm going to run into is that statically rendering a whole
+tree is really slow. so the ui actually needs some local state that it can use
+to determine which parts of the tree it actually needs to render.
+
+i guess this is an "app".
+in its local state it stores info like:
+- which subpath am i rendering
+- which directories are unfolded
+- what is the manx-ified rendering of this node.
+
+so while i'm building out the app system, i'll just use the htmx-static renderer.
+
+then once it works, i'll strip out the gall and eyre stuff.
+
+then i'll build a namespace renderer within the namespace as an app.
+
+then i'll figure out how to pipe its reactive output through eyre
+so that it works as a mast-like system.
+
+
+
+-------
+
+
 pith printing/parsing is broken. round trips
 through pate can be lossy for the %pith case
 

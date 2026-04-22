@@ -119,6 +119,33 @@
       =/  resp  (initial-watch-response:engine full-pax)
       (emit %give %fact ~ %oxal-snap !>([snap.resp ~ life.resp case.resp]))
     ::
+    [%code *]
+      =/  pax=pith  (pave t.path)
+      =/  full-pax=pith  [p+our.bowl pax]
+      ~|  forbidden/(spud path)
+      ?:  (lth (lent full-pax) 2)  !!
+      =/  =meta  (fall (~(get ox code.file.acer) full-pax) *meta)
+      ?~  gall.meta  !!
+      ?>  (check-auth u.gall.meta our.bowl src.bowl)
+      =/  resp  (initial-watch-response-code:engine full-pax)
+      (emit %give %fact ~ %oxal-code !>([snap.resp ~ life.resp case.resp]))
+    ::
+    [%both *]
+      =/  pax=pith  (pave t.path)
+      ~&  watch/pax
+      =/  full-pax=pith  [p+our.bowl pax]
+      ~|  forbidden/(spud path)
+      ?:  (lth (lent full-pax) 2)  !!
+      =/  =meta  (fall (~(get ox code.file.acer) full-pax) *meta)
+      ?~  gall.meta  !!
+      ?>  (check-auth u.gall.meta our.bowl src.bowl)
+      =/  dresp  (initial-watch-response:engine full-pax)
+      =/  cresp  (initial-watch-response-code:engine full-pax)
+      %-  emil
+      :~  [%give %fact ~ %oxal-snap !>([snap.dresp ~ life.dresp case.dresp])]
+          [%give %fact ~ %oxal-code !>([snap.cresp ~ life.cresp case.cresp])]
+      ==
+    ::
     [%logs *]  cor
   ==
 ::
@@ -228,6 +255,13 @@
       =+  !<  [=ship pax=pith snap=data =move =life =case]  vase
       =^  cz=(list card:agent:gall)  acer
         abet:(ingress-hear-remote:engine ship pax snap move life case)
+      (emil cz)
+      ::
+    %hear-remote-code
+      ::
+      =+  !<  [=ship pax=pith snap=code =meta-move =life =case]  vase
+      =^  cz=(list card:agent:gall)  acer
+        abet:(ingress-hear-remote-code:engine ship pax snap meta-move life case)
       (emil cz)
       ::
     ::

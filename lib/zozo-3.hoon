@@ -64,6 +64,24 @@
     ^-  meta
     (fall (~(get ox cod) pax) *meta)
   ::
+  ++  meta-significant-change
+    ::
+    ::  does the transition from old to new touch any structural field?
+    ::  case/logs/life alone are engine bookkeeping and don't fire
+    ::  code facts.
+    ::
+    |=  [old=(unit meta) new=(unit meta)]
+    ^-  ?
+    ?~  new  ?=(^ old)
+    ?~  old  %.y
+    ?|  !=(grow.u.old grow.u.new)
+        !=(eyre.u.old eyre.u.new)
+        !=(gall.u.old gall.u.new)
+        !=(view.u.old view.u.new)
+        !=(subs.u.old subs.u.new)
+        !=(view-subs.u.old view-subs.u.new)
+    ==
+  ::
   ++  beneath-view
     ::
     ::  is pax beneath an existing view?
@@ -215,12 +233,16 @@
   ++  ingress-do-move
     ::
     ::  user-facing move: chng piths are bare, relative to /[our].
-    ::  qualify them and dispatch to apply-move-qualified.
+    ::  qualify them and dispatch to apply-move-qualified.  wraps the
+    ::  dispatch to capture structural code changes produced by any
+    ::  transformer firings during propagate.
     ::
     |=  [=move allow-view-write=?]
     ^+  cor
     =.  cor  (vlog "ae: do-move ({(scow %ud ~(wyt in move))} changes)")
-    (apply-move-qualified (prefix-move [p+our ~] move) allow-view-write)
+    =/  cod-before  cod
+    =.  cor  (apply-move-qualified (prefix-move [p+our ~] move) allow-view-write)
+    (emit-code-at-ancestors cod-before)
   ::
   ++  apply-move-qualified
     ::
@@ -262,7 +284,7 @@
       ::  install re-qualifies internally, so strip the head iota.
       ::
       =/  bare-pax=pith  ?>(?=(^ i.views) t.i.views)
-      =.  cor  (ingress-install bare-pax code.u.view.vmet dep.u.view.vmet)
+      =.  cor  (install-inner bare-pax code.u.view.vmet dep.u.view.vmet)
       $(views t.views)
     $(chs t.chs)
   ::
@@ -281,10 +303,10 @@
     =/  smet=meta  (gut-meta i.subs-list)
     ?~  view.smet  $(subs-list t.subs-list)
     ::  sub paxes are fully qualified with [%p our]; strip head iota
-    ::  since ingress-install re-qualifies internally.
+    ::  since install-inner re-qualifies internally.
     ::
     =/  bare-pax=pith  ?>(?=(^ i.subs-list) t.i.subs-list)
-    =.  cor  (ingress-install bare-pax code.u.view.smet dep.u.view.smet)
+    =.  cor  (install-inner bare-pax code.u.view.smet dep.u.view.smet)
     $(subs-list t.subs-list)
   ::
   ++  apply-changes
@@ -433,6 +455,17 @@
   ::
   ++  ingress-install
     ::
+    ::  user-entry wrapper: snapshot cod, run install-inner, emit any
+    ::  structural code changes to gall-authorized ancestors.
+    ::
+    |=  [pax=pith code=source-code dep=source-ref]
+    ^+  cor
+    =/  cod-before  cod
+    =.  cor  (install-inner pax code dep)
+    (emit-code-at-ancestors cod-before)
+  ::
+  ++  install-inner
+    ::
     ::  install a view: store source in code tree, wipe data subtree.
     ::  pax is user-facing (bare, relative to /[our]); qualify it.
     ::  caller supplies only code and dep; lyf/cas/err default to
@@ -514,9 +547,10 @@
     =/  full-pax  (under-our pax)
     =.  cor  (vlog "ae: set-grow at {(pate full-pax)} = {?:(val "y" "n")}")
     ?.  (meta-allowed full-pax)  (reject-shallow "set-grow" full-pax)
+    =/  cod-before  cod
     =/  met=meta  (gut-meta full-pax)
     =.  cod  (~(put ox cod) full-pax met(grow val))
-    cor
+    (emit-code-at-ancestors cod-before)
   ::
   ++  ingress-set-eyre
     ::
@@ -531,22 +565,26 @@
     =/  full-pax  (under-our pax)
     =.  cor  (vlog "ae: set-eyre at {(pate full-pax)}")
     ?.  (meta-allowed full-pax)  (reject-shallow "set-eyre" full-pax)
+    =/  cod-before  cod
     =/  met=meta  (gut-meta full-pax)
     =/  new-met=meta  met(eyre val)
     =.  cod  (~(put ox cod) full-pax new-met)
-    ?:  (eyre-cached new-met)
-      (eyre-push full-pax new-met (~(get do dat) full-pax))
-    ?:  (eyre-cached met)
-      (eyre-evict full-pax)
-    cor
+    =.  cor
+      ?:  (eyre-cached new-met)
+        (eyre-push full-pax new-met (~(get do dat) full-pax))
+      ?:  (eyre-cached met)
+        (eyre-evict full-pax)
+      cor
+    (emit-code-at-ancestors cod-before)
   ::
   ++  ingress-set-gall
     ::
     ::  set gall auth on meta at pax, creating meta if missing.
     ::  pax is user-facing (qualified with /[our]).
-    ::  on flip-off, kick existing /sub/ subscribers (their subscription
-    ::  is no longer valid).  on flip-on, nothing to push: subscribers
-    ::  will arrive via on-watch and get initial state there.
+    ::  on flip-off, kick existing /sub/, /code/, and /both/ subscribers
+    ::  (their subscription is no longer valid).  on flip-on, nothing
+    ::  to push: subscribers will arrive via on-watch and get initial
+    ::  state there.
     ::
     |=  [pax=pith val=(unit auth)]
     ^+  cor
@@ -554,11 +592,14 @@
     =/  full-pax  (under-our pax)
     =.  cor  (vlog "ae: set-gall at {(pate full-pax)}")
     ?.  (meta-allowed full-pax)  (reject-shallow "set-gall" full-pax)
+    =/  cod-before  cod
     =/  met=meta  (gut-meta full-pax)
     =.  cod  (~(put ox cod) full-pax met(gall val))
+    =.  cor  (emit-code-at-ancestors cod-before)
     ?.  &(?=(^ gall.met) ?=(~ val))  cor
+    =/  bp=path  (bare-path full-pax)
     %-  emit
-    [%give %kick ~[[%sub (bare-path full-pax)]] ~]
+    [%give %kick ~[[%sub bp] [%code bp] [%both bp]] ~]
   ::
   ++  ingress-uninstall
     ::
@@ -570,6 +611,7 @@
     =/  full-pax  (under-our pax)
     =.  cor  (vlog "ae: uninstall at {(pate full-pax)}")
     ?.  (meta-allowed full-pax)  (reject-shallow "uninstall" full-pax)
+    =/  cod-before  cod
     =/  met=meta  (gut-meta full-pax)
     ::  remove from faucet subs if this was a view
     ::
@@ -577,7 +619,7 @@
       =.  cor  (faucet-unsub full-pax dep.u.view.met)
       (maybe-link-unsub full-pax u.view.met)
     =.  cod  (~(put ox cod) full-pax met(view ~))
-    cor
+    (emit-code-at-ancestors cod-before)
   ::
   ++  initialize-from-snap
     ::
@@ -609,6 +651,7 @@
     =/  full-pax  `pith`[p+ship pax]
     =.  cor  (vlog "ae: hear-remote from {<ship>} at {(pate full-pax)}")
     ?.  (meta-allowed full-pax)  (reject-shallow "hear-remote" full-pax)
+    =/  cod-before  cod
     =/  met=meta  (gut-meta full-pax)
     =?  cor  |((gth life life.met) =(~ move))
       =.  dat  (~(rep do dat) full-pax snap)
@@ -620,7 +663,39 @@
       =/  snp=data  (~(dip do dat) full-pax)
       =.  cor  (emit-node-effects full-pax new-met snp ~)
       (reinstall-subs full-pax)
-    (apply-move-qualified (prefix-move [p+ship ~] move) %.y)
+    =.  cor  (apply-move-qualified (prefix-move [p+ship ~] move) %.y)
+    (emit-code-at-ancestors cod-before)
+  ::
+  ++  ingress-hear-remote-code
+    ::
+    ::  apply an incoming %oxal-code fact about ship's faucet at pax.
+    ::  life bump or empty meta-move => overwrite our mirrored code
+    ::  subtree at full-pax with snap; otherwise apply the incremental
+    ::  meta-move by welding full-pax onto each relative pith.  local
+    ::  /code/ and /both/ subscribers are notified by the trailing
+    ::  emit-code-at-ancestors call.
+    ::
+    |=  [=ship pax=pith snap=code =meta-move =life =case]
+    ^+  cor
+    =/  full-pax  `pith`[p+ship pax]
+    =.  cor  (vlog "ae: hear-remote-code from {<ship>} at {(pate full-pax)}")
+    ?.  (meta-allowed full-pax)  (reject-shallow "hear-remote-code" full-pax)
+    =/  cod-before  cod
+    =/  met=meta  (gut-meta full-pax)
+    ?:  |((gth life life.met) =(~ meta-move))
+      =.  cod  (~(rep ox cod) full-pax snap)
+      (emit-code-at-ancestors cod-before)
+    =.  cod
+      =/  chs=(list meta-chng)  ~(tap in meta-move)
+      |-  ^+  cod
+      ?~  chs  cod
+      =.  cod
+        ?-  -.i.chs
+          %ins  (~(put ox cod) (weld full-pax pith.i.chs) meta.i.chs)
+          %del  (~(del ox cod) (weld full-pax pith.i.chs))
+        ==
+      $(chs t.chs)
+    (emit-code-at-ancestors cod-before)
   ::
   ++  ingress-bump
     ::
@@ -641,12 +716,15 @@
     ::
     =/  subs=(list (pair pith meta))
       ~(tap ox (~(dip ox cod) full-pax))
-    |-  ^+  cor
-    ?~  subs
-      =.  dat  (~(lop do dat) full-pax)
-      (reset-submetas full-pax %.n)
-    ?<  ?=(^ view.q.i.subs)
-    $(subs t.subs)
+    =/  cod-before  cod
+    =.  cor
+      |-  ^+  cor
+      ?~  subs
+        =.  dat  (~(lop do dat) full-pax)
+        (reset-submetas full-pax %.n)
+      ?<  ?=(^ view.q.i.subs)
+      $(subs t.subs)
+    (emit-code-at-ancestors cod-before)
   ::
   ++  build-rels
     ::
@@ -873,16 +951,31 @@
   ::
   ++  gall-channel
     ::
-    ::  /sub/ subscription effects.  always emits %oxal-snap.
+    ::  /sub/ and /both/ subscription effects.  always emits %oxal-snap.
     ::  an empty move signals a full-replace; otherwise incremental.
     ::  no-op if gall.met is ~.
     ::
     |=  [full-pax=pith met=meta snap=data =move]
     ^+  cor
     ?~  gall.met  cor
-    =/  sub-path=path  [%sub (bare-path full-pax)]
+    =/  bp=path  (bare-path full-pax)
+    =/  paths=(list path)  ~[[%sub bp] [%both bp]]
     %-  emit
-    [%give %fact ~[sub-path] %oxal-snap !>([snap move life.met case.met])]
+    [%give %fact paths %oxal-snap !>([snap move life.met case.met])]
+  ::
+  ++  code-channel
+    ::
+    ::  /code/ and /both/ subscription effects.  emits %oxal-code.
+    ::  an empty meta-move signals a full-replace; otherwise incremental.
+    ::  no-op if gall.met is ~.
+    ::
+    |=  [full-pax=pith met=meta snap=code =meta-move]
+    ^+  cor
+    ?~  gall.met  cor
+    =/  bp=path  (bare-path full-pax)
+    =/  paths=(list path)  ~[[%code bp] [%both bp]]
+    %-  emit
+    [%give %fact paths %oxal-code !>([snap meta-move life.met case.met])]
   ::
   ++  grow-channel
     ::
@@ -936,5 +1029,82 @@
     =.  cor  (gall-channel full-pax met snap move)
     =.  cor  (grow-channel full-pax met snap move)
     (eyre-push full-pax met (~(get do dat) full-pax))
+  ::
+  ++  initial-watch-response-code
+    ::
+    ::  current [snap life case] of code subtree at full-pax, for
+    ::  on-watch of /code/ and /both/.
+    ::
+    |=  full-pax=pith
+    ^-  [snap=code life=@ud case=@ud]
+    =/  met=meta  (gut-meta full-pax)
+    =/  snap=code  (~(dip ox cod) full-pax)
+    [snap life.met case.met]
+  ::
+  ++  emit-code-at-ancestors
+    ::
+    ::  diff cod-before against current cod, filter by
+    ::  meta-significant-change, and fan each surviving change out to
+    ::  every gall-authorized ancestor (of length >= min-meta-depth),
+    ::  relativizing the change pith to each ancestor.
+    ::
+    |=  cod-before=code
+    ^+  cor
+    ?.  effects  cor
+    =/  before-list=(list [pith meta])  ~(tap ox cod-before)
+    =/  after-list=(list [pith meta])   ~(tap ox cod)
+    =/  before-map=(map pith meta)  (malt before-list)
+    =/  after-map=(map pith meta)   (malt after-list)
+    =/  all-piths=(set pith)
+      %-  ~(uni in (silt (turn before-list head)))
+      (silt (turn after-list head))
+    =/  chngs=(list [pith meta-chng])
+      %+  murn  ~(tap in all-piths)
+      |=  p=pith
+      ^-  (unit [pith meta-chng])
+      =/  old=(unit meta)  (~(get by before-map) p)
+      =/  new=(unit meta)  (~(get by after-map) p)
+      ?.  (meta-significant-change old new)  ~
+      ?~  new  `[p [%del p]]
+      `[p [%ins p u.new]]
+    ?~  chngs  cor
+    =|  rels=(map pith meta-move)
+    =.  rels
+      =/  cs=(list [pith meta-chng])  chngs
+      |-  ^+  rels
+      ?~  cs  rels
+      =/  pax=pith       -.i.cs
+      =/  mc=meta-chng   +.i.cs
+      =/  len=@ud        (lent pax)
+      =/  depths=(list @ud)
+        ?:  (lth len min-meta-depth)  ~
+        (gulf min-meta-depth len)
+      =.  rels
+        |-  ^+  rels
+        ?~  depths  rels
+        =/  d=@ud       i.depths
+        =/  anc=pith    (scag d pax)
+        =/  anc-met=meta  (gut-meta anc)
+        ?~  gall.anc-met
+          $(depths t.depths)
+        =/  rp=pith   (slag d pax)
+        =/  rel=meta-chng
+          ?-  -.mc
+            %ins  mc(pith rp)
+            %del  mc(pith rp)
+          ==
+        =/  have=meta-move  (fall (~(get by rels) anc) ~)
+        =.  rels  (~(put by rels) anc (~(put in have) rel))
+        $(depths t.depths)
+      $(cs t.cs)
+    =/  rel-list=(list [pith meta-move])  ~(tap by rels)
+    |-  ^+  cor
+    ?~  rel-list  cor
+    =/  anc=pith       -.i.rel-list
+    =/  mm=meta-move   +.i.rel-list
+    =/  anc-met=meta   (gut-meta anc)
+    =/  anc-snap=code  (~(dip ox cod) anc)
+    =.  cor  (code-channel anc anc-met anc-snap mm)
+    $(rel-list t.rel-list)
   --
 --

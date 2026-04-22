@@ -121,8 +121,46 @@
 +$  data  $+  data  (oxal node)
 +$  code  $+  code  (oxal meta)
 ::
-+$  source-ref  [=ship =pith]
-+$  source-code  $@(@t [%link =source-ref])
+::
+::: shape of the namepsace
+::
+::
+::  first level: identies and system nodes
+::      @p tree owner
+::    or /global       :: tree of global data that all "app-shapes" depend on
+::       /apps/[name]  :: tree of local data that a single "app-shape" depends on
+::
+::     when something in /global or /apps changes, first the app-templates are
+::       re-run, then the data deps are re-run.
+::
+:::
+::
+::  new
+::
++$  shape  (list %not-implemented)
++$  view
+  $%  [%form out=shape]               :: define user-generated data
+      $:  %lens                       :: define cached reactive data
+          out=shape  in=shape 
+          =sauc  dep=link
+          lyf=@ud  cas=@ud
+          tang
+      ==
+  ==
++$  app
+  $:  source=@t
+      local=shape
+      compiled=$-([name=term globals=data locals=data] (map stem view))
+      ran=(map stem view)
+  ==
++$  apps  (list [name=term =app])  ::  all named apps
++$  link  [=ship =root]            ::  location
++$  sauc  $@(@t link)              ::  lambda code or [@t *] leaf location
+::
+::  old
+::
++$  source-ref  [=ship =pith]  ::xx remove
++$  source-code  $@(@t [%link =source-ref])  :: xx remve
 +$  source
   ::
   $:  code=source-code
@@ -133,9 +171,16 @@
   ==
 +$  meta
   ::
+  $+  meta
   $:  life=@ud
       =case
       logs=(list move)
+      ::
+      ::  xx i think i will get rid of these grow, eyre, gall.
+      ::     instead:
+      ::       grow will live under /[our]/publ
+      ::       1-to-1 encrypted     /[our]/chum
+      ::
       ::
       grow=_|              :: is this life static?, if no, lifes can be re-used.
       ::                   :: after yet, can't go back til next life
@@ -148,9 +193,13 @@
       ::
       gall=(unit auth)     :: ~ no subcription facts, ^ who can subscribe
       ::
-      view=(unit source)
-      subs=(set pith)
-      view-subs=(set pith)
+      view=(unit source)   :: xx remove
+      ::
+      ::  xx app=(unit term)
+      ::
+      ::
+      subs=(set pith)        :: views subscribed to my log
+      view-subs=(set pith)   :: views using my node as code
   ==
 ::
 +$  auth-kind
@@ -195,13 +244,22 @@
       ::
       ::  remote-subs=(jar source-ref pith)
       ::
+      ::  future field
+      ::    =apps
   ==
 ::
 +$  chng
+  $+  chng
   $%  [%ins =pith =node]
       [%del =pith]
   ==
-+$  move  (set chng)
++$  move  $+(move (set chng))
++$  meta-chng
+  $+  meta-chng
+  $%  [%ins =pith =meta]
+      [%del =pith]
+  ==
++$  meta-move  $+(meta-move (set meta-chng))
 +$  transformer  $-([mine=data snap=data =move life=@ case=@] move)
 ::
 ++  ref-to-pith

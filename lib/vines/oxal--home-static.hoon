@@ -482,6 +482,7 @@
         =placeholder  "/some/pith"
         =required  ""
         =spellcheck  "false"
+        =value  ?~(pax "/" (weld (pate pax) "/"))
         ;*  ~
       ==
     ==

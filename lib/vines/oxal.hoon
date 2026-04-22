@@ -17,6 +17,7 @@
       %+  turn
         ^-  (list path)
         :~  /home-static
+            /home-reactive
             /author
             /gall/sky
             /gall/sup
