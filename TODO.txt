@@ -93,7 +93,19 @@ then i'll build a namespace renderer within the namespace as an app.
 then i'll figure out how to pipe its reactive output through eyre
 so that it works as a mast-like system.
 
+------
 
+the static htmx renderer and eventually the dynamic namepsace internal renderer
+are rendering an "app".
+that is: instead of rendering a subtree, they're rendering a coherent collection
+of subtrees, that might be siblings, or very far aprart in the tree.
+
+the ui lets you filter to:
+- a subset of the views in the app
+- only the %form-s or only the %lens-es
+
+the datastar-static one probably just always shows all of them.
+that's fine for now.
 
 -------
 
