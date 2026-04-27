@@ -1,6 +1,7 @@
 ::  attempt to make a reactive renderer with fully cached state
-::
 ::  fat morph without full re-render
+::
+::  STATUS: BROKEN
 ::
 ::
 /+  *vineio

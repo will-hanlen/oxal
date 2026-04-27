@@ -19,6 +19,7 @@
         :~  /home-static
             /home-reactive
             /author
+            /apps
             /gall/sky
             /gall/sup
             /eyre/cache

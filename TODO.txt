@@ -1,44 +1,4 @@
 
-
-
-
------ static pals 
-
-what i initially thought:
-  the right thing to do is to use lib gossip to eagerly sync public indexes.
-
-  and use the pals targets as the set of people who you would willingly recieve
-  1on1 communication with. you will willingly sync a part of their tree that they control
-  just for you. if i'm in your targets, you'll poll for my /[source]/to/[recipient] index.
-  or maybe even the whole tree?
-
-  a pals verbiage is the right verbiage: if i target you, i will sync part of your tree.
-
-new thinking:
-
-  static namespace is simpler
-
-  /our=@p/home/context=@tas                           :: local workspaces
-
-  /our=@p/publ/context=@tas                           :: my public feeds
-         /chum/context=@tas                           :: 1on1 workspaces
-         /shut/context=@tas                           :: multiparty
-         /conf/coop/context=@tas/@p   ~               :: (set ship) allowed to read
-              /targets/publ/@p        refresh=@dr     :: remote feeds
-                      /chum/@p        refresh=@dr     :: remote dm-s
-                      /shut/@p        refresh=@dr     :: remote groupchats
-
-
-  /our=@p/eyre    :: tree of http responses bound under /-
-
-  if this is the case, then we can get rid of grow, gall, & eyre from meta.
-
-  then there's no need to really
-
-------
-
-
-
 instead of installing views and placing data manually,
 all code and data in the tree is managed by an "app".
 this is because the dataful parts of the tree are "locked"
@@ -57,63 +17,22 @@ locals are stored globally under /apps/[title=iota]/local
 
 globals are things like "who do i generally want to sync public data from"
 
-the globals and locals are used to build the shape of the app's views.
-once the views are in place, the user interacts with the app through
-its forms.
-
-i think i want to move away from html based interfaces.
-i don't want users to be writing interfaces.
-i don't really want them thinking about sail.
-i think it will be totally possible to just have them specify %form-s and %lens-s.
-
-then in the very distant future, maybe there's some convention which
-uses some namespace convention to generate rich interfaces.
-
-but the first round of things is just done in the static-datastar model.
-no sse for now.
-
-just get the spreadsheetedness to feel really good.
-
-i think the problem that i'm going to run into is that statically rendering a whole
-tree is really slow. so the ui actually needs some local state that it can use
-to determine which parts of the tree it actually needs to render.
-
-i guess this is an "app".
-in its local state it stores info like:
-- which subpath am i rendering
-- which directories are unfolded
-- what is the manx-ified rendering of this node.
-
-so while i'm building out the app system, i'll just use the htmx-static renderer.
-
-then once it works, i'll strip out the gall and eyre stuff.
-
-then i'll build a namespace renderer within the namespace as an app.
-
-then i'll figure out how to pipe its reactive output through eyre
-so that it works as a mast-like system.
-
 ------
 
-the static htmx renderer and eventually the dynamic namepsace internal renderer
-are rendering an "app".
-that is: instead of rendering a subtree, they're rendering a coherent collection
-of subtrees, that might be siblings, or very far aprart in the tree.
+should a %form view include schema migration logic?
+i think so. it's a gate that can morph the current tree when the %form is installed.
 
-the ui lets you filter to:
-- a subset of the views in the app
-- only the %form-s or only the %lens-es
-
-the datastar-static one probably just always shows all of them.
-that's fine for now.
-
--------
+---
 
 
 pith printing/parsing is broken. round trips
 through pate can be lossy for the %pith case
 
-idea: work on serializing $data to tarball
+---
+
+serialize $data to tarball
+
+---
 
 the %oxal-snap mark represents a change to a location in the $data tree.
 there needs to be a new mark which represents changes to the $code tree.
@@ -124,14 +43,16 @@ it should really only be emitted on nodes which have the gall.meta unit full.
 the path on which code changes should be emitted is /code/...
 and ther is a new subscription path /both/... which sends both %oxal-snap and the new code-change mark.
 
-idea: delete meta if no subdata and all lifes below are 0
+---
 
-before attempting to optimize the acer engine, test it fully
+delete $meta nodes if no subdata and all lifes below are 0
 
-transformer cache stores a (set pith) of refs so that it
-can remove caches once no views are installing from it anymore
+---
 
-idea: inherited metadata. it's cumbersome to make a full subtree available over http
+before attempting to optimize the acer engine, finish it
+and have it fully teste
+
+---
 
 mirror remote faucets via grow
 - calculate indexes and publish them
@@ -139,14 +60,3 @@ mirror remote faucets via grow
 - the acer optimizes by only holding the shortest
   mirror path necessary. so that it can use /[remote]/some/path
   as the real data tree.
-
-idea: multi-view programs
-- a special kind of node that lives in a meta.
-- it manages views below it
-- it takes a subscription from a source and then
-  emits a view-shape below.
-- it allows programatic install/uninstall based
-  on the state of another spot in the tree.
-- this is what gets shipped as full experiences
-- should these just be long-running threads?
-  so that they can manage pokes too?1

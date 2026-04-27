@@ -139,19 +139,31 @@
 ::
 +$  shape  (list %not-implemented)
 +$  view
-  $%  [%form out=shape]               :: define user-generated data
-      $:  %lens                       :: define cached reactive data
-          out=shape  in=shape 
-          =sauc  dep=link
-          lyf=@ud  cas=@ud
-          tang
-      ==
+  $%
+    ::  irreducable data
+    $:  %form
+        out=shape
+        ::  xx migrator to run on install? $-(data data)
+    ==
+    ::  derived data
+    ::
+    $:  %lens
+        out=shape
+        in=shape 
+        =sauc
+        dep=link
+        lyf=@ud
+        cas=@ud
+        tang
+    ==
   ==
++$  app-gate  $-([name=term globals=data locals=data] (map stem view))
 +$  app
   $:  source=@t
       local=shape
-      compiled=$-([name=term globals=data locals=data] (map stem view))
-      ran=(map stem view)
+      =app-gate
+      views=(map stem view)
+      error=(unit tang)
   ==
 +$  apps  (list [name=term =app])  ::  all named apps
 +$  link  [=ship =root]            ::  location
@@ -234,7 +246,7 @@
   ::
   $:  =file
       nuke=@ud
-      xfms=(map @t transformer)
+      xfms=(map @t transformer) :: xx (map @t [transformer (set pith)]) :: (set pith) is refcount
       ::
       ::  future field: an index of local subscribers keyed by remote
       ::  faucet [ship pith].  when the gall-networking layer lands,
@@ -245,7 +257,7 @@
       ::  remote-subs=(jar source-ref pith)
       ::
       ::  future field
-      ::    =apps
+      =apps
   ==
 ::
 +$  chng
