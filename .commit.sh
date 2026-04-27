@@ -6,7 +6,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 exec "${SCRIPT_DIR}/.dojo.sh" \
-  oxal:master-migrev-dolseg \
+  oxal:ship \
   150 \
   '|commit %oxal' \
   --sync="${SCRIPT_DIR}/.piers/master-migrev-dolseg/oxal"
