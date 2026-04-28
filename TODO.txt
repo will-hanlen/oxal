@@ -1,29 +1,8 @@
 
-instead of installing views and placing data manually,
-all code and data in the tree is managed by an "app".
-this is because the dataful parts of the tree are "locked"
-with either a form or a lens. forms constrain a subtree's shape
-so that user can manually place data in there. views are
-transformers that either transform the output of a form or the
-output of another view.
-
-apps have their shape governed by a gate like
-|=  [title=iota globals=data locals=data]
-^-  (map pith view)
-
-there are a list of apps.
-globals are store globally under /globals
-locals are stored globally under /apps/[title=iota]/local
-
-globals are things like "who do i generally want to sync public data from"
-
-------
-
 should a %form view include schema migration logic?
 i think so. it's a gate that can morph the current tree when the %form is installed.
 
 ---
-
 
 pith printing/parsing is broken. round trips
 through pate can be lossy for the %pith case

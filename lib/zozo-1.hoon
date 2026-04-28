@@ -173,37 +173,6 @@
           %-  octt
           %+  welp  "<!doctype html>"
           (en m)
-        ::
-        ::  %feather is a bad idea. going to cause bad caches
-        ::  xx remove me
-        ::
-        %feather
-          :-  'text/html'
-          %-  octt
-          %+  welp  "<!doctype html>"
-          %-  en
-          ^-  manx
-          ;html
-            ;head
-              ;meta(charset "UTF-8");
-              ;meta
-                =name  "viewport"
-                =content  "width=device-width, ".
-                          "initial-scale=1, ".
-                          "maximum-scale=1, ".
-                          "user-scalable=no, ".
-                          "viewport-fit=cover"
-                ;*  ~
-              ==
-              ;title
-                ;-  %+  fall  (get-attribute %title m)
-                    "feather document"
-              ==
-              ;link(rel "icon", href "data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\"/>");
-              ;link(rel "stylesheet", href "/hawk-init/feather/1/style");
-            ==
-            ;+  m(n.g %body)
-          ==
       ==
   ==
 ::
@@ -575,13 +544,13 @@
 ++  fix-newlines
   ::
   |=  c=cord
-  %^  cat  3
+  :: %^  cat  3
     %+  rap  3
     %+  murn  (rip 3 c)
     |=  char=@t
     ?:  =(char '\0d')  ~
     `char
-  '\0a'
+  :: '\0a'
 ::
 ++  map-to-json
   ::

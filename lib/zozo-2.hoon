@@ -75,7 +75,7 @@
     ^-  (list pith)
     %-  ~(mur ox cod)
     |=  [=pith =meta]
-    ?~  view.meta  ~
+    ?~  lord.meta  ~
     `(welp pax pith)
     ::
   --

@@ -203,18 +203,32 @@
         abet:(ingress-do-move:engine [move %.n])
       (emil cz)
       ::
-    %install
+    %install-app
       ::
-      =+  !<  [pax=pith code=source-code dep=source-ref]  vase
+      =+  !<  [name=term source=@t]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-install:engine pax code dep)
+        abet:(ingress-install-app:engine name source)
       (emil cz)
       ::
-    %uninstall
+    %uninstall-app
       ::
-      =+  !<  pax=pith  vase
+      =+  !<  name=term  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-uninstall:engine pax)
+        abet:(ingress-uninstall-app:engine name)
+      (emil cz)
+      ::
+    %reinstall-app
+      ::
+      =+  !<  name=term  vase
+      =^  cz=(list card:agent:gall)  acer
+        abet:(ingress-reinstall-app:engine name)
+      (emil cz)
+      ::
+    %update-app
+      ::
+      =+  !<  [name=term source=@t]  vase
+      =^  cz=(list card:agent:gall)  acer
+        abet:(ingress-update-app:engine name source)
       (emil cz)
       ::
     %bump

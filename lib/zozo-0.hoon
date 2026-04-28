@@ -139,27 +139,29 @@
 ::
 +$  shape  (list %not-implemented)
 +$  view
-  $%
-    ::  irreducable data
-    $:  %form
-        out=shape
-        ::  xx migrator to run on install? $-(data data)
-    ==
-    ::  derived data
-    ::
-    $:  %lens
-        out=shape
-        in=shape 
-        =sauc
-        dep=link
-        lyf=@ud
-        cas=@ud
-        tang
-    ==
+  $%  [%form form]  :: base data
+      [%lens lens]  :: derived data
   ==
+::
++$  form
+  $:
+    out=shape
+    ::  xx migrator to run on install? $-(data data)
+  ==
++$  lens
+  $:
+    out=shape
+    in=shape
+    =sauc
+    dep=link
+    lyf=@ud
+    cas=@ud
+    err=(unit tang)
+  ==
+::
 +$  app-gate  $-([name=term globals=data locals=data] (map stem view))
 +$  app
-  $:  source=@t
+  $:  source=@t  :: xx this is for dynamic apps; there should be a static version like (map stem @t) or something
       local=shape
       =app-gate
       views=(map stem view)
@@ -169,18 +171,6 @@
 +$  link  [=ship =root]            ::  location
 +$  sauc  $@(@t link)              ::  lambda code or [@t *] leaf location
 ::
-::  old
-::
-+$  source-ref  [=ship =pith]  ::xx remove
-+$  source-code  $@(@t [%link =source-ref])  :: xx remve
-+$  source
-  ::
-  $:  code=source-code
-      dep=source-ref
-      lyf=@ud
-      cas=@ud
-      err=tang
-  ==
 +$  meta
   ::
   $+  meta
@@ -205,10 +195,7 @@
       ::
       gall=(unit auth)     :: ~ no subcription facts, ^ who can subscribe
       ::
-      view=(unit source)   :: xx remove
-      ::
-      ::  xx app=(unit term)
-      ::
+      lord=(unit [app=term =view])
       ::
       subs=(set pith)        :: views subscribed to my log
       view-subs=(set pith)   :: views using my node as code
@@ -254,7 +241,7 @@
       ::  watches on without walking the code tree.  maintained by
       ::  +install / +uninstall.
       ::
-      ::  remote-subs=(jar source-ref pith)
+      ::  remote-subs=(jar link pith)
       ::
       ::  future field
       =apps
@@ -276,11 +263,11 @@
 ::
 ++  ref-to-pith
   ::
-  ::  source-ref to a tree pith: [ship pith] -> /[ship]/pith
+  ::  link to a tree pith: [ship root] -> /[ship]/root
   ::
-  |=  r=source-ref
+  |=  r=link
   ^-  pith
-  [p+ship.r pith.r]
+  [p+ship.r root.r]
 ::
 ++  pith-of-chng
   ::
@@ -1332,8 +1319,9 @@
   %+  ~(anc ox co)  stem
   |=  code
   ?&  ?=(^ leaf)
-      ?=(^ view.u.leaf)
-      ?=(~ err.u.view.u.leaf)
+      ?=(^ lord.u.leaf)
+      ?=(%lens -.view.u.lord.u.leaf)
+      ?=(~ err.view.u.lord.u.leaf)
   ==
   ::
 ::

@@ -64,6 +64,18 @@
     ^-  meta
     (fall (~(get ox cod) pax) *meta)
   ::
+  ++  find-app
+    ::
+    ::  linear scan of apps.ax for an entry with the given name.
+    ::
+    |=  want=term
+    ^-  (unit app)
+    =/  aps  apps.ax
+    |-  ^-  (unit app)
+    ?~  aps  ~
+    ?:  =(name.i.aps want)  `app.i.aps
+    $(aps t.aps)
+  ::
   ++  meta-significant-change
     ::
     ::  does the transition from old to new touch any structural field?
@@ -77,7 +89,7 @@
     ?|  !=(grow.u.old grow.u.new)
         !=(eyre.u.old eyre.u.new)
         !=(gall.u.old gall.u.new)
-        !=(view.u.old view.u.new)
+        !=(lord.u.old lord.u.new)
         !=(subs.u.old subs.u.new)
         !=(view-subs.u.old view-subs.u.new)
     ==
@@ -88,27 +100,45 @@
     ::
     |=  [pax=pith c=code]
     ^-  ?
-    ?=(^ (~(abo ox c) pax |=(m=_c &(?=(^ leaf.m) ?=(^ view.u.leaf.m)))))
+    ?=(^ (~(abo ox c) pax |=(m=_c &(?=(^ leaf.m) ?=(^ lord.u.leaf.m)))))
   ::
-  ++  at-or-beneath-view
+  ++  beneath-lens
     ::
-    ::  does pax itself have a view, or is pax beneath an existing view?
+    ::  is pax beneath an existing %lens view?
+    ::
+    |=  [pax=pith c=code]
+    ^-  ?
+    ?=(^ (~(abo ox c) pax |=(m=_c ?&(?=(^ leaf.m) ?=(^ lord.u.leaf.m) ?=(%lens -.view.u.lord.u.leaf.m)))))
+  ::
+  ++  at-or-beneath-lens
+    ::
+    ::  does pax itself have a %lens view, or sit beneath one?
+    ::  do-move rejects writes here: %lens output is derived, not
+    ::  user-editable.  %form views (and unview'd paths) hold base
+    ::  data and pass through.
     ::
     |=  [pax=pith c=code]
     ^-  ?
     =/  met=meta  (fall (~(get ox c) pax) *meta)
-    ?:  ?=(^ view.met)  %.y
-    (beneath-view pax c)
+    ?:  ?&  ?=(^ lord.met)
+            ?=(%lens -.view.u.lord.met)
+        ==
+      %.y
+    (beneath-lens pax c)
   ::
   ++  suspend-view
     ::
     ::  unsub from faucet and store error on view
     ::
-    |=  [pax=pith =source met=meta =tang]
+    |=  [pax=pith =view met=meta =tang]
     ^+  cor
+    ?>  ?=(%lens -.view)
+    ?>  ?=(^ lord.met)
     =.  cor  (vlog "ae: suspend view at {(pate pax)}")
-    =.  cor  (faucet-unsub pax dep.source)
-    =.  cod  (~(put ox cod) pax met(view `source(err tang)))
+    =.  cor  (faucet-unsub pax dep.view)
+    =.  cod
+      %+  ~(put ox cod)  pax
+      met(lord `[app=app.u.lord.met view=view(err `tang)])
     cor
   ::
   ++  get-xfm
@@ -133,16 +163,17 @@
   ::
   ++  resolve-code
     ::
-    ::  resolve source.code to the @t cord to compile.
+    ::  resolve view.sauc to the @t cord to compile.
     ::    - atom: use as-is
-    ::    - [%link pith]: fetch leaf from local data; on miss or
+    ::    - link: fetch leaf from local data; on miss or
     ::      wrong shape, fall back to a crashing-gate cord so the
     ::      view suspends via run-xfm's mule on first invocation.
     ::
-    |=  =source
+    |=  =view
     ^-  @t
-    ?@  code.source  code.source
-    =/  link-pax=pith  (ref-to-pith source-ref.code.source)
+    ?>  ?=(%lens -.view)
+    ?@  sauc.view  sauc.view
+    =/  link-pax=pith  (ref-to-pith sauc.view)
     =/  fallback=@t
       %-  crip
       """
@@ -186,7 +217,7 @@
     ::  remove full-pax from a faucet's subscriber set.
     ::  the faucet may live on any ship's subtree.
     ::
-    |=  [full-pax=pith dep=source-ref]
+    |=  [full-pax=pith dep=link]
     ^+  cor
     =/  faucet-pax       (ref-to-pith dep)
     =/  faucet-met=meta  (gut-meta faucet-pax)
@@ -223,12 +254,13 @@
   ::
   ++  maybe-link-unsub
     ::
-    ::  if source.code is a [%link source-ref], call link-unsub; else no-op.
+    ::  if view.sauc is a link, call link-unsub; else no-op.
     ::
-    |=  [full-pax=pith =source]
+    |=  [full-pax=pith =view]
     ^+  cor
-    ?@  code.source  cor
-    (link-unsub full-pax (ref-to-pith source-ref.code.source))
+    ?>  ?=(%lens -.view)
+    ?@  sauc.view  cor
+    (link-unsub full-pax (ref-to-pith sauc.view))
   ::
   ++  ingress-do-move
     ::
@@ -257,75 +289,78 @@
     ?:  =(~ effective)  cor
     (propagate d cod effective)
   ::
+  ++  rebuild-view
+    ::
+    ::  wipe a view's output and re-fire its transformer from the
+    ::  current faucet snap.  used when the view's source code
+    ::  changed (link target update) or its faucet's life bumped.
+    ::  full-pax is fully qualified with [%p our].
+    ::
+    |=  full-pax=pith
+    ^+  cor
+    =/  met=meta  (gut-meta full-pax)
+    ?~  lord.met  cor
+    =*  vw  view.u.lord.met
+    ?>  ?=(%lens -.vw)
+    =.  cor  (vlog "ae: rebuild-view at {(pate full-pax)}")
+    =.  dat  (~(lop do dat) full-pax)
+    =/  faucet-met=meta  (gut-meta (ref-to-pith dep.vw))
+    (initialize-from-snap full-pax vw faucet-met)
+  ::
   ++  reinstall-links
     ::
-    ::  for each effective change, look up view-subs on the meta
-    ::  at the change's pith; re-install every view in that set
-    ::  using its currently stored source.  a re-install re-resolves
-    ::  the link and either rebuilds cleanly or suspends with
-    ::  %no-pith via the fallback gate.
+    ::  for each effective change, rebuild every view-sub on the meta
+    ::  at the change's pith from the current faucet snap.  re-resolves
+    ::  link sources, so a code change at the link target propagates
+    ::  into a fresh transformer.
     ::
     |=  effective=(set chng)
     ^+  cor
     =/  chs=(list chng)  ~(tap in effective)
     |-  ^+  cor
     ?~  chs  cor
-    =/  p=pith  (pith-of-chng i.chs)
-    =/  met=meta  (gut-meta p)
-    =/  vs=(set pith)  view-subs.met
-    ?~  vs  $(chs t.chs)
-    =/  views=(list pith)  ~(tap in `(set pith)`vs)
+    =/  m=meta  (gut-meta (pith-of-chng i.chs))
+    =/  vs=(list pith)  ~(tap in view-subs.m)
     =.  cor
       |-  ^+  cor
-      ?~  views  cor
-      =/  vmet=meta  (gut-meta i.views)
-      ?~  view.vmet  $(views t.views)
-      ::  view paxes in view-subs are fully qualified with [%p our];
-      ::  install re-qualifies internally, so strip the head iota.
-      ::
-      =/  bare-pax=pith  ?>(?=(^ i.views) t.i.views)
-      =.  cor  (install-inner bare-pax code.u.view.vmet dep.u.view.vmet)
-      $(views t.views)
+      ?~  vs  cor
+      =.  cor  (rebuild-view i.vs)
+      $(vs t.vs)
     $(chs t.chs)
   ::
   ++  reinstall-subs
     ::
-    ::  re-install every view in pax's subs set using its currently
-    ::  stored source.  used on reinstall / life-bump to force local
-    ::  subscribers to rebuild from the fresh snap with an empty move.
+    ::  rebuild every view in pax's subs set from the current faucet
+    ::  snap.  used on remote life-bump to force local subscribers
+    ::  to rebuild from the fresh snap.
     ::
     |=  pax=pith
     ^+  cor
-    =/  met=meta  (gut-meta pax)
-    =/  subs-list=(list pith)  ~(tap in subs.met)
+    =/  m=meta  (gut-meta pax)
+    =/  subs-list=(list pith)  ~(tap in subs.m)
     |-  ^+  cor
     ?~  subs-list  cor
-    =/  smet=meta  (gut-meta i.subs-list)
-    ?~  view.smet  $(subs-list t.subs-list)
-    ::  sub paxes are fully qualified with [%p our]; strip head iota
-    ::  since install-inner re-qualifies internally.
-    ::
-    =/  bare-pax=pith  ?>(?=(^ i.subs-list) t.i.subs-list)
-    =.  cor  (install-inner bare-pax code.u.view.smet dep.u.view.smet)
+    =.  cor  (rebuild-view i.subs-list)
     $(subs-list t.subs-list)
   ::
   ++  apply-changes
     ::
     ::  apply each change to data, filtering to effective ones.
-    ::  skip changes at or beneath a view unless allow-view-write.
+    ::  skip changes at or beneath a %lens view unless allow-view-write:
+    ::  do-move only writes to base data (under forms or unview'd).
     ::
     |=  [=move allow-view-write=?]
     ^-  [data (set chng)]
     =/  d=data  dat
     =/  c=code  cod
-    =/  is-at-or-beneath-view=$-([pith code] ?)  at-or-beneath-view
+    =/  is-at-or-beneath-lens=$-([pith code] ?)  at-or-beneath-lens
     =/  effective=(set chng)  ~
     =/  changes=(list chng)  ~(tap in move)
     |-
     ?~  changes  [d effective]
     =/  p=pith  (pith-of-chng i.changes)
-    ?:  ?&(!allow-view-write (is-at-or-beneath-view p c))
-      ~|  "fe: rejected write at or beneath view at {(pate p)}"
+    ?:  ?&(!allow-view-write (is-at-or-beneath-lens p c))
+      ~|  "fe: rejected write at or beneath lens at {(pate p)}"
       !!
     ?-  -.i.changes
       %ins
@@ -433,12 +468,14 @@
     ::  the transformer output is prefixed with sub and applied
     ::  via apply-move-qualified to avoid double-prefixing.
     ::
-    |=  [sub=pith =source met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
+    |=  [sub=pith =view met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^+  cor
+    ?>  ?=(%lens -.view)
+    ?>  ?=(^ lord.met)
     =.  cor  (vlog "ae: run-xfm at {(pate sub)}")
-    =^  xfm-res=(each transformer tang)  cor  (get-xfm (resolve-code source))
+    =^  xfm-res=(each transformer tang)  cor  (get-xfm (resolve-code view))
     ?:  ?=(%| -.xfm-res)
-      (suspend-view sub source met p.xfm-res)
+      (suspend-view sub view met p.xfm-res)
     =/  xfm=transformer  p.xfm-res
     =/  mine=data  (~(dip do dat) sub)
     =/  result=(each move tang)
@@ -446,62 +483,32 @@
     ?-  -.result
       %&
         =.  cod
-          (~(put ox cod) sub met(view `source(lyf lyf, cas cas)))
+          %+  ~(put ox cod)  sub
+          met(lord `[app=app.u.lord.met view=view(lyf lyf, cas cas)])
         (apply-move-qualified [(prefix-move sub p.result) %.y])
       ::
       %|
-        (suspend-view sub source met p.result)
+        (suspend-view sub view met p.result)
     ==
   ::
-  ++  ingress-install
+  ++  place-app-view
     ::
-    ::  user-entry wrapper: snapshot cod, run install-inner, emit any
-    ::  structural code changes to gall-authorized ancestors.
+    ::  install one view from app `name` at stem.  for %lens, wires
+    ::  faucet subs, optional link subs, and runs initialize-from-snap.
+    ::  for %form, just writes the meta (no faucet, no transformer).
+    ::  pre-validated by ingress-install-app, so the meta-allowed and
+    ::  beneath-view checks here are defensive.
     ::
-    |=  [pax=pith code=source-code dep=source-ref]
+    |=  [name=term stem=pith =view]
     ^+  cor
-    =/  cod-before  cod
-    =.  cor  (install-inner pax code dep)
-    (emit-code-at-ancestors cod-before)
-  ::
-  ++  install-inner
-    ::
-    ::  install a view: store source in code tree, wipe data subtree.
-    ::  pax is user-facing (bare, relative to /[our]); qualify it.
-    ::  caller supplies only code and dep; lyf/cas/err default to
-    ::  initial values (run-xfm overwrites lyf/cas on first fire).
-    ::
-    |=  [pax=pith code=source-code dep=source-ref]
-    ^+  cor
-    =/  =source  [code dep lyf=0 cas=0 err=~]
-    =/  full-pax  (under-our pax)
-    =/  full-dep  (ref-to-pith dep.source)
-    =.  cor  (vlog "ae: install at {(pate full-pax)}")
-    ?.  (meta-allowed full-pax)  (reject-shallow "install" full-pax)
-    ::  reject install beneath an existing view
-    ::
-    ?:  (beneath-view full-pax cod)
-      %-  (slog leaf+"fe: rejected install at or beneath view at {(pate full-pax)}" ~)
-      cor
-    ::  reject install whose faucet is the view itself or an ancestor
-    ::  of it: the view's output would flow back into its own input.
-    ::
-    ?:  (~(is-ancestor-or-same th full-pax) full-dep)
-      %-  %+  slog  leaf+"fe: rejected install at {(pate full-pax)}: faucet {(pate full-dep)} is self or ancestor"
-          ~
-      cor
-    =/  old  (~(get ox cod) full-pax)
-    ::  if re-installing, run uninstall cleanup first
-    ::
-    =?  cor  &(?=(^ old) ?=(^ view.u.old))
-      =.  cor  (faucet-unsub full-pax dep.u.view.u.old)
-      (maybe-link-unsub full-pax u.view.u.old)
+    =/  full-pax  (under-our stem)
+    =/  old=(unit meta)  (~(get ox cod) full-pax)
     =/  met=meta
       %*  .  *meta
         life       ?~  old  0
                    ?:  grow.u.old  +(life.u.old)
                    life.u.old
-        view       `source
+        lord       `[app=name view=view]
         subs       ?~(old ~ subs.u.old)
         view-subs  ?~(old ~ view-subs.u.old)
         grow       ?~(old %.n grow.u.old)
@@ -510,31 +517,147 @@
       ==
     =.  cod  (~(put ox cod) full-pax met)
     =.  dat  (~(lop do dat) full-pax)
-    ::  on reinstall, fire life-bump effects on the root.  life on
-    ::  root may or may not have bumped depending on grow.
-    ::
-    =?  cor  ?=(^ old)
-      =/  snap=data  (~(dip do dat) full-pax)
-      (emit-node-effects full-pax met snap ~)
-    ::  on grow children, increment life; reset case for all submetas
-    ::
-    =.  cor  (reset-submetas full-pax %.y)
-    ::  populate faucet subs with this view's path
-    ::
+    ?:  ?=(%form -.view)  cor
+    =/  full-dep=pith    (ref-to-pith dep.view)
     =/  faucet-met=meta  (gut-meta full-dep)
     =.  cod
       %+  ~(put ox cod)  full-dep
       faucet-met(subs (~(put in subs.faucet-met) full-pax))
-    ::  populate link subs if source uses %link
+    =?  cor  ?=(^ sauc.view)
+      (link-sub full-pax (ref-to-pith sauc.view))
+    (initialize-from-snap full-pax view faucet-met)
+  ::
+  ++  ingress-install-app
     ::
-    =?  cor  ?=([%link *] code.source)
-      (link-sub full-pax (ref-to-pith source-ref.code.source))
-    =.  cor  (initialize-from-snap full-pax source faucet-met)
-    ::  on reinstall, force local subs to rebuild from fresh snap
-    ::  (empty move); new installs have no prior subs to notify.
+    ::  compile app source, run it with empty data, place all returned
+    ::  views, and append the app entry to acer.apps.  on compile or
+    ::  run failure, store the entry with views=~ and error=`tang —
+    ::  no tree changes.  rejects if `name` already exists, or if any
+    ::  returned stem fails pre-validation (depth or beneath-view).
     ::
-    ?~  old  cor
-    (reinstall-subs full-pax)
+    |=  [name=term source=@t]
+    ^+  cor
+    =.  cor  (vlog "ae: install-app {<name>}")
+    ?:  ?=(^ (find-app name))
+      %-  (slog leaf+"ae: rejected install-app: {<name>} already exists" ~)
+      cor
+    =/  cod-before  cod
+    =/  comp=(each app-gate tang)
+      (mule |.(!<(app-gate (slap !>(.) (ream source)))))
+    ?:  ?=(%| -.comp)
+      =/  =app  *app
+      =.  source.app  source
+      =.  error.app  `p.comp
+      =.  apps.ax  (snoc apps.ax [name app])
+      cor
+    =/  =app-gate  p.comp
+    =/  run=(each (map stem view) tang)
+      (mule |.((app-gate [name *data *data])))
+    ?:  ?=(%| -.run)
+      =/  =app  *app
+      =.  source.app    source
+      =.  app-gate.app  app-gate
+      =.  error.app     `p.run
+      =.  apps.ax  (snoc apps.ax [name app])
+      cor
+    =/  vws=(map stem view)  p.run
+    =/  pairs=(list [stem view])  ~(tap by vws)
+    =/  validation=(unit @t)
+      |-  ^-  (unit @t)
+      ?~  pairs  ~
+      =/  full-pax  (under-our -.i.pairs)
+      ?.  (meta-allowed full-pax)
+        `(crip "ae: install-app rejected: stem too shallow at {(pate full-pax)}")
+      ?:  (beneath-view full-pax cod)
+        `(crip "ae: install-app rejected: stem at or beneath existing view at {(pate full-pax)}")
+      $(pairs t.pairs)
+    ?^  validation
+      %-  (slog leaf+(trip u.validation) ~)
+      cor
+    =.  cor
+      =/  pairs=(list [stem view])  ~(tap by vws)
+      |-  ^+  cor
+      ?~  pairs  cor
+      =.  cor  (place-app-view name -.i.pairs +.i.pairs)
+      $(pairs t.pairs)
+    =/  =app  *app
+    =.  source.app    source
+    =.  app-gate.app  app-gate
+    =.  views.app     vws
+    =.  apps.ax  (snoc apps.ax [name app])
+    (emit-code-at-ancestors cod-before)
+  ::
+  ++  uninstall-app-view
+    ::
+    ::  remove a single app view: faucet/link unsub for %lens, then
+    ::  clear lord on meta.  preserves data.  stem is bare; qualified
+    ::  with /[our] before lookup.
+    ::
+    |=  [stem=pith =view]
+    ^+  cor
+    =/  full-pax  (under-our stem)
+    =/  met=meta  (gut-meta full-pax)
+    =?  cor  ?=(%lens -.view)
+      =.  cor  (faucet-unsub full-pax dep.view)
+      (maybe-link-unsub full-pax view)
+    =.  cod  (~(put ox cod) full-pax met(lord ~))
+    cor
+  ::
+  ++  ingress-uninstall-app
+    ::
+    ::  remove every view placed by app `name` (faucet/link unsub,
+    ::  clear lord) and drop the entry from apps.ax.  preserves data.
+    ::  no-op (with slog) if name not found.
+    ::
+    |=  name=term
+    ^+  cor
+    =.  cor  (vlog "ae: uninstall-app {<name>}")
+    =/  found=(unit app)  (find-app name)
+    ?~  found
+      %-  (slog leaf+"ae: rejected uninstall-app: {<name>} not found" ~)
+      cor
+    =/  cod-before  cod
+    =.  cor
+      =/  pairs=(list [stem view])  ~(tap by views.u.found)
+      |-  ^+  cor
+      ?~  pairs  cor
+      =.  cor  (uninstall-app-view -.i.pairs +.i.pairs)
+      $(pairs t.pairs)
+    =.  apps.ax
+      %+  skip  apps.ax
+      |=  [n=term *]
+      =(n name)
+    (emit-code-at-ancestors cod-before)
+  ::
+  ++  ingress-reinstall-app
+    ::
+    ::  re-install app `name` from its stored source: remove all of
+    ::  its current views, then rerun install-app with the same source.
+    ::  no-op (with slog) if name not found.
+    ::
+    |=  name=term
+    ^+  cor
+    =.  cor  (vlog "ae: reinstall-app {<name>}")
+    =/  found=(unit app)  (find-app name)
+    ?~  found
+      %-  (slog leaf+"ae: rejected reinstall-app: {<name>} not found" ~)
+      cor
+    =/  src=@t  source.u.found
+    =.  cor  (ingress-uninstall-app name)
+    (ingress-install-app name src)
+  ::
+  ++  ingress-update-app
+    ::
+    ::  replace app `name`'s source: uninstall its current views, then
+    ::  install fresh from the new source.  installs from scratch if
+    ::  no app by that name exists.
+    ::
+    |=  [name=term source=@t]
+    ^+  cor
+    =.  cor  (vlog "ae: update-app {<name>}")
+    =/  found=(unit app)  (find-app name)
+    =?  cor  ?=(^ found)  (ingress-uninstall-app name)
+    (ingress-install-app name source)
   ::
   ++  ingress-set-grow
     ::
@@ -601,40 +724,23 @@
     %-  emit
     [%give %kick ~[[%sub bp] [%code bp] [%both bp]] ~]
   ::
-  ++  ingress-uninstall
-    ::
-    ::  remove a view: clear view from meta, preserve data.
-    ::  pax is user-facing (qualified with /[our]).
-    ::
-    |=  pax=pith
-    ^+  cor
-    =/  full-pax  (under-our pax)
-    =.  cor  (vlog "ae: uninstall at {(pate full-pax)}")
-    ?.  (meta-allowed full-pax)  (reject-shallow "uninstall" full-pax)
-    =/  cod-before  cod
-    =/  met=meta  (gut-meta full-pax)
-    ::  remove from faucet subs if this was a view
-    ::
-    =?  cor  ?=(^ view.met)
-      =.  cor  (faucet-unsub full-pax dep.u.view.met)
-      (maybe-link-unsub full-pax u.view.met)
-    =.  cod  (~(put ox cod) full-pax met(view ~))
-    (emit-code-at-ancestors cod-before)
-  ::
   ++  initialize-from-snap
     ::
     ::  run the transformer once with the faucet's current snap and
     ::  an empty move, signaling "reconstruct state from snap".
     ::  full-pax is qualified.
     ::
-    |=  [full-pax=pith =source faucet-met=meta]
+    |=  [full-pax=pith =view faucet-met=meta]
     ^+  cor
+    ?>  ?=(%lens -.view)
     =/  met=meta  (gut-meta full-pax)
-    ?.  ?=(^ view.met)  cor
-    ?:  ?=(^ err.u.view.met)  cor
-    =/  snap=data  (~(dip do dat) (ref-to-pith dep.source))
+    ?.  ?=(^ lord.met)  cor
+    =*  vw  view.u.lord.met
+    ?>  ?=(%lens -.vw)
+    ?:  ?=(^ err.vw)  cor
+    =/  snap=data  (~(dip do dat) (ref-to-pith dep.view))
     %:  run-xfm
-      full-pax  source  met  snap  ~
+      full-pax  view  met  snap  ~
       life.faucet-met  case.faucet-met
     ==
   ::
@@ -711,7 +817,7 @@
     ::  check no ancestor of full-pax has a view
     ::
     ~|  %cannot-bump-an-installed-view
-    ?<  ?=(^ (~(anc ox cod) full-pax |=(m=_cod ?&(?=(^ leaf.m) ?=(^ view.u.leaf.m)))))
+    ?<  ?=(^ (~(anc ox cod) full-pax |=(m=_cod ?&(?=(^ leaf.m) ?=(^ lord.u.leaf.m)))))
     ::  check no node at or below full-pax has a view
     ::
     =/  subs=(list (pair pith meta))
@@ -722,7 +828,7 @@
       ?~  subs
         =.  dat  (~(lop do dat) full-pax)
         (reset-submetas full-pax %.n)
-      ?<  ?=(^ view.q.i.subs)
+      ?<  ?=(^ lord.q.i.subs)
       $(subs t.subs)
     (emit-code-at-ancestors cod-before)
   ::
@@ -814,11 +920,12 @@
     ?~  sub-list  [out cor]
     =/  sub=pith  i.sub-list
     =/  sub-met=meta  (gut-meta sub)
-    ?~  view.sub-met  $(sub-list t.sub-list)
-    =/  =source  u.view.sub-met
-    ?:  ?=(^ err.source)  $(sub-list t.sub-list)
+    ?~  lord.sub-met  $(sub-list t.sub-list)
+    =*  vw  view.u.lord.sub-met
+    ?>  ?=(%lens -.vw)
+    ?:  ?=(^ err.vw)  $(sub-list t.sub-list)
     =^  maybe-out=(unit move)  cor
-      (run-xfm-collect sub source sub-met snap mov lyf cas)
+      (run-xfm-collect sub vw sub-met snap mov lyf cas)
     =?  out  ?=(^ maybe-out)  (~(uni in out) u.maybe-out)
     $(sub-list t.sub-list)
   ::
@@ -828,12 +935,14 @@
     ::  meta and return the prefixed output move.  on crash, suspend
     ::  the view and return ~.
     ::
-    |=  [sub=pith =source met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
+    |=  [sub=pith =view met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^-  [(unit move) _cor]
+    ?>  ?=(%lens -.view)
+    ?>  ?=(^ lord.met)
     =.  cor  (vlog "ae: fire xfm at {(pate sub)}")
-    =^  xfm-res=(each transformer tang)  cor  (get-xfm (resolve-code source))
+    =^  xfm-res=(each transformer tang)  cor  (get-xfm (resolve-code view))
     ?:  ?=(%| -.xfm-res)
-      [~ (suspend-view sub source met p.xfm-res)]
+      [~ (suspend-view sub view met p.xfm-res)]
     =/  xfm=transformer  p.xfm-res
     =/  mine=data  (~(dip do dat) sub)
     =/  result=(each move tang)
@@ -841,11 +950,12 @@
     ?-  -.result
       %&
         =.  cod
-          (~(put ox cod) sub met(view `source(lyf lyf, cas cas)))
+          %+  ~(put ox cod)  sub
+          met(lord `[app=app.u.lord.met view=view(lyf lyf, cas cas)])
         [`(prefix-move sub p.result) cor]
       ::
       %|
-        [~ (suspend-view sub source met p.result)]
+        [~ (suspend-view sub view met p.result)]
     ==
   ::
   ++  apply-extra-changes

@@ -25,28 +25,45 @@
 ::
 =/  hymn=manx
   ::
-  ;feather.p5.fc.g5.pb15(title "oxal sky")
-    ;h1: sky
-    ;div.fr.g3.f4.o6
-      ;span
-        ;-  "{(scow %ud (lent entries))} binding"
-        ;-  ?:(=(1 (lent entries)) "" "s")
+  ;html
+    ;head
+      ;meta(charset "UTF-8");
+      ;meta
+        =name  "viewport"
+        =content  "width=device-width, ".
+                  "initial-scale=1, ".
+                  "maximum-scale=1, ".
+                  "user-scalable=no, ".
+                  "viewport-fit=cover"
+        ;*  ~
       ==
-      ;span: under
-      ;span.mono.bold: {filter-label}
+      ;title: oxal sky
+      ;link(rel "icon", href "data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\"/>");
+      ;link(rel "stylesheet", href "/hawk-init/feather/1/style");
     ==
-    ;div.fc.g3
-      ;*
-      =;  =marl  ?^  marl  marl
-        ;=
-          ;div.p3.bd1.br2.o6
-            ;-  ?~  rest.bowl  "no bindings"
-                "no bindings under {(spud rest.bowl)}"
-          ==
+    ;body.p5.fc.g5.pb15
+      ;h1: sky
+      ;div.fr.g3.f4.o6
+        ;span
+          ;-  "{(scow %ud (lent entries))} binding"
+          ;-  ?:(=(1 (lent entries)) "" "s")
         ==
-      %+  turn  entries
-      |=  [=path =fans:gall]
-      (render-binding path fans)
+        ;span: under
+        ;span.mono.bold: {filter-label}
+      ==
+      ;div.fc.g3
+        ;*
+        =;  =marl  ?^  marl  marl
+          ;=
+            ;div.p3.bd1.br2.o6
+              ;-  ?~  rest.bowl  "no bindings"
+                  "no bindings under {(spud rest.bowl)}"
+            ==
+          ==
+        %+  turn  entries
+        |=  [=path =fans:gall]
+        (render-binding path fans)
+      ==
     ==
   ==
 ::
