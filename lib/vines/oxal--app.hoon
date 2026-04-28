@@ -5,38 +5,33 @@
 =/  vio  ~(. server bowl)
 ^-  form:m
 ::
-;<  =acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+;<  ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
 =/  app-name=@tas  ~|  %not-found  (head rest.bowl)
-=/  =app  (got-app acer app-name)
+=/  =app  (got-app ax app-name)
 ::
 |^
   :::
   ?:  =('POST' method.bowl)
     =/  body=(map @t @t)  formencoded-body:vio
-    =/  op=@t  (~(got by body) 'op')
-    ;<  ~  bind:m
-      ?:  =('set-source' op)
+    =/  op=@tas           (~(got by body) 'op')
+    =/  is-ds=?           =((get-header:vio 'datastar-request') `'true')
+    =/  route             [is-ds op]
+    ::
+    ?+  route  ~|  route-not-found/route  !!
+      :::
+      [%.y %set-source]
         ::
         =/  source=@t   (fix-newlines (~(got by body) 'source'))
-        (poke-our:vio %update-app !>([app-name source]))
-      !!
-    =/  is-ds=?
-      =((get-header:http 'datastar-request' header-list.bowl) `'true')
-    ?.  is-ds  ~|  %not-datastar  !!
-    ;<  ax=^acer  bind:m  (scry ,^acer /gx/oxal/acer/noun)
-    =.  acer  ax
-    ;<  ~  bind:m
-      %-  send-simple-payload:vio
-      :-  [200 ['content-type' 'text/html']~]
-      :-  ~
-      %-  as-octt:mimes:html
-      %-  en-xml:html
-      part-file
-    (pure:m !>(~))
+        ;<  ~  bind:m  (poke-our:vio %update-app !>([app-name source]))
+        ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+        =.  ax  new-ax
+        =.  app  (got-app ax app-name)
+        ;<  ~  bind:m  (send-html-payload:vio part-file)
+        (pure:m !>(~))
+      ::
+    ==
   ::
-  ;<  ~  bind:m
-    %-  send-simple-payload:vio
-    (node-to-simple-payload manx+hymn)
+  ;<  ~  bind:m  (send-html-payload:vio hymn)
   ::
   (pure:m !>(~))
 ::
@@ -68,7 +63,7 @@
       ;+  part-header
       ;feather-slide-panels
         ;+  part-file
-        ;+  part-source
+        ;+  part-source 
       ==
     ==
   ==
@@ -122,7 +117,53 @@
 ::
 ++  part-file
   ::
-  ^-  manx
-  ;div#file: the file {<now.bowl>}
+  ;div#file.p4
+    ;+
+    %-  render-file
+    %-  ~(partial fe file.ax)
+    ~(key by views.app)
+  ==
+::
+++  render-file
+  ::
+  =|  sug=(unit iota)
+  =|  pax=pith
+  |_  fap=file
+  ++  $  level
+  ++  level
+    ^-  manx
+    ;div
+      ;+  part-row
+      ;+  part-kids
+    ==
+  ::
+  ++  render-node
+    |=  =node
+    ;span.fr.g2
+      ;+  ?@  node  ;span:"%"
+          ;span.fs-2.f4: {(print-aura node)}:
+      ;span: {(print-node node)}
+    ==
+  ::
+  ++  part-row
+    ^-  manx
+    ;div.fr.g2
+      ;span
+        ;+  ?~  sug  ;span:"/"
+            (render-node u.sug)
+      ==
+    ==
+  ::
+  ::
+  ++  part-kids
+    ^-  manx
+    ;div.pl4
+      ;*
+      %+  turn  ~(kid-list fe fap)
+      |=  [=iota =file]
+      level(sug `iota, pax (snoc pax iota), fap file)
+    ==
+  ::
+  --
 ::
 --

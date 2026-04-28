@@ -3,6 +3,10 @@ rewrite the app viewer in a better way.
 
 ---
 
+bug: after installing app, file isn't cleaned up and some data is left orphaned
+
+---
+
 pith printing/parsing is broken. round trips
 through pate can be lossy for the %pith case
 

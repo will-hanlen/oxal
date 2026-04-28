@@ -11,6 +11,12 @@
   ::
 ++  server
   |_  http-bowl
+  ++  get-header
+    ::
+    |=  header=@t
+    ^-  (unit @t)
+    (get-header:http header header-list)
+    ::
   ++  poke-our
     ::
     |=  =cage
@@ -96,6 +102,19 @@
         [%give %fact paths %http-response-data !>(+.pl)]
         [%give %kick paths ~]
     ==
+    ::
+  ++  send-html-payload
+    ::
+    |=  =manx
+    %+  send-simple-payload
+      [200 ['content-type' 'text/html']~]
+    :-  ~
+    %-  as-octt:mimes:html
+    %+  welp
+      ?.  ?=(%html n.g.manx)  ""
+      "<!doctype html>"
+    %-  en-xml:html
+    manx
     ::
   ++  open-sse
     ::
