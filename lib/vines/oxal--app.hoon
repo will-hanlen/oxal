@@ -117,20 +117,48 @@
 ::
 ++  part-file
   ::
-  ;div#file.p4
+  =/  partial=file
+    %-  ~(partial fe file.ax)
+    %-  ~(run in ~(key by views.app))
+    |=  =pith
+    [p+our.bowl pith]
+  ;div#file.p4.fc.grow.hf.scroll-always
+    :: ;div.f6
+    ::   :: ;div: {<~(key by views.app)>}
+    ::   ;*
+    ::   %+  turn  ~(tap ox code.partial)
+    ::   |=  [=pith =meta]
+    ::   :: ?~  lord.meta  ~
+    ::   :: :-  ~
+    ::   ;div.fr.g2
+    ::     ;div: {(pate pith)}
+    ::     ;div: {<lord.meta>}
+    ::   ==
+    ::   ::
+    ::   ;div: end
+    :: ==
     ;+
     %-  render-file
-    %-  ~(partial fe file.ax)
-    ~(key by views.app)
+    partial
   ==
 ::
 ++  render-file
-  ::
+  :::
   =|  sug=(unit iota)
   =|  pax=pith
+  =|  under-view=_|
+  =|  under-lens=_|
+  =|  under-form=_|
+  =|  at-view=_|
+  =|  at-lens=_|
+  =|  at-form=_|
+  =|  cod=code
+  =|  dat=data
   |_  fap=file
   ++  $  level
+  ::
   ++  level
+    ::
     ^-  manx
     ;div
       ;+  part-row
@@ -138,30 +166,49 @@
     ==
   ::
   ++  render-node
+    ::
     |=  =node
-    ;span.fr.g2
-      ;+  ?@  node  ;span:"%"
-          ;span.fs-2.f4: {(print-aura node)}:
+    ;span.fr.ae
+      ;+  ?@  node  ;span.fs-2.o6:"%"
+          ;span.fs-2.o6: {(print-aura node)}:
       ;span: {(print-node node)}
     ==
   ::
   ++  part-row
+    ::
     ^-  manx
     ;div.fr.g2
+      ;+  %^  add-class-if  under-lens  "f-4"
+          %^  add-class-if  under-form  "f-3"
+          %^  add-class-if  at-view  "bold"
       ;span
         ;+  ?~  sug  ;span:"/"
             (render-node u.sug)
       ==
     ==
   ::
-  ::
   ++  part-kids
+    ::
     ^-  manx
     ;div.pl4
       ;*
       %+  turn  ~(kid-list fe fap)
       |=  [=iota =file]
-      level(sug `iota, pax (snoc pax iota), fap file)
+      =/  node-meta=meta  (fall leaf.code.file *meta)
+      =/  at-view     ?=(^ lord.node-meta)
+      =/  at-lens     &(?=(^ lord.node-meta) ?=(%lens -.view.u.lord.node-meta))
+      =/  at-form     &(?=(^ lord.node-meta) ?=(%form -.view.u.lord.node-meta))
+      %=  level
+        sug  `iota
+        pax  (snoc pax iota)
+        at-view  at-view
+        at-lens  at-lens
+        at-form  at-form
+        under-view  |(under-view at-view)
+        under-lens  |(under-lens at-lens)
+        under-form  |(under-form at-form)
+        fap  file
+      ==
     ==
   ::
   --

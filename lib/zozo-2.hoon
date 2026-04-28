@@ -85,11 +85,12 @@
     ::
     |=  parts=(set pith)
     ^-  file
-    %+  roll  ~(tap in parts)
-    |=  [pax=pith out=file]
-    ^-  file
-    =/  sub=file  (dip pax)
-    :-  (~(rep ox data.out) pax data.sub)
-    (~(rep ox code.out) pax code.sub)
+    =|  fax=file
+    =/  todo=(list pith)  ~(tap in parts)
+    |-
+    ?~  todo  fax
+    =.  code.fax  (~(rep ox code.fax) i.todo (~(dip ox code.fil) i.todo))
+    =.  data.fax  (~(rep ox data.fax) i.todo (~(dip ox data.fil) i.todo))
+    $(todo t.todo)
   --
 --
