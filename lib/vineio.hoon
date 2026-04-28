@@ -97,6 +97,87 @@
         [%give %kick paths ~]
     ==
     ::
+  ++  open-sse
+    ::
+    ::  send the text/event-stream response headers
+    ::
+    =/  m  (strand ,~)
+    ^-  form:m
+    =/  paths  ~[/http-response/[rid]]
+    =/  =response-header:http
+      :-  200
+      :~  ['content-type' 'text/event-stream']
+          ['cache-control' 'no-cache']
+          ['Connection' 'keep-alive']
+      ==
+    %-  send-raw-card
+    [%give %fact paths %http-response-header !>(response-header)]
+    ::
+  ++  close-sse
+    ::
+    ::  end the SSE stream with a kick
+    ::
+    =/  m  (strand ,~)
+    ^-  form:m
+    %-  send-raw-card
+    [%give %kick ~[/http-response/[rid]] ~]
+    ::
+  ++  keep-alive
+    ::
+    ::  send an SSE keep-alive comment
+    ::
+    =/  m  (strand ,~)
+    ^-  form:m
+    %-  send-raw-card
+    :*  %give  %fact  ~[/http-response/[rid]]  %http-response-data
+        !>(`(unit octs)``(as-octs:mimes:html ': keep-alive\0a\0a'))
+    ==
+    ::
+  ++  patch
+    ::
+    ::  send signals and fragments in a single datastar response.  emits a
+    ::  datastar-patch-signals event followed by one datastar-patch-elements
+    ::  event per fragment.
+    ::
+    |=  [sig-list=(list (pair @t @t)) fragments=(list datastar-fragment)]
+    =/  m  (strand ,~)
+    ^-  form:m
+    =/  body=octs
+      (as-octs:mimes:html (datastar-response-body sig-list fragments))
+    %-  send-raw-card
+    :*  %give  %fact  ~[/http-response/[rid]]  %http-response-data
+        !>(`(unit octs)``body)
+    ==
+    ::
+  ++  patch-signals
+    ::
+    ::  send a datastar-patch-signals event with the given signals
+    ::
+    |=  sig-list=(list (pair @t @t))
+    (patch sig-list ~)
+    ::
+  ++  patch-elements
+    ::
+    ::  send a datastar-patch-elements event for each fragment
+    ::
+    |=  fragments=(list datastar-fragment)
+    (patch ~ fragments)
+    ::
+  ++  patch-element
+    ::
+    ::  send a single fragment with the given mode, optional selector, and manx
+    ::
+    |=  fragment=datastar-fragment
+    (patch ~ ~[fragment])
+    ::
+  ++  morph
+    ::
+    ::  send a single manx with mode "outer" — datastar's default,
+    ::  which morphs the matching top-level element by id
+    ::
+    |=  =manx
+    (patch ~ ~[["outer" ~ manx]])
+    ::
   ++  formencoded-body
     ::
     ^-  (map @t @t)
