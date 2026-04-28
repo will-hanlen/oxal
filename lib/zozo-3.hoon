@@ -491,6 +491,18 @@
         (suspend-view sub view met p.result)
     ==
   ::
+  ++  migrate-form-view
+    ::
+    ::  splat a form view's pre-computed migration output into the
+    ::  cleared subtree at its stem.  place-app-view has already lopped
+    ::  the subtree, so rep replaces a clean target.
+    ::
+    |=  [stem=pith new=data]
+    ^+  cor
+    =/  full-pax  (under-our stem)
+    =.  dat  (~(rep do dat) full-pax new)
+    cor
+  ::
   ++  place-app-view
     ::
     ::  install one view from app `name` at stem.  for %lens, wires
@@ -551,8 +563,10 @@
       =.  apps.ax  (snoc apps.ax [name app])
       cor
     =/  =app-gate  p.comp
+    =/  globals=data  (~(dip do dat) ~[p+our [%n ~] %globals])
+    =/  locals=data   (~(dip do dat) ~[p+our [%n ~] name])
     =/  run=(each (map stem view) tang)
-      (mule |.((app-gate [name *data *data])))
+      (mule |.((app-gate [name globals locals])))
     ?:  ?=(%| -.run)
       =/  =app  *app
       =.  source.app    source
@@ -574,12 +588,74 @@
     ?^  validation
       %-  (slog leaf+(trip u.validation) ~)
       cor
+    ::
+    ::  pre-capture: snapshot data at every form-view stem (v1 state).
+    ::  must run before any place-app-view, because place-app-view lops
+    ::  the subtree, and a shallow form's lop would erase data a deeper
+    ::  form still needs to migrate from.
+    ::
+    =/  form-snaps=(map stem data)
+      =/  ps=(list [s=stem v=view])  ~(tap by vws)
+      =|  acc=(map stem data)
+      |-  ^-  (map stem data)
+      ?~  ps  acc
+      ?.  ?=(%form -.v.i.ps)
+        $(ps t.ps)
+      =/  full-pax  (under-our s.i.ps)
+      $(ps t.ps, acc (~(put by acc) s.i.ps (~(dip do dat) full-pax)))
+    ::
+    ::  pre-flight migrators: run every form view's migrator on its
+    ::  snapshot, trapped via mule.  if any crashes, abort the install:
+    ::  store entry with error, no dat or cod mutation.
+    ::
+    =/  migrated=(each (map stem data) tang)
+      =/  ps=(list [s=stem v=view])  ~(tap by vws)
+      =|  acc=(map stem data)
+      |-  ^-  (each (map stem data) tang)
+      ?~  ps  [%& acc]
+      ?.  ?=(%form -.v.i.ps)
+        $(ps t.ps)
+      ?~  migrator.v.i.ps
+        $(ps t.ps)
+      =/  pre=data  (~(got by form-snaps) s.i.ps)
+      =/  res=(each data tang)
+        (mule |.((u.migrator.v.i.ps pre)))
+      ?-  -.res
+        %|  [%| p.res]
+        %&  $(ps t.ps, acc (~(put by acc) s.i.ps p.res))
+      ==
+    ?:  ?=(%| -.migrated)
+      =/  =app  *app
+      =.  source.app    source
+      =.  app-gate.app  app-gate
+      =.  error.app     `p.migrated
+      =.  apps.ax       (snoc apps.ax [name app])
+      cor
+    ::
+    ::  phase A: place all views (existing behavior — meta + lop, lens
+    ::  wires faucet and runs initialize-from-snap).
+    ::
     =.  cor
       =/  pairs=(list [stem view])  ~(tap by vws)
       |-  ^+  cor
       ?~  pairs  cor
       =.  cor  (place-app-view name -.i.pairs +.i.pairs)
       $(pairs t.pairs)
+    ::
+    ::  phase B: splat migrator outputs into the cleared subtrees,
+    ::  shallowest-first.  rep replaces a whole subtree, so a deeper
+    ::  stem's splat must land last to win where stems nest.
+    ::
+    =.  cor
+      =/  splats=(list [stem data])  ~(tap by p.migrated)
+      =.  splats
+        %+  sort  splats
+        |=  [a=[s=stem *] b=[s=stem *]]
+        (lth (lent s.a) (lent s.b))
+      |-  ^+  cor
+      ?~  splats  cor
+      =.  cor  (migrate-form-view -.i.splats +.i.splats)
+      $(splats t.splats)
     =/  =app  *app
     =.  source.app    source
     =.  app-gate.app  app-gate

@@ -146,7 +146,7 @@
 +$  form
   $:
     out=shape
-    ::  xx migrator to run on install? $-(data data)
+    migrator=(unit $-(data data))
   ==
 +$  lens
   $:
