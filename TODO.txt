@@ -1,6 +1,5 @@
 
-should a %form view include schema migration logic?
-i think so. it's a gate that can morph the current tree when the %form is installed.
+rewrite the app viewer in a better way.
 
 ---
 
@@ -13,14 +12,7 @@ serialize $data to tarball
 
 ---
 
-the %oxal-snap mark represents a change to a location in the $data tree.
-there needs to be a new mark which represents changes to the $code tree.
-whenever a part of the code tree changes, every location above it should emit
-this mark through a gall fact so that gall subscribers can correctly reconstruct
-the full $file and understand all the changes that happen to it.
-it should really only be emitted on nodes which have the gall.meta unit full.
-the path on which code changes should be emitted is /code/...
-and ther is a new subscription path /both/... which sends both %oxal-snap and the new code-change mark.
+subscribe to oxal tree over a gall subscription
 
 ---
 

@@ -4,6 +4,22 @@
 |%
 ++  zozo  %400
 ::
+++  get-app
+  ::
+  ::  linear scan of apps for a name match.
+  ::
+  |=  [acer want=term]
+  ^-  (unit app)
+  ?~  apps  ~
+  ?:  =(name.i.apps want)  `app.i.apps
+  $(apps t.apps)
+::
+++  got-app
+  ::
+  |=  [=acer name=term]
+  ~|  app-not-found/name
+  (need (get-app acer name))
+::
 ++  ae
   :::
   ::    acer engine
