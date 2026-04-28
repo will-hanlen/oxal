@@ -78,5 +78,18 @@
     ?~  lord.meta  ~
     `(welp pax pith)
     ::
+  ::
+  ++  partial
+    ::
+    ::  (set pith) stitched back together
+    ::
+    |=  parts=(set pith)
+    ^-  file
+    %+  roll  ~(tap in parts)
+    |=  [pax=pith out=file]
+    ^-  file
+    =/  sub=file  (dip pax)
+    :-  (~(rep ox data.out) pax data.sub)
+    (~(rep ox code.out) pax code.sub)
   --
 --
