@@ -1,0 +1,18 @@
+!:
+|=  [mine=data snap=data mov=move *]
+^-  move
+%-  silt
+?^  mov
+  %+  murn  ~(tap in `move`mov)
+  |=  =chng
+  ?-  -.chng
+    %del  `chng
+    %ins
+      ?.  ?=([%ud *] node.chng)  ~
+      `[%ins pith.chng ud+(mul 2 ud.node.chng)]
+    ::
+  ==
+%+  murn  ~(tap do snap)
+|=  [=pith =node]
+?.  ?=([%ud *] node)  ~
+`[%ins pith ud+(mul 2 ud.node)]

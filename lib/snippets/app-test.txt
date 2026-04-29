@@ -1,0 +1,6 @@
+|=  [our=@p name=@tas data data]
+%-  malt
+^-  (list [pith view])
+:~
+  :-  /test  [%form ~ ~]
+==
