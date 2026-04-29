@@ -1,0 +1,61 @@
+|=  [our=@p name=@tas data data]
+%-  malt
+^-  (list [pith view])
+:~
+  :-  /blog/raw  [%form ~ ~]
+  :-  /blog/rendered  :-  %lens
+    ^-  lens
+    %*  .  *lens
+      dep  [our /blog/raw]
+      sauc
+        '''
+        !:
+        %-  easy-transform
+        |%
+        ++  ins
+          |=  [=pith =node]
+          ^-  (unit chng)
+          ?.  ?=([%t *] node)  ~
+          =/  =(each manx tang)
+            %-  mule  |.
+            !<  manx
+            (slap !>(.) (ream t.node))
+          :-  ~
+          :+  %ins  pith
+          ?:  ?=(%.y -.each)  manx+p.each
+          tang+p.each
+        ++  del
+          |=  =pith
+          `[%del pith]
+        --
+        '''
+      ::
+    ==
+  :-  /blog/toc  :-  %lens
+    ^-  lens
+    %*  .  *lens
+      dep  [our /blog/rendered]
+      sauc
+        '''
+        !:
+        |=  [data snap=data *]
+        ^-  move
+        %-  silt
+        :_  ~
+        :+  %ins  /
+        :-  %manx
+        ;div
+          ;*
+          %+  murn  ~(tap do snap)
+          |=  [=pith =node]
+          ?.  ?=  [%manx *]  node  ~
+          :-  ~
+          ;div
+            ;-  (pate pith)
+          ==
+        ==
+        '''
+      ::
+    ==
+  ::
+==

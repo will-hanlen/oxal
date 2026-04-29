@@ -51,10 +51,12 @@
         =/  =pith  (cord-to-pith (~(got by body) 'pith'))
         =/  value=@t   (fix-newlines (~(got by body) 'value'))
         =/  =node
-          %+  fall
+          =/  try=(unit node)
             %-  mole  |.
             !<  node
             (slap !>(.) (ream value))
+          ?^  try  u.try
+          ~|  invalid-node/value
           (cord-to-node value)
         =/  =move  (silt [%ins pith node]~)
         ;<  ~  bind:m  (poke-our:vio %do-move !>(move))
@@ -74,6 +76,26 @@
         =.  app  (got-app ax app-name)
         ;<  ~  bind:m  (send-html-payload:vio part-file)
         (pure:m !>(~))
+      ::
+      [%.y %show-logs]
+        ::
+        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        ;<  ~  bind:m
+          %-  send-html-payload:vio
+          %~  part-logs-full  render-file
+          [pith (~(dip fe file.ax) pith)]
+        (pure:m !>(~))
+        ::
+      ::
+      [%.y %hide-logs]
+        ::
+        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        ;<  ~  bind:m
+          %-  send-html-payload:vio
+          %~  part-logs-stub  render-file
+          [pith (~(dip fe file.ax) pith)]
+        (pure:m !>(~))
+        ::
       ::
       [%.y %clear-error]
         ::
@@ -178,13 +200,13 @@
     |=  =pith
     [p+our.bowl pith]
   ;div#file.p4.pb20.fc.grow.hf.scroll-y-always
-    ;+  (render-file partial)
+    ;+  (render-file [/ partial])
   ==
 ::
 ++  render-file
   :::
   =|  sug=(unit iota)
-  =|  pax=pith
+  :: =|  pax=pith
   =|  under-view=_|
   =|  under-lens=_|
   =|  under-form=_|
@@ -192,20 +214,22 @@
   =|  at-lens=_|
   =|  at-form=_|
   =|  data-below=_&
-  =|  node-meta=meta
-  |_  fap=file
+  :: =|  node-meta=meta
+  |_  [pax=pith fap=file]
   ++  $  level
   ::
   ++  nid  (uid pax)
+  ++  node-meta  (fall leaf.code.fap *meta)
   ::
   ++  recurse
     ::
+    =/  node-meta=meta  node-meta
     ^-  manx
     ;div.pl4
       ;*
       %+  turn  ~(kid-list fe fap)
       |=  [=iota =file]
-      =/  node-meta=meta  (fall leaf.code.file *meta)
+      :: =/  node-meta=meta  (fall leaf.code.file *meta)
       =/  at-view         ?=(^ lord.node-meta)
       =/  at-lens         &(?=(^ lord.node-meta) ?=(%lens -.view.u.lord.node-meta))
       =/  at-form         &(?=(^ lord.node-meta) ?=(%form -.view.u.lord.node-meta))
@@ -219,7 +243,7 @@
         under-lens    |(under-lens at-lens)
         under-form    |(under-form at-form)
         data-below    ?=(^ kids.data.fap) ::  ?=(^ leaf.data.fap))
-        node-meta     node-meta
+        :: node-meta     node-meta
         fap  file
       ==
     ==
@@ -243,6 +267,7 @@
   ::
   ++  part-row
     ::
+    =/  node-meta=meta  node-meta
     ^-  manx
     ;div.fc
       ;div.fr.g2.wf
@@ -273,18 +298,12 @@
         =style  hid
         =data-show  "$_rowopen{nid}"
         ::
-        ;+
-          ?~  lord.node-meta  ;/  ""
-          ?.  ?=  %lens  -.view.u.lord.node-meta  ;/  ""
-          =/  =lens  +.view.u.lord.node-meta
-          ?~  err.lens  ;/  ""
-          ;div.br2.bd1.p2.scroll-none.lh0.fs-1
-            ;+  (render-tang u.err.lens)
-          ==
+        ;+  part-logs-stub
         ::
         ;+
           ?~  leaf.data.fap  ;/  ""
-          ?.  under-form     ;/  ""
+          ?.  under-form
+            (view-node u.leaf.data.fap)
           (edit-node u.leaf.data.fap)
         ::
         ;+
@@ -299,12 +318,82 @@
   ::
   ++  part-indicators
     ::
+    =/  node-meta=meta  node-meta
     ^-  manx
     ?~  lord.node-meta  ;/  ""
     ?.  ?=  %lens  -.view.u.lord.node-meta  ;/  ""
     =/  =lens  +.view.u.lord.node-meta
     ?~  err.lens  ;/  ""
     ;div.f-1: •
+    ::
+  ::
+  ++  part-logs-stub
+    ::
+    =/  node-meta=meta  node-meta
+    ;form(id "logs{nid}")
+      =data-on_submit  post
+      ;input(type "hidden", name "op", value "show-logs");
+      ;input(type "hidden", name "pith", value (pate pax));
+      ;button.p2.br2.bd1.b2.hover: view logs {<case.node-meta>}
+    ==
+    ::
+  ::
+  ++  part-logs-full
+    ::
+    =/  node-meta=meta  node-meta
+    ;div.fc.bbv.br2.bd1.p2.fs-2(id "logs{nid}")
+      ;form
+        =data-on_submit  post
+        ;input(type "hidden", name "op", value "hide-logs");
+        ;input(type "hidden", name "pith", value (pate pax));
+        ;button.p2.br2.bd1.b2.hover: hide logs
+      ==
+      ::
+      ;*
+      %-  flop
+      =<  p
+      %^  spin  logs.node-meta  0
+      |=  [=move a=@]
+      :_  +(a)
+      ;div.fr.as.g3
+        ;span: {<a>}
+        ;div.fc.mono
+          ;*
+          %+  turn  ~(tap in move)
+          |=  =chng
+          ?-  -.chng
+            %ins
+              ;div.fr.g3
+                ;span: %ins
+                ;span: {(pate pith.chng)}
+                ;span: {(print-aura node.chng)}
+              ==
+            %del
+              ;div.fr.g3
+                ;span: %del
+                ;span: {(pate pith.chng)}
+              ==
+          ==
+        ==
+      ==
+    ==
+    ::
+  ::
+  ++  view-node
+    ::
+    |=  =node
+    ^-  manx
+    ;div.fc.bbv.br2.bd1.scroll-none
+      ;+
+      ?+  node  ;div: not renderable: {(print-aura node)}
+        aota  ;div:(-(print-node node))
+        [%manx *]
+          ;iframe.max-h20
+            =srcdoc  (en-xml:html manx.node)
+            ;*  ~
+          ==
+      ==
+    ==
     ::
   ::
   ++  edit-node
@@ -316,7 +405,7 @@
         =data-on_submit  post
         ;input(type "hidden", name "op", value "ins-node");
         ;input(type "hidden", name "pith", value (pate ?~(pax ~ t.pax)));
-        ;feather-textarea.p2
+        ;feather-textarea.p2.mono.fs-1
           =required  ""
           =name  "value"
           =placeholder  "ud+88"
@@ -344,8 +433,23 @@
   ++  edit-lens
     ::
     |=  =lens
-    ;div.fc.bbv.br2.bd1.scroll-none.p2
-      ; lens editor
+    ;div.fc.g2
+      ;+
+        ?~  err.lens  ;/  ""
+        ;div.br2.bd1.p2.scroll-none.lh0.fs-1
+          ;+  (render-tang u.err.lens)
+        ==
+      ::
+    ;div.fc.bbv.br2.bd1.scroll-none
+        ;div.p2
+          ; /{(scow %p ship.dep.lens)}{(pate root.dep.lens)}
+          ; = {<cas.lens>}:{<lyf.lens>}
+        ==
+        ;div.p2.mono.pre.f3.fs-2.lh0
+          ;-  ?@  sauc.lens  (trip sauc.lens)
+              <sauc.lens>
+        ==
+      ==
     ==
   ::
   ++  edit-form
@@ -361,7 +465,7 @@
         =value  (pate ?~(pax ~ t.pax))
         ;*  ~
       ==
-      ;feather-textarea.p-1
+      ;feather-textarea.p-1.mono.fs-1
         =name  "value"
         =placeholder  "value"
         =required  ""

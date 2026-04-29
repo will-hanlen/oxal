@@ -22,7 +22,7 @@
     ::
     ::  escape hatch
     ::
-    [%noun =noun]  
+    [%noun =noun]
     ::
     ::  %many
     ::
@@ -1351,6 +1351,7 @@
   --
 ::
 ++  easy-transform
+  ::
   |=  ec=easy-core
   ^-  transformer
   |=  [mine=data snap=data =move *]
