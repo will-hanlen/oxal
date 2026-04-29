@@ -159,7 +159,7 @@
     err=(unit tang)
   ==
 ::
-+$  app-gate  $-([name=term globals=data locals=data] (map stem view))
++$  app-gate  $-([our=@p name=term globals=data locals=data] (map stem view))
 +$  app
   $:  source=@t  :: xx this is for dynamic apps; there should be a static version like (map stem @t) or something
       local=shape

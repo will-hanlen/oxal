@@ -582,7 +582,7 @@
     =/  globals=data  (~(dip do dat) ~[p+our [%n ~] %globals])
     =/  locals=data   (~(dip do dat) ~[p+our [%n ~] name])
     =/  run=(each (map stem view) tang)
-      (mule |.((app-gate [name globals locals])))
+      (mule |.((app-gate [our name globals locals])))
     ?:  ?=(%| -.run)
       =/  =app  *app
       =.  source.app    source
@@ -596,10 +596,15 @@
       |-  ^-  (unit @t)
       ?~  pairs  ~
       =/  full-pax  (under-our -.i.pairs)
+      =/  vw=view   +.i.pairs
       ?.  (meta-allowed full-pax)
         `(crip "ae: install-app rejected: stem too shallow at {(pate full-pax)}")
       ?:  (beneath-view full-pax cod)
         `(crip "ae: install-app rejected: stem at or beneath existing view at {(pate full-pax)}")
+      ?:  ?&  ?=(%lens -.vw)
+              (~(is-ancestor-or-same th full-pax) (ref-to-pith dep.vw))
+          ==
+        `(crip "ae: install-app rejected: lens at {(pate full-pax)} has self or ancestor as faucet at {(pate (ref-to-pith dep.vw))}")
       $(pairs t.pairs)
     ?^  validation
       %-  (slog leaf+(trip u.validation) ~)
