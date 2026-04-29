@@ -580,7 +580,7 @@
       cor
     =/  =app-gate  p.comp
     =/  globals=data  (~(dip do dat) ~[p+our [%n ~] %globals])
-    =/  locals=data   (~(dip do dat) ~[p+our [%n ~] name])
+    =/  locals=data   (~(dip do dat) ~[p+our [%n ~] %app name])
     =/  run=(each (map stem view) tang)
       (mule |.((app-gate [our name globals locals])))
     ?:  ?=(%| -.run)
@@ -591,6 +591,20 @@
       =.  apps.ax  (snoc apps.ax [name app])
       cor
     =/  vws=(map stem view)  p.run
+    ::
+    ::  inject the system-owned locals view at /[our]/~/app/[name].
+    ::  bare stem; under-our qualifies it during placement.  reject
+    ::  if the app-gate already declared a view at this exact stem.
+    ::
+    =/  locals-stem=stem  ~[[%n ~] %app name]
+    ?:  (~(has by vws) locals-stem)
+      =/  =app  *app
+      =.  source.app    source
+      =.  app-gate.app  app-gate
+      =.  error.app     `~[leaf+"app may not declare view at locals stem"]
+      =.  apps.ax       (snoc apps.ax [name app])
+      cor
+    =.  vws  (~(put by vws) locals-stem [%form ~ ~])
     =/  pairs=(list [stem view])  ~(tap by vws)
     =/  validation=(unit @t)
       |-  ^-  (unit @t)
