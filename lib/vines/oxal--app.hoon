@@ -11,6 +11,23 @@
 ::
 |^
   :::
+  =;  =(each form:m tang)  :: error handling
+    ::
+    ?:  ?=(%.y -.each)  p.each
+    ;<  ~  bind:m
+      %-  send-html-payload:vio
+      ;div#error.p3.bdb1.lh0.fs-1.b-1.scroll-y
+        =style  "max-height: 120px;"
+        ;form(data-on_submit post)
+          ;input(type "hidden", name "op", value "clear-error");
+          ;button.p-2.br2.bd1.f-1.b-1.bc-1.hover: clear error
+        ==
+        ;+  (render-tang p.each)
+      ==
+    (pure:m !>(~))
+    ::
+  %-  mule  |.
+  ^-  form:m
   ?:  =('POST' method.bowl)
     =/  body=(map @t @t)  formencoded-body:vio
     =/  op=@tas           (~(got by body) 'op')
@@ -28,6 +45,43 @@
         =.  app  (got-app ax app-name)
         ;<  ~  bind:m  (send-html-payload:vio part-file)
         (pure:m !>(~))
+      ::
+      [%.y %ins-node]
+        ::
+        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        =/  value=@t   (fix-newlines (~(got by body) 'value'))
+        =/  =node
+          %+  fall
+            %-  mole  |.
+            !<  node
+            (slap !>(.) (ream value))
+          (cord-to-node value)
+        =/  =move  (silt [%ins pith node]~)
+        ;<  ~  bind:m  (poke-our:vio %do-move !>(move))
+        ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+        =.  ax  new-ax
+        =.  app  (got-app ax app-name)
+        ;<  ~  bind:m  (send-html-payload:vio part-file)
+        (pure:m !>(~))
+      ::
+      [%.y %del-node]
+        ::
+        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        =/  =move  (silt [%del pith]~)
+        ;<  ~  bind:m  (poke-our:vio %do-move !>(move))
+        ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+        =.  ax  new-ax
+        =.  app  (got-app ax app-name)
+        ;<  ~  bind:m  (send-html-payload:vio part-file)
+        (pure:m !>(~))
+      ::
+      [%.y %clear-error]
+        ::
+        ;<  ~  bind:m
+          %-  send-html-payload:vio
+          ;div#error;
+        (pure:m !>(~))
+        ::
       ::
     ==
   ::
@@ -59,9 +113,10 @@
       ;script(type "module", src "/hawk-init/feather/1/slide-panels");
       ;script(type "module", src "/hawk-init/feather/1/datastar");
     ==
-    ;body.fc.bbv
+    ;body.fc.bbv.hf
       ;+  part-header
-      ;feather-slide-panels
+      ;div#error;
+      ;feather-slide-panels.grow.scroll-none
         ;+  part-file
         ;+  part-source 
       ==
@@ -122,7 +177,7 @@
     %-  ~(run in ~(key by views.app))
     |=  =pith
     [p+our.bowl pith]
-  ;div#file.p4.fc.grow.hf.scroll-always
+  ;div#file.p4.fc.grow.hf.scroll-y-always
     :: ;div.f6
     ::   :: ;div: {<~(key by views.app)>}
     ::   ;*
@@ -152,10 +207,11 @@
   =|  at-view=_|
   =|  at-lens=_|
   =|  at-form=_|
-  =|  cod=code
-  =|  dat=data
+  =|  node-meta=meta
   |_  fap=file
   ++  $  level
+  ::
+  ++  nid  (uid pax)
   ::
   ++  level
     ::
@@ -177,13 +233,130 @@
   ++  part-row
     ::
     ^-  manx
-    ;div.fr.g2
-      ;+  %^  add-class-if  under-lens  "f-4"
-          %^  add-class-if  under-form  "f-3"
-          %^  add-class-if  at-view  "bold"
-      ;span
-        ;+  ?~  sug  ;span:"/"
-            (render-node u.sug)
+    ;div.fc
+      ;div.fr.g2.wf
+        ;+  %^  add-class-if  under-lens  "f-3"
+            %^  add-class-if  under-form  "f-4"
+            %^  add-class-if  at-view  "bold"
+        ;button.fr.g4.hover.b1.grow
+          =data-on_click  "$_rowopen{nid} = !$_rowopen{nid}"
+          ;+  ?~  sug  ;span:"/"
+              (render-node u.sug)
+          ;+  ?:  =(~ subs.node-meta)  ;/  ""
+              ;span: [{<~(wyt in subs.node-meta)>}]
+          ;+  ?:  =(~ view-subs.node-meta)  ;/  ""
+              ;span: \{{<~(wyt in view-subs.node-meta)>}}
+          ;+  ?~  leaf.data.fap  ;/  ""
+              (render-node u.leaf.data.fap)
+          ;+  part-indicators
+          ;div.grow;
+          ;div
+            ;-  <case.node-meta>
+            ;-  ":"
+            ;-  <life.node-meta>
+          ==
+        ==
+      ==
+      ;div.fc.g2.mr5.ml3
+        =style  hid
+        =data-show  "$_rowopen{nid}"
+        ::
+        ;+
+          ?~  lord.node-meta  ;/  ""
+          ?.  ?=  %lens  -.view.u.lord.node-meta  ;/  ""
+          =/  =lens  +.view.u.lord.node-meta
+          ?~  err.lens  ;/  ""
+          ;div.br2.bd1.p2.scroll-none.lh0.fs-1
+            ;+  (render-tang u.err.lens)
+          ==
+        ::
+        ;+
+          ?~  leaf.data.fap  ;/  ""
+          ?.  under-form     ;/  ""
+          (edit-node u.leaf.data.fap)
+        ::
+        ;+
+          ?~  lord.node-meta  ;/  ""
+          ?-  -.view.u.lord.node-meta
+            %lens  (edit-lens +.view.u.lord.node-meta)
+            %form  (edit-form +.view.u.lord.node-meta)
+          ==
+        ::
+      ==
+    ==
+  ::
+  ++  part-indicators
+    ::
+    ^-  manx
+    ?~  lord.node-meta  ;/  ""
+    ?.  ?=  %lens  -.view.u.lord.node-meta  ;/  ""
+    =/  =lens  +.view.u.lord.node-meta
+    ?~  err.lens  ;/  ""
+    ;div.f-1: •
+    ::
+  ::
+  ++  edit-node
+    ::
+    |=  =node
+    ;div.fc.bbv.br2.bd1.scroll-none
+      ;form.fc.bbv
+        =id  "editnode{nid}"
+        =data-on_submit  post
+        ;input(type "hidden", name "op", value "ins-node");
+        ;input(type "hidden", name "pith", value (pate ?~(pax ~ t.pax)));
+        ;feather-textarea.p2
+          =required  ""
+          =name  "value"
+          =placeholder  "ud+88"
+          ;-  (print-node-strict node)
+        ==
+      ==
+      ;div.fr.bbh
+        ;button.b2.hover.p2.grow
+          =form  "editnode{nid}"
+          =type  "submit"
+          ; save
+        ==
+        ;form
+          =data-on_submit  post
+          ;input(type "hidden", name "op", value "del-node");
+          ;input(type "hidden", name "pith", value (pate ?~(pax ~ t.pax)));
+          ;button.b2.hover.p-2
+            ; delete
+          ==
+        ==
+      ==
+    ==
+    ::
+  ::
+  ++  edit-lens
+    ::
+    |=  =lens
+    ;div.fc.bbv.br2.bd1.scroll-none.p2
+      ; lens editor
+    ==
+  ::
+  ++  edit-form
+    ::
+    |=  =form
+    ;form.fc.bbv.br2.bd1.scroll-none
+      =data-on_submit  post
+      ;input(type "hidden", name "op", value "ins-node");
+      ;input.p-1
+        =name  "pith"
+        =placeholder  "pith"
+        =required  ""
+        =value  (pate ?~(pax ~ t.pax))
+        ;*  ~
+      ==
+      ;feather-textarea.p-1
+        =name  "value"
+        =placeholder  "value"
+        =required  ""
+        ;*  ~
+      ==
+      ;button.b2.hover.p2
+        ; save
       ==
     ==
   ::
@@ -207,6 +380,7 @@
         under-view  |(under-view at-view)
         under-lens  |(under-lens at-lens)
         under-form  |(under-form at-form)
+        node-meta  node-meta
         fap  file
       ==
     ==

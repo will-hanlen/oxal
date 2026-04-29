@@ -171,11 +171,11 @@
   |=  =path
   ^-  (unit (unit cage))
   ?+  path  ~
-    [%x %acer ~]       ``noun+!>(acer)
-    [%x %data *]        ``noun+!>((~(dip do data.file.acer) (pave t.t.path)))
-    [%x %code *]        ``noun+!>((~(dip ox code.file.acer) (pave t.t.path)))
-    [%x %file ~]        ``noun+!>(file.acer)
-    [%x %our ~]         ``noun+!>(our.bowl)
+    [%x %acer ~]  ``noun+!>(acer)
+    [%x %data *]  ``noun+!>((~(dip do data.file.acer) (pave t.t.path)))
+    [%x %code *]  ``noun+!>((~(dip ox code.file.acer) (pave t.t.path)))
+    [%x %file ~]  ``noun+!>(file.acer)
+    [%x %our ~]   ``noun+!>(our.bowl)   :: xx this should not be needed
   ==
 ::
 ++  poke
@@ -193,6 +193,7 @@
     %wipe
       ::
       =.  file.acer  *file
+      =.  apps.acer  ~
       %-  (slog 'oxal: wipe' ~)
       cor
     ::
