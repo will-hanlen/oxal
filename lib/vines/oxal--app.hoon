@@ -177,24 +177,8 @@
     %-  ~(run in ~(key by views.app))
     |=  =pith
     [p+our.bowl pith]
-  ;div#file.p4.fc.grow.hf.scroll-y-always
-    :: ;div.f6
-    ::   :: ;div: {<~(key by views.app)>}
-    ::   ;*
-    ::   %+  turn  ~(tap ox code.partial)
-    ::   |=  [=pith =meta]
-    ::   :: ?~  lord.meta  ~
-    ::   :: :-  ~
-    ::   ;div.fr.g2
-    ::     ;div: {(pate pith)}
-    ::     ;div: {<lord.meta>}
-    ::   ==
-    ::   ::
-    ::   ;div: end
-    :: ==
-    ;+
-    %-  render-file
-    partial
+  ;div#file.p4.pb20.fc.grow.hf.scroll-y-always
+    ;+  (render-file partial)
   ==
 ::
 ++  render-file
@@ -207,18 +191,45 @@
   =|  at-view=_|
   =|  at-lens=_|
   =|  at-form=_|
+  =|  data-below=_&
   =|  node-meta=meta
   |_  fap=file
   ++  $  level
   ::
   ++  nid  (uid pax)
   ::
+  ++  recurse
+    ::
+    ^-  manx
+    ;div.pl4
+      ;*
+      %+  turn  ~(kid-list fe fap)
+      |=  [=iota =file]
+      =/  node-meta=meta  (fall leaf.code.file *meta)
+      =/  at-view         ?=(^ lord.node-meta)
+      =/  at-lens         &(?=(^ lord.node-meta) ?=(%lens -.view.u.lord.node-meta))
+      =/  at-form         &(?=(^ lord.node-meta) ?=(%form -.view.u.lord.node-meta))
+      %=  level
+        sug           `iota
+        pax           (snoc pax iota)
+        at-view       at-view
+        at-lens       at-lens
+        at-form       at-form
+        under-view    |(under-view at-view)
+        under-lens    |(under-lens at-lens)
+        under-form    |(under-form at-form)
+        data-below    ?=(^ kids.data.fap) ::  ?=(^ leaf.data.fap))
+        node-meta     node-meta
+        fap  file
+      ==
+    ==
+  ::
   ++  level
     ::
     ^-  manx
     ;div
       ;+  part-row
-      ;+  part-kids
+      ;+  recurse
     ==
   ::
   ++  render-node
@@ -235,12 +246,13 @@
     ^-  manx
     ;div.fc
       ;div.fr.g2.wf
-        ;+  %^  add-class-if  under-lens  "f-3"
-            %^  add-class-if  under-form  "f-4"
-            %^  add-class-if  at-view  "bold"
-        ;button.fr.g4.hover.b1.grow
+        ;+  %^  add-class-if  !data-below  "o4"
+        ;button.fr.g4.hover.b1.grow.px2
           =data-on_click  "$_rowopen{nid} = !$_rowopen{nid}"
-          ;+  ?~  sug  ;span:"/"
+          ;+  %^  add-class-if  under-lens  "f-3"
+              %^  add-class-if  under-form  "f-4"
+              %^  add-class-if  at-view  "bold"
+              ?~  sug  ;span:"/"
               (render-node u.sug)
           ;+  ?:  =(~ subs.node-meta)  ;/  ""
               ;span: [{<~(wyt in subs.node-meta)>}]
@@ -357,31 +369,6 @@
       ==
       ;button.b2.hover.p2
         ; save
-      ==
-    ==
-  ::
-  ++  part-kids
-    ::
-    ^-  manx
-    ;div.pl4
-      ;*
-      %+  turn  ~(kid-list fe fap)
-      |=  [=iota =file]
-      =/  node-meta=meta  (fall leaf.code.file *meta)
-      =/  at-view     ?=(^ lord.node-meta)
-      =/  at-lens     &(?=(^ lord.node-meta) ?=(%lens -.view.u.lord.node-meta))
-      =/  at-form     &(?=(^ lord.node-meta) ?=(%form -.view.u.lord.node-meta))
-      %=  level
-        sug  `iota
-        pax  (snoc pax iota)
-        at-view  at-view
-        at-lens  at-lens
-        at-form  at-form
-        under-view  |(under-view at-view)
-        under-lens  |(under-lens at-lens)
-        under-form  |(under-form at-form)
-        node-meta  node-meta
-        fap  file
       ==
     ==
   ::

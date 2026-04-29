@@ -2,7 +2,8 @@
 
 ## Specification
 
-%oxal is a reactive database.
+%oxal is a networked other than tests
+reactive database.
 
 There is a single tree of data.
 
