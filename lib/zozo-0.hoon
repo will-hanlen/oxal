@@ -43,24 +43,32 @@
     ::
   ==
 ::
-++  comp-nodes  ::: xx i think this is broken for pith comparisons
+++  comp-nodes
   ::
   ::  canonical node ordering
   ::
-  |=  [a=* b=*]
+  |=  [a=node b=node]
   ^-  ?
   =>  .(a ?@(a [%tas a] a), b ?@(b [%tas b] b))
-  ?>  ?=([@ *] a)
-  ?>  ?=([@ *] b)
   ?:  ?=([%n ~] a)  %.y  :: n/~ is always first
-  ?:  ?=([%n ~] b)  %.n  ::
+  ?:  ?=([%n ~] b)  %.n
   ?.  =(-.a -.b)
     (aor -.a -.b)
-  ?:  ?=(^ +.a)  %.y  :: xx maybe broken here
-  ?:  ?=(^ +.b)  %.y
+  ::  heads equal — order by tail, dispatched by tag
+  ::
+  ?:  ?=(%pith -.a)
+    ?>  ?=([%pith *] b)
+    (por +.a +.b)
   ?:  ?=(?(%t %ta %tas %f) -.a)
-    (aor +.a (@ +.b))
-  (lte +.a (@ +.b))
+    ?>  ?=(?(%t %ta %tas %f) -.b)
+    (aor +.a +.b)
+  ?:  ?=(@ +.a)
+    ?>  ?=(@ +.b)
+    (lte +.a +.b)
+  ::  cell-tailed blobs (manx, tang, mime, data, json, noun) —
+  ::  no semantic order, fall back to noun order
+  ::
+  (aor +.a +.b)
   ::
 ::
 ::

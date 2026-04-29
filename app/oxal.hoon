@@ -1,4 +1,4 @@
-::  oxal
+::  oxal: networked reactive database
 ::
 /+  vine
 /+  *zozo
