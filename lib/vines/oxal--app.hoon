@@ -181,7 +181,7 @@
     =data-class_o7  "$_savesource"
     ;+  part-error
     ;input(type "hidden", name "op", value "set-source");
-    ;feather-text-editor.grow.fs-1
+    ;feather-text-editor.grow.fs-2
       =auto-indent  ""
       =name  "source"
       ;-  (trip source.app)
@@ -214,7 +214,6 @@
   =|  at-lens=_|
   =|  at-form=_|
   =|  data-below=_&
-  :: =|  node-meta=meta
   |_  [pax=pith fap=file]
   ++  $  level
   ::
@@ -223,13 +222,12 @@
   ::
   ++  recurse
     ::
-    =/  node-meta=meta  node-meta
     ^-  manx
     ;div.pl4
       ;*
       %+  turn  ~(kid-list fe fap)
       |=  [=iota =file]
-      :: =/  node-meta=meta  (fall leaf.code.file *meta)
+      =/  node-meta=meta  (fall leaf.code.file *meta)
       =/  at-view         ?=(^ lord.node-meta)
       =/  at-lens         &(?=(^ lord.node-meta) ?=(%lens -.view.u.lord.node-meta))
       =/  at-form         &(?=(^ lord.node-meta) ?=(%form -.view.u.lord.node-meta))
@@ -242,8 +240,7 @@
         under-view    |(under-view at-view)
         under-lens    |(under-lens at-lens)
         under-form    |(under-form at-form)
-        data-below    ?=(^ kids.data.fap) ::  ?=(^ leaf.data.fap))
-        :: node-meta     node-meta
+        data-below    |(?=(^ kids.data.file) ?=(^ leaf.data.file))
         fap  file
       ==
     ==
@@ -269,20 +266,21 @@
     ::
     =/  node-meta=meta  node-meta
     ^-  manx
-    ;div.fc
+    ;div.fc.g1
       ;div.fr.g2.wf
         ;+  %^  add-class-if  !data-below  "o4"
-        ;button.fr.g4.hover.b1.grow.px2
+        ;button.fr.g4.hover.b1.grow.px2.br2
           =data-on_click  "$_rowopen{nid} = !$_rowopen{nid}"
+          =data-class_active  "$_rowopen{nid}"
           ;+  %^  add-class-if  under-lens  "f-3"
               %^  add-class-if  under-form  "f-4"
               %^  add-class-if  at-view  "bold"
               ?~  sug  ;span:"/"
               (render-node u.sug)
           ;+  ?:  =(~ subs.node-meta)  ;/  ""
-              ;span: [{<~(wyt in subs.node-meta)>}]
+              ;span.f-3: [{<~(wyt in subs.node-meta)>}]
           ;+  ?:  =(~ view-subs.node-meta)  ;/  ""
-              ;span: \{{<~(wyt in view-subs.node-meta)>}}
+              ;span.f-2: \{{<~(wyt in view-subs.node-meta)>}}
           ;+  ?~  leaf.data.fap  ;/  ""
               (render-node u.leaf.data.fap)
           ;+  part-indicators
@@ -294,7 +292,7 @@
           ==
         ==
       ==
-      ;div.fc.g2.mr5.ml3
+      ;div.fc.g2.mr5.ml3.p2.br2.bd1.b2
         =style  hid
         =data-show  "$_rowopen{nid}"
         ::
@@ -334,45 +332,48 @@
       =data-on_submit  post
       ;input(type "hidden", name "op", value "show-logs");
       ;input(type "hidden", name "pith", value (pate pax));
-      ;button.p2.br2.bd1.b2.hover: view logs {<case.node-meta>}
+      ;button.p2.br2.bd1.b3.hover.fs-2: view logs ({<case.node-meta>})
     ==
     ::
   ::
   ++  part-logs-full
     ::
     =/  node-meta=meta  node-meta
-    ;div.fc.bbv.br2.bd1.p2.fs-2(id "logs{nid}")
+    ;div.fc.g2
+      =id  "logs{nid}"
       ;form
         =data-on_submit  post
         ;input(type "hidden", name "op", value "hide-logs");
         ;input(type "hidden", name "pith", value (pate pax));
-        ;button.p2.br2.bd1.b2.hover: hide logs
+        ;button.p2.br2.bd1.b3.hover.fs-2: hide logs
       ==
       ::
-      ;*
-      %-  flop
-      =<  p
-      %^  spin  logs.node-meta  0
-      |=  [=move a=@]
-      :_  +(a)
-      ;div.fr.as.g3
-        ;span: {<a>}
-        ;div.fc.mono
-          ;*
-          %+  turn  ~(tap in move)
-          |=  =chng
-          ?-  -.chng
-            %ins
-              ;div.fr.g3
-                ;span: %ins
-                ;span: {(pate pith.chng)}
-                ;span: {(print-aura node.chng)}
-              ==
-            %del
-              ;div.fr.g3
-                ;span: %del
-                ;span: {(pate pith.chng)}
-              ==
+      ;div.fc.bbv.br2.bd1.p2.fs-2
+        ;*
+        %-  flop
+        =<  p
+        %^  spin  logs.node-meta  0
+        |=  [=move a=@]
+        :_  +(a)
+        ;div.fr.as.g3
+          ;span: {<a>}
+          ;div.fc.mono
+            ;*
+            %+  turn  ~(tap in move)
+            |=  =chng
+            ?-  -.chng
+              %ins
+                ;div.fr.g3
+                  ;span: %ins
+                  ;span: {(pate pith.chng)}
+                  ;span: {(print-aura node.chng)}
+                ==
+              %del
+                ;div.fr.g3
+                  ;span: %del
+                  ;span: {(pate pith.chng)}
+                ==
+            ==
           ==
         ==
       ==
@@ -405,15 +406,24 @@
         =data-on_submit  post
         ;input(type "hidden", name "op", value "ins-node");
         ;input(type "hidden", name "pith", value (pate ?~(pax ~ t.pax)));
-        ;feather-textarea.p2.mono.fs-1
+        ;feather-textarea.p2.mono.fs-2
           =required  ""
           =name  "value"
           =placeholder  "ud+88"
-          ;-  (print-node-strict node)
+          ;-
+          ?+  node  (print-node-strict node)
+            [%t *]
+                """
+                :-  %t
+                '''
+                {(trip t.node)}
+                '''
+                """
+          ==
         ==
       ==
       ;div.fr.bbh
-        ;button.b2.hover.p2.grow
+        ;button.b3.hover.p2.grow
           =form  "editnode{nid}"
           =type  "submit"
           ; save
@@ -422,7 +432,7 @@
           =data-on_submit  post
           ;input(type "hidden", name "op", value "del-node");
           ;input(type "hidden", name "pith", value (pate ?~(pax ~ t.pax)));
-          ;button.b2.hover.p-2
+          ;button.b3.hover.p-2.f-1
             ; delete
           ==
         ==
@@ -465,13 +475,13 @@
         =value  (pate ?~(pax ~ t.pax))
         ;*  ~
       ==
-      ;feather-textarea.p-1.mono.fs-1
+      ;feather-textarea.p-1.mono.fs-2
         =name  "value"
         =placeholder  "value"
         =required  ""
         ;*  ~
       ==
-      ;button.b2.hover.p2
+      ;button.b3.hover.p2
         ; save
       ==
     ==

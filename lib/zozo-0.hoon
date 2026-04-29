@@ -186,12 +186,6 @@
       =case
       logs=(list move)
       ::
-      ::  xx i think i will get rid of these grow, eyre, gall.
-      ::     instead:
-      ::       grow will live under /[our]/publ
-      ::       1-to-1 encrypted     /[our]/chum
-      ::
-      ::
       grow=_|              :: is this life static?, if no, lifes can be re-used.
       ::                   :: after yet, can't go back til next life
       ::
