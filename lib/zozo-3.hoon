@@ -1169,7 +1169,7 @@
   ::    gall.met ≠ ~            => /sub/<pax> facts
   ::    grow.met                => /logs/ history facts
   ::    eyre.met ∈ {^%white ^%black}, no exceptions
-  ::                            => %set-response (print-node node)
+  ::                            => %set-response (node-summary node)
   ::
   ::  all emission paths strip the leading ship iota of full-pax,
   ::  so subscribers and urls are ship-less.
@@ -1260,7 +1260,7 @@
   ::
   ++  eyre-push
     ::
-    ::  cache (print-node node) as plain-text response at full-pax's url.
+    ::  cache (node-summary node) as plain-text response at full-pax's url.
     ::  no-op if eyre.met is not cache-safe; evict if no leaf at full-pax.
     ::  auth in the entry is true iff %white (only self); %black is public.
     ::
@@ -1271,7 +1271,7 @@
     ?.  ?=(?(%white %black) kind.u.eyre.met)  cor
     =/  url=@t  (eyre-url full-pax)
     ?~  nod  (eyre-set url ~)
-    =/  body=@t  (crip (print-node u.nod))
+    =/  body=@t  (crip (node-summary u.nod))
     =/  entry=cache-entry:eyre
       :*  auth=?=(%white kind.u.eyre.met)
           :-  %payload

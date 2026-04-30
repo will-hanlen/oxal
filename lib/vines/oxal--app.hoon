@@ -48,9 +48,9 @@
       ::
       [%.y %ins-node]
         ::
-        =/  =pith  (ream-pith (~(got by body) 'pith'))
+        =/  =pith  !<(pith (slap !>(.) (ream (~(got by body) 'pith'))))
         =/  value=@t   (fix-newlines (~(got by body) 'value'))
-        =/  =node  (ream-node value)
+        =/  =node  !<(node (slap !>(.) (ream value)))
         =/  changes=(set chng)  (silt [%ins pith node]~)
         ;<  ~  bind:m  (poke-our:vio %do-move !>(changes))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
@@ -61,7 +61,7 @@
       ::
       [%.y %del-node]
         ::
-        =/  =pith  (ream-pith (~(got by body) 'pith'))
+        =/  =pith  !<(pith (slap !>(.) (ream (~(got by body) 'pith'))))
         =/  changes=(set chng)  (silt [%del pith]~)
         ;<  ~  bind:m  (poke-our:vio %do-move !>(changes))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
@@ -72,7 +72,7 @@
       ::
       [%.y %bump]
         ::
-        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        =/  =pith  (stib (trip (~(got by body) 'pith')))
         ;<  ~  bind:m  (poke-our:vio %bump !>(pith))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
@@ -82,7 +82,7 @@
       ::
       [%.y %show-logs]
         ::
-        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        =/  =pith  (stib (trip (~(got by body) 'pith')))
         ;<  ~  bind:m
           %-  send-html-payload:vio
           %~  part-logs-full  render-file
@@ -92,7 +92,7 @@
       ::
       [%.y %hide-logs]
         ::
-        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        =/  =pith  (stib (trip (~(got by body) 'pith')))
         ;<  ~  bind:m
           %-  send-html-payload:vio
           %~  part-logs-stub  render-file
@@ -223,6 +223,7 @@
   ++  nid  (uid pax)
   ++  node-meta  (fall leaf.code.fap *meta)
   ++  pate-stem  (pate ?~(pax ~ t.pax))
+  ++  pare-stem  (pare ?~(pax ~ t.pax))
   ::
   ++  recurse
     ::
@@ -277,7 +278,7 @@
                 ;+  ^$(node nod)
               ==
             ==
-          ;span: {(print-node node)}
+          ;span: {(node-summary node)}
     ==
   ::
   ++  part-row
@@ -418,7 +419,7 @@
     ;div.fc.bbv.br2.bd1.scroll-none
       ;+
       ?+  node  ;div: not renderable: {(print-aura node)}
-        aota  ;div:(-(print-node node))
+        aota  ;div:(-(node-summary node))
         [%manx *]
           ;iframe.max-h20
             =srcdoc  (en-xml:html manx.node)
@@ -436,13 +437,13 @@
         =id  "editnode{nid}"
         =data-on_submit  post
         ;input(type "hidden", name "op", value "ins-node");
-        ;input(type "hidden", name "pith", value pate-stem);
+        ;input(type "hidden", name "pith", value pare-stem);
         ;feather-textarea.p2.mono.fs-2
           =required  ""
           =name  "value"
           =placeholder  "ud+88"
           ;-
-          ?+  node  (print-node-strict node)
+          ?+  node  (nate node)
             [%t *]
                 """
                 :-  %t
@@ -503,7 +504,7 @@
         =name  "pith"
         =placeholder  "pith"
         =required  ""
-        =value  pate-stem
+        =value  pare-stem
         ;*  ~
       ==
       ;feather-textarea.p-1.mono.fs-2

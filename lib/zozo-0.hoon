@@ -950,38 +950,9 @@
     ==
   --
 ::
-::  pith helpers
-::
-++  stip
-  ::
-  =<  swot
-  |%
-  ++  swot  |=(n=nail (;~(pfix fas (more fas spot)) n))
-  ::
-  ++  spot
-    %+  sear
-      |=  txt=tape
-      ^-  (unit iota)
-      ?~  cn=(slay (crip txt))  ~
-      `(coin-to-node u.cn)
-    (plus ;~(less fas next))
-  --
-::
-++  pave
-  ::
-  |=  pit=pith
-  ^-  pith
-  %+  turn  pit
-  |=  i=iota
-  ?@  i
-    ^-  iota
-    =;  =coin  (coin-to-node coin)
-    %+  fall
-      (rush i nuck:so)
-    ?:  =('.__' i)  [%many ~]
-    ?:  =('' i)     [%$ %tas %$]
-    [%$ %t (@t i)]
-  i
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::  node <-> coin bridge
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
 ::
 ++  coin-to-node
   ::
@@ -1017,6 +988,29 @@
       ^$(nod nod)
   ==
 ::
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::  pith <-> path bridge
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::
+::    +pave  path -> pith (slay-decode each segment)
+::    +pout  pith -> path (rend each segment via coin)
+::
+++  pave
+  ::
+  |=  pit=pith
+  ^-  pith
+  %+  turn  pit
+  |=  i=iota
+  ?@  i
+    ^-  iota
+    =;  =coin  (coin-to-node coin)
+    %+  fall
+      (rush i nuck:so)
+    ?:  =('.__' i)  [%many ~]
+    ?:  =('' i)     [%$ %tas %$]
+    [%$ %t (@t i)]
+  i
+::
 ++  pout
   ::
   |=  =pith
@@ -1025,11 +1019,29 @@
   |=  =node
   %-  crip
   ~(rend co (node-to-coin node))
+::
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::  url-safe round-trip serializers
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::
+::    +nate  node -> tape   (terms render as %foo)
+::    +sily  tape -> node   (inverse of +nate)
+::    +pate  pith -> tape   (path-segment form, no % on terms)
+::    +stib  tape -> pith   (inverse of +pate; +stip on the inside)
+::
+++  nate
   ::
+  ::  hoon-literal form: terms render as %foo so the output is
+  ::  unambiguously parseable by +sily.
+  ::
+  |=  =node
+  ^-  tape
+  ?@  node  ['%' (trip node)]
+  ~(rend co (node-to-coin node))
 ::
-::  parsers
-::
-++  tape-to-iota
+++  sily
+  ::
+  ::  url-safe tape -> node.
   ::
   |=  tap=tape
   ^-  iota
@@ -1041,67 +1053,24 @@
     %-  fall  :_  t+(crip tap)
     %-  mole  |.
     ?:  =('/' (snag 0 tap))
-      pith+(tape-to-pith tap)
+      pith+(stib tap)
+    ?:  =('%' (snag 0 tap))
+      ::
+      ::  hoon-literal term: %foo, %$
+      ::
+      =/  rest=tape  (slag 1 tap)
+      ?~  rest  ^-  iota  %$
+      ^-  iota
+      `@tas`(scan rest sym:so)
     %-  iota
     %+  snag  0
     (scan (welp "/" tap) stip)
   !!
 ::
-++  cord-to-iota
-  ::
-  |=  =cord
-  ^-  iota
-  (tape-to-iota (trip cord))
-::
-++  cord-to-node  cord-to-iota
-::
-++  tape-to-pith
-  ::
-  |=  =tape
-  ^-  pith
-  ~|  invalid-pith-tape+(crip tape)
-  (scan tape stip)
-::
-++  cord-to-pith
-  ::
-  |=  =cord
-  ^-  pith
-  ~|  invalid-pith-cord+cord
-  (rash cord stip)
-::
-++  ream-pith
-  ::
-  |=  =cord
-  ^-  pith
-  =/  try=(unit pith)
-    %-  mole  |.
-    !<  pith
-    (slap !>(.) (ream cord))
-  ?^  try  u.try
-  (cord-to-pith cord)
-  ::
-::
-++  ream-node
-  ::
-  |=  =cord
-  ^-  node
-  =/  try=(unit node)
-    %-  mole  |.
-    !<  node
-    (slap !>(.) (ream cord))
-  ?^  try  u.try
-  (cord-to-node cord)
-  ::
-::
-++  print-node-strict
-  ::
-  |=  =node
-  ^-  tape
-  ~(rend co (node-to-coin node))
-::
-++  dane  print-node-strict
-::
 ++  pate
+  ::
+  ::  pith renders as a path; each segment is the path-style form of
+  ::  its node (terms bare, with no %), matching what +stip parses.
   ::
   |=  =pith
   ^-  tape
@@ -1111,7 +1080,245 @@
       ~["/"]
   %+  turn  pith
   |=  =node
-  ['/' (print-node-strict node)]
+  :-  '/'
+  ?@  node  (trip node)
+  ~(rend co (node-to-coin node))
+::
+++  stib
+  ::
+  ::  url-safe tape -> pith.
+  ::
+  |=  =tape
+  ^-  pith
+  ~|  invalid-pith-tape+(crip tape)
+  (scan tape stip)
+::
+++  stip
+  ::
+  ::  parser combinator (rule) consumed by +stib and +sily.  parses
+  ::  /-prefixed paths whose segments are slay-decodable coins.
+  ::
+  =<  swot
+  |%
+  ++  swot  |=(n=nail (;~(pfix fas (more fas spot)) n))
+  ::
+  ++  spot
+    %+  sear
+      |=  txt=tape
+      ^-  (unit iota)
+      ?~  cn=(slay (crip txt))  ~
+      `(coin-to-node u.cn)
+    (plus ;~(less fas next))
+  --
+::
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::  hoon-source round-trip serializers (via +ream)
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::
+::    +nare  node -> tape (human-readable hoon source)
+::    +pare  pith -> tape (human-readable hoon source)
+::
+::  unlike +nate / +pate (terse, url-safe), these emit the form
+::  a programmer would write in source, e.g. for [%t cord]:
+::
+::      :-  %t
+::      '''
+::      <text>
+::      '''
+::
+::  inverse: +ream + +slap (no built-in helper).
+::
+++  nare
+  ::
+  |=  =node
+  ^-  tape
+  ?@  node
+    ?:  =(%$ node)  "%$"
+    ['%' (trip node)]
+  ?+    node  <node>
+    [%t *]
+        %-  trip
+        %^  cat  3  ':-  %t\0a'
+        %^  cat  3  '\'\'\'\0a'
+        %^  cat  3  t.node
+        '\0a\'\'\''
+    [%mime *]
+        ?.  ?=([%text * ~] p.mime.node)  <node>
+        %-  of-wall:format
+        :~  ":+  %mime  {(spud p.mime.node)}"
+            "%-  as-octs:mimes:html"
+            "'''"
+            (trip q.q.mime.node)
+            "'''"
+        ==
+    [%pith *]
+        (welp "[%pith " (welp (pare pith.node) "]"))
+    aota
+        ::  wide-form coin literal: ud+42, p+~zod, da+~2026.4.30 — fits
+        ::  inside ~[...] list literals so +pare stays roundtripable.
+        ::
+        %+  welp  (trip -.node)
+        ['+' (scow node)]
+  ==
+::
+++  pare
+  ::
+  ::  emits a pith as the bracketed `#/` path-literal hoon syntax,
+  ::  which (unlike `/foo/bar`) parses without a trailing `%$`.
+  ::  segments use the path parser's coin auto-decoding for atoms
+  ::  (foo, 22, ~zod, ...).  nested pith nodes are emitted as
+  ::  `[pith+<pare>]`, which the path parser reads as a wide-form
+  ::  cell `[%pith inner]`.
+  ::
+  ::      ~              ->  "~"
+  ::      /foo/bar       ->  "[#/foo/bar]"
+  ::      /foo/22        ->  "[#/foo/22]"
+  ::      /a/[%pith /b]  ->  "[#/a/[pith+[#/b]]]"
+  ::
+  |=  pat=pith
+  ^-  tape
+  ?~  pat  "~"
+  =/  full=pith  pat
+  =/  inner=tape
+    %-  zing
+    %+  turn  full
+    |=  =node
+    ^-  tape
+    :-  '/'
+    ?@  node  (trip node)
+    ?:  ?=([%pith *] node)
+      ;:  weld
+        "[pith+"
+        (pare pith.node)
+        "]"
+      ==
+    ~(rend co (node-to-coin node))
+  (welp "#" inner)
+::
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::  human-readable summaries (lossy, not round-trippable)
+::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::  ::
+::
+::    +node-summary  one-line, max-80-char, no-newlines tape summary
+::                   of a node.  delegates per-type to +raw-summary.
+::    +print-aura    aura name as a tape ("ud", "tas", ...)
+::    +print-aota    +scow with safe fallback for any aota
+::
+++  node-summary
+  ::
+  ::  one-line, human-readable summary of a node.  no newlines, max
+  ::  80 characters with trailing "..." if truncated.  not round-
+  ::  trippable; use +nate / +nare for that.
+  ::
+  ::  some node types have richer summaries:
+  ::    %mime  shows the mime type and byte count
+  ::    %manx  shows the tag with id, classes, and trailing attr count
+  ::    %data  shows the leaf count
+  ::    %t     shows the cord truncated to first newline
+  ::    %tang  flattens to a single line
+  ::    aota   uses +scow on the dime
+  ::
+  |=  nod=node
+  ^-  tape
+  =/  raw=tape
+    =;  x=(unit tape)
+      ?^  x  u.x
+      "render-failed"
+    %-  mole  |.
+    (raw-summary nod)
+  =/  flat=tape  (flatten-tape raw)
+  ?:  (lte (lent flat) 80)  flat
+  (welp (scag 77 flat) "...")
+::
+++  raw-summary
+  ::
+  |=  nod=node
+  ^-  tape
+  ?@  nod  (trip nod)
+  ?-    -.nod
+      ?(%n %f %ub %uc %ud %ui %ux %uv %uw %sb %sc %sd %si %sx %sv %sw)
+        (print-aota nod)
+      ?(%da %dr %if %is %ta %p %q %rs %rd %rh %rq)
+        (print-aota nod)
+      %t
+        ::  cord up to first newline
+        ::
+        %-  trip
+        ^-  @t
+        =/  long  t.nod
+        =|  out=@t
+        |-
+        ?~  long  out
+        =/  firt  (cut 3 [0 1] long)
+        ?:  =(firt 10)  out
+        =.  out  (cat 3 out firt)
+        $(long (rsh 3 long))
+      %pith  (pate pith.nod)
+      %data  "<data {(a-co:co (lent ~(tap ox data.nod)))} leaves>"
+      %manx  (manx-summary manx.nod)
+      %mime  "{(spud p.mime.nod)} ({(a-co:co p.q.mime.nod)} bytes)"
+      %tang
+        %-  zing
+        %+  turn  tang.nod
+        |=  =tank
+        %-  of-wall:format
+        (~(win re tank) 0 80)
+      %json  "<json>"
+      %noun  "<noun>"
+  ==
+::
+++  flatten-tape
+  ::
+  ::  replace newlines with spaces.
+  ::
+  |=  tap=tape
+  ^-  tape
+  %+  turn  tap
+  |=  c=@tD
+  ?:(=(10 c) ' ' c)
+::
+++  manx-summary
+  ::
+  ::  ";tag#id.class +N attrs" — only id and class are shown by
+  ::  value; remaining attribute count is appended if non-zero.
+  ::
+  |=  =manx
+  ^-  tape
+  =/  =marx  g.manx
+  =/  tag=tape
+    ?@  n.marx  (trip n.marx)
+    "{(trip -.n.marx)}:{(trip +.n.marx)}"
+  =/  attrs=mart  a.marx
+  =/  id=(unit tape)  (lookup-attr 'id' attrs)
+  =/  cls=(unit tape)  (lookup-attr 'class' attrs)
+  =/  other=@ud
+    %-  lent
+    %+  skip  attrs
+    |=  [n=mane v=tape]
+    ?&  ?=(@ n)
+        |(=('id' n) =('class' n))
+    ==
+  =/  out=tape  (welp ";" tag)
+  =?  out  ?=(^ id)   (welp out (welp "#" u.id))
+  =?  out  ?=(^ cls)
+    %-  zing
+    :~  out
+        "."
+        (turn u.cls |=(c=@tD ?:(=(' ' c) '.' c)))
+    ==
+  =?  out  (gth other 0)
+    "{out} +{(a-co:co other)} attr{?:(=(other 1) "" "s")}"
+  out
+::
+++  lookup-attr
+  ::
+  |=  [name=@tas attrs=mart]
+  ^-  (unit tape)
+  ?~  attrs  ~
+  =/  n  n.i.attrs
+  ?:  &(?=(@ n) =(name n))
+    `v.i.attrs
+  $(attrs t.attrs)
 ::
 ++  print-aota
   ::
@@ -1126,84 +1333,6 @@
     %ud   (scow %ud +.aota)
     %t    (trip +.aota)
     %ta   (trip +.aota)
-  ==
-
-::
-++  print-node
-  ::
-  |=  nod=node
-  ^-  tape
-  =;  x=(unit tape)
-    ?^  x  u.x
-    "render-failed"
-  %-  mole  |.
-  ?+    nod  "lost: {<-.nod>}"
-      @  (trip nod)
-      [%t *]
-          %-  trip
-          ^-  @t
-          =/  long  t.nod
-          =|  out=@t
-          =|  i=@
-          |-
-          ?~  long  out
-          ?:  (gte i 50)  out
-          =/  firt  (cut 3 [0 1] long)
-          ?:  =(firt 10)  out
-          =.  out  (cat 3 out firt)
-          $(long (rsh 3 long), i +(i))
-      aota  (print-aota nod)
-    [%pith *]  (pate pith.nod)
-    [%data *]  "<data ({(scow %ud (lent ~(tap ox data.nod)))} leaves)>"
-    [%manx *]
-      %+  welp  ";"
-      ?@  x=n.g.manx.nod  (trip x)
-      <x>
-    [%mime *]
-      ?+    p.mime.nod
-          "non-printable mite: {<`(list cord)`p.mime.nod>}"
-        [%text * ~]
-          %+  welp  "mime: {(spud p.mime.nod)}\0a"
-          (trip q.q.mime.nod)
-      ==
-    [%tang *]
-      %-  zing
-      %+  turn  tang.nod
-      |=  =tank
-      %-  of-wall:format
-      (~(win re tank) 0 55)
-  ==
-::
-::  prints in a machine-readable way
-::
-++  print-strict
-  ::
-  |=  =node
-  ^-  (unit tape)
-  ?+    node  ~
-    @  `<node>
-    [%t *]
-      :-  ~
-      =/  ticl  (crip "'''\0a")
-      %-  trip
-      %^  cat  3  ':-  %t\0a'
-      %^  cat  3  ticl
-      %^  cat  3  t.node
-      %^  cat  3  '\0a'
-      ticl
-    [%mime *]
-      ?:  ?=([%text *] p.mime.node)
-        :-  ~
-        %-  of-wall:format
-        :~  ":+  %mime  {(spud p.mime.node)}"
-            "%-  as-octs:mimes:html"
-            "'''"
-            (trip q.q.mime.node)
-            "'''"
-        ==
-      ~
-    aota
-      `(welp ":-  {<-.node>}\0a" (scow node))
   ==
 ::
 ++  print-aura
@@ -1365,7 +1494,7 @@
     |=  pax=pith
     ^-  (unit tape)
     ?~  x=(get pax)  ~
-    `(print-node u.x)
+    `(node-summary u.x)
     ::
   ++  pib
     ::
@@ -1377,14 +1506,14 @@
     ::
     |=  pax=pith
     ^-  tape
-    (print-node (got pax))
+    (node-summary (got pax))
     ::
   ++  pub
     ::
     |=  [pax=pith back=tape]
     ^-  tape
     ?~  x=(get pax)  back
-    (print-node u.x)
+    (node-summary u.x)
     ::
   ::
   ::  polymorphic getters: aura-parameterized node accessors

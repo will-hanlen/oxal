@@ -150,7 +150,7 @@
   =;  [content-type=@t =octs]
     :-  [200 ['content-type' content-type]~]
     [~ octs]
-  ?+  node  ['text/plain' (as-octt:mimes:html (print-node node))]
+  ?+  node  ['text/plain' (as-octt:mimes:html (node-summary node))]
     :::
     [%mime *]  [(en-mite p.mime.node) q.mime.node]
     ::
@@ -638,7 +638,7 @@
     ;div.bdt1.fc.bc9
       ;+  ?~  leaf.data  ;/  ""
       ;div.b0.p3.scroll-x.scroll-y.pre.max-h18
-        ;-  (print-node u.leaf.data)
+        ;-  (node-summary u.leaf.data)
       ==
       ;+
       =;  =marl
@@ -669,7 +669,7 @@
       ;div
         ;-
         ?~  seg  "/"
-        (print-node u.seg)
+        (node-summary u.seg)
       ==
       ;div
         ;-  ?~  leaf.data  ""
@@ -678,8 +678,8 @@
             (print-aura u.leaf.data)
             " : "
             ?@  u.leaf.data  (trip u.leaf.data)
-            ?+  -.u.leaf.data  (scag 30 (print-node u.leaf.data))
-              ?(%da %p %ta %pith %ud)  (print-node u.leaf.data)
+            ?+  -.u.leaf.data  (scag 30 (node-summary u.leaf.data))
+              ?(%da %p %ta %pith %ud)  (node-summary u.leaf.data)
             ==
         ==
       ==
