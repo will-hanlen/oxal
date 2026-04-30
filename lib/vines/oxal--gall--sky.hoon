@@ -150,7 +150,7 @@
       %oxal-snap
         =+  ;;([snap=data =move =life =case] q.page)
         =/  d=@ud  ~(wyt do snap)
-        =/  m=@ud  ~(wyt in move)
+        =/  m=@ud  ~(wyt in chng-set.move)
         "nodes={(scow %ud d)} chng={(scow %ud m)} life={(scow %ud life)} case={(scow %ud case)}"
     ==
   ?-  -.res

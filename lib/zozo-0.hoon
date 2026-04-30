@@ -1,5 +1,52 @@
 ::  oxal : the backbone of a programmable interface
 ::
+::  $hlc: hybrid logical clock
+::
+::    every move committed to the tree carries an hlc stamp.  an hlc is
+::    a pair [phys=@da logi=@ud]:
+::
+::      .phys   wall-clock time, taken from the bowl's `now` at the
+::              moment the move entered the system.
+::      .logi   logical counter that breaks ties when two events share
+::              the same physical time, and that keeps the clock moving
+::              forward when the wall clock stalls or runs backwards.
+::
+::    why both halves?  a bare wall-clock stamp is broken under clock
+::    skew between ships: two writes that happen "at the same time" by
+::    one ship's clock can interleave incorrectly with a peer's writes.
+::    a bare logical counter (lamport-style) is causally correct but
+::    meaningless to humans -- it can't express "the last hour" or
+::    "wednesday afternoon".  the hybrid clock gives both: physical
+::    ordering when the wall clocks agree, lamport-style fallback when
+::    they don't.
+::
+::    rules:
+::
+::      on a local cause (a poke, a self-arvo): tick once.
+::        new.phys = max(old.phys, now)
+::        new.logi = (now > old.phys) ? 0 : old.logi + 1
+::
+::      on receiving a remote move with hlc r: merge.
+::        m = max(old.phys, r.phys, now)
+::        if m == old.phys && m == r.phys: new.logi = max(old.logi, r.logi) + 1
+::        elif m == old.phys:              new.logi = old.logi + 1
+::        elif m == r.phys:                new.logi = r.logi + 1
+::        else:                            new.logi = 0
+::        new.phys = m
+::
+::    invariants:
+::
+::      - hlcs are monotonic per-ship.  the agent-level clock
+::        (now-hlc.acer) only goes forward.
+::      - an hlc stamped onto a move is frozen.  it travels with the
+::        move through fan-out (transformer outputs all carry the
+::        cause's hlc, not their own newly-computed one) and through
+::        replication.
+::      - transformers may *read* time.move but must never read `now`
+::        themselves; otherwise view replay diverges.
+::
+::    reference: kulkarni et al., "logical physical clocks", opodis 2014.
+::
 ::
 /+  multipart
 |%
@@ -112,6 +159,38 @@
 ::
 +$  case  @ud
 +$  life  @ud
++$  hlc   $+(hlc [phys=@da logi=@ud])
+::
+++  hlc-tick
+  ::
+  ::  advance an hlc against wall-clock now (local cause).
+  ::
+  |=  [old=hlc now=@da]
+  ^-  hlc
+  ?:  (gth now phys.old)  [now 0]
+  [phys.old +(logi.old)]
+::
+++  hlc-merge
+  ::
+  ::  merge a remote hlc into the local one against wall-clock now.
+  ::
+  |=  [old=hlc rem=hlc now=@da]
+  ^-  hlc
+  =/  m=@da  (max phys.old (max phys.rem now))
+  ?:  &(=(m phys.old) =(m phys.rem))
+    [m +((max logi.old logi.rem))]
+  ?:  =(m phys.old)  [m +(logi.old)]
+  ?:  =(m phys.rem)  [m +(logi.rem)]
+  [m 0]
+::
+++  comp-hlcs
+  ::
+  ::  total order on hlcs: physical, then logical.
+  ::
+  |=  [a=hlc b=hlc]
+  ^-  ?
+  ?:  =(phys.a phys.b)  (lte logi.a logi.b)
+  (lte phys.a phys.b)
 ::
 ::  pith aliases
 ::
@@ -237,6 +316,12 @@
       nuke=@ud
       xfms=(map @t transformer) :: xx (map @t [transformer (set pith)]) :: (set pith) is refcount
       ::
+      ::  agent-level hybrid logical clock.  advanced on every local
+      ::  cause and on every remote-receive.  the source of truth for
+      ::  "the next timestamp this ship will emit".
+      ::
+      now-hlc=hlc
+      ::
       ::  future field: an index of local subscribers keyed by remote
       ::  faucet [ship pith].  when the gall-networking layer lands,
       ::  it will read this to decide which remote ships to open
@@ -254,7 +339,7 @@
   $%  [%ins =pith =node]
       [%del =pith]
   ==
-+$  move  $+(move (set chng))
++$  move  $+(move [time=hlc chng-set=(set chng)])
 +$  meta-chng
   $+  meta-chng
   $%  [%ins =pith =meta]
@@ -281,12 +366,13 @@
 ::
 ++  prefix-move
   ::
-  ::  weld a prefix pith onto every chng in a move
+  ::  weld a prefix pith onto every chng in a move; preserve time.
   ::
   |=  [pre=pith =move]
   ^-  ^move
+  :-  time.move
   %-  silt
-  %+  turn  ~(tap in move)
+  %+  turn  ~(tap in chng-set.move)
   |=  =chng
   ?-  -.chng
     %ins  chng(pith (weld pre pith.chng))
@@ -1374,10 +1460,11 @@
   ^-  transformer
   |=  [mine=data snap=data =move *]
   ^+  move
+  :-  time.move
   %-  silt
   ^-  (list chng)
-  ?:  =(~ move)  (~(mur do snap) ins:ec)
-  %+  murn  ~(tap in move)
+  ?:  =(~ chng-set.move)  (~(mur do snap) ins:ec)
+  %+  murn  ~(tap in chng-set.move)
   |=  =chng
   ^-  (unit _chng)
   ?-  -.chng

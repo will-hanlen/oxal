@@ -77,7 +77,7 @@
 --
 ::
 |_  [=bowl:gall cards=(list card:agent:gall)]
-+*  engine  ~(. ae acer our.bowl verb &)
++*  engine  ~(. ae acer our.bowl now.bowl verb &)
 ++  cor   .
 ++  abet  :-  (flop cards)  state
 ++  emit  |=  =card:agent:gall  cor(cards [card cards])
@@ -117,7 +117,7 @@
       ?~  gall.meta  !!
       ?>  (check-auth u.gall.meta our.bowl src.bowl)
       =/  resp  (initial-watch-response:engine full-pax)
-      (emit %give %fact ~ %oxal-snap !>([snap.resp ~ life.resp case.resp]))
+      (emit %give %fact ~ %oxal-snap !>([snap.resp [*hlc ~] life.resp case.resp]))
     ::
     [%code *]
       =/  pax=pith  (pave t.path)
@@ -142,7 +142,7 @@
       =/  dresp  (initial-watch-response:engine full-pax)
       =/  cresp  (initial-watch-response-code:engine full-pax)
       %-  emil
-      :~  [%give %fact ~ %oxal-snap !>([snap.dresp ~ life.dresp case.dresp])]
+      :~  [%give %fact ~ %oxal-snap !>([snap.dresp [*hlc ~] life.dresp case.dresp])]
           [%give %fact ~ %oxal-code !>([snap.cresp ~ life.cresp case.cresp])]
       ==
     ::
@@ -199,9 +199,12 @@
     ::
     %do-move
       ::
-      =+  !<  =move  vase
+      ::  user pokes a bare (set chng); the engine stamps it on entry.
+      ::  the move's time field is owned by the engine, not the user.
+      ::
+      =+  !<  changes=(set chng)  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-do-move:engine [move %.n])
+        abet:(ingress-do-move:engine [[*hlc changes] %.n])
       (emil cz)
       ::
     %install-app

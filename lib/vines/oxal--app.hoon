@@ -51,8 +51,8 @@
         =/  =pith  (ream-pith (~(got by body) 'pith'))
         =/  value=@t   (fix-newlines (~(got by body) 'value'))
         =/  =node  (ream-node value)
-        =/  =move  (silt [%ins pith node]~)
-        ;<  ~  bind:m  (poke-our:vio %do-move !>(move))
+        =/  changes=(set chng)  (silt [%ins pith node]~)
+        ;<  ~  bind:m  (poke-our:vio %do-move !>(changes))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
         =.  app  (got-app ax app-name)
@@ -62,8 +62,18 @@
       [%.y %del-node]
         ::
         =/  =pith  (ream-pith (~(got by body) 'pith'))
-        =/  =move  (silt [%del pith]~)
-        ;<  ~  bind:m  (poke-our:vio %do-move !>(move))
+        =/  changes=(set chng)  (silt [%del pith]~)
+        ;<  ~  bind:m  (poke-our:vio %do-move !>(changes))
+        ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+        =.  ax  new-ax
+        =.  app  (got-app ax app-name)
+        ;<  ~  bind:m  (send-html-payload:vio part-file)
+        (pure:m !>(~))
+      ::
+      [%.y %bump]
+        ::
+        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        ;<  ~  bind:m  (poke-our:vio %bump !>(pith))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
         =.  app  (got-app ax app-name)
@@ -376,9 +386,11 @@
         :_  +(a)
         ;div.fr.as.g3
           ;span: {<a>}
+          ;span.fs-2.o6: {(scow %da phys.time.move)}
+          ;span.fs-2.o4: .{(scow %ud logi.time.move)}
           ;div.fc.mono
             ;*
-            %+  turn  ~(tap in move)
+            %+  turn  ~(tap in chng-set.move)
             |=  =chng
             ?-  -.chng
               %ins

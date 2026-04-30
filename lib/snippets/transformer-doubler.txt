@@ -1,9 +1,10 @@
 !:
 |=  [mine=data snap=data mov=move *]
 ^-  move
+:-  time.mov
 %-  silt
-?^  mov
-  %+  murn  ~(tap in `move`mov)
+?^  chng-set.mov
+  %+  murn  ~(tap in chng-set.mov)
   |=  =chng
   ?-  -.chng
     %del  `chng

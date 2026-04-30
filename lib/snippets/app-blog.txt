@@ -38,8 +38,9 @@
       sauc
         '''
         !:
-        |=  [data snap=data *]
+        |=  [data snap=data mov=move *]
         ^-  move
+        :-  time.mov
         %-  silt
         :_  ~
         :+  %ins  /

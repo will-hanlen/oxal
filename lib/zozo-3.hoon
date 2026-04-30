@@ -25,7 +25,7 @@
   ::    acer engine
   ::
   =|  cards=(list card:agent:gall)
-  |_  [ax=acer our=ship verb=? effects=?]
+  |_  [ax=acer our=ship now=@da verb=? effects=?]
   +*  fil  file.ax
       dat  data.fil
       cod  code.fil
@@ -34,6 +34,27 @@
   ++  abet  [(flop cards) ax]
   ++  emit  |=  =card:agent:gall  cor(cards [card cards])
   ++  emil  |=  cs=(list card:agent:gall)  cor(cards (welp (flop cs) cards))
+  ::
+  ++  ingress-tick
+    ::
+    ::  advance the acer's hlc against now (local cause).  returns the
+    ::  new hlc and an updated cor.
+    ::
+    ^-  [hlc _cor]
+    =/  new=hlc  (hlc-tick now-hlc.ax now)
+    =.  now-hlc.ax  new
+    [new cor]
+  ::
+  ++  ingress-merge
+    ::
+    ::  merge a remote hlc into the acer's hlc against now.  returns
+    ::  the merged hlc and an updated cor.
+    ::
+    |=  rem=hlc
+    ^-  [hlc _cor]
+    =/  new=hlc  (hlc-merge now-hlc.ax rem now)
+    =.  now-hlc.ax  new
+    [new cor]
   ::
   ++  vlog
     ::
@@ -225,7 +246,7 @@
         ==
       =.  cod  (~(put ox cod) full new-met)
       =/  snap=data  (~(dip do dat) full)
-      (emit-node-effects full new-met snap ~)
+      (emit-node-effects full new-met snap [*hlc ~])
     $(subs t.subs)
   ::
   ++  faucet-unsub
@@ -283,11 +304,15 @@
     ::  user-facing move: chng piths are bare, relative to /[our].
     ::  qualify them and dispatch to apply-move-qualified.  wraps the
     ::  dispatch to capture structural code changes produced by any
-    ::  transformer firings during propagate.
+    ::  transformer firings during propagate.  ticks the agent-level
+    ::  hlc once and freezes that time onto the move, so all log
+    ::  entries from this cause share one timestamp.
     ::
     |=  [=move allow-view-write=?]
     ^+  cor
-    =.  cor  (vlog "ae: do-move ({(scow %ud ~(wyt in move))} changes)")
+    =^  time=hlc  cor  ingress-tick
+    =.  move  move(time time)
+    =.  cor  (vlog "ae: do-move ({(scow %ud ~(wyt in chng-set.move))} changes)")
     =/  cod-before  cod
     =.  cor  (apply-move-qualified (prefix-move [p+our ~] move) allow-view-write)
     (emit-code-at-ancestors cod-before)
@@ -303,7 +328,7 @@
     =/  [d=data effective=(set chng)]
       (apply-changes move allow-view-write)
     ?:  =(~ effective)  cor
-    (propagate d cod effective)
+    (propagate d cod effective time.move)
   ::
   ++  rebuild-view
     ::
@@ -371,7 +396,7 @@
     =/  c=code  cod
     =/  is-at-or-beneath-lens=$-([pith code] ?)  at-or-beneath-lens
     =/  effective=(set chng)  ~
-    =/  changes=(list chng)  ~(tap in move)
+    =/  changes=(list chng)  ~(tap in chng-set.move)
     |-
     ?~  changes  [d effective]
     =/  p=pith  (pith-of-chng i.changes)
@@ -408,7 +433,11 @@
     ::  nested propagates.  at the end, re-install %link-subscribed
     ::  views whose link target was in any effective change.
     ::
-    |=  [d=data c=code effective=(set chng)]
+    ::  time is the cause's hlc, frozen at ingress.  every log entry
+    ::  appended during this walk -- including transformer-produced
+    ::  ones -- carries this same time.
+    ::
+    |=  [d=data c=code effective=(set chng) time=hlc]
     ^+  cor
     ::  commit data/code up front so transformer-produced changes
     ::  see the current state.
@@ -418,7 +447,7 @@
     =/  queue=(list pith)  (sort-piths-desc ~(key by rels))
     =|  processed=(set pith)
     =/  combined=(set chng)  effective
-    (propagate-loop queue rels processed combined)
+    (propagate-loop queue rels processed combined time)
   ::
   ++  propagate-loop
     ::
@@ -428,6 +457,7 @@
             rels=(map pith (set chng))
             processed=(set pith)
             combined=(set chng)
+            time=hlc
         ==
     ^+  cor
     ?~  queue
@@ -441,12 +471,13 @@
     ?~  rel
       $(queue rest)
     =/  met=meta  (gut-meta anc)
+    =/  rel-move=move  [time rel]
     =/  new-met=meta
       %=  met
         case  +(case.met)
-        logs  (snoc logs.met [rel])
+        logs  (snoc logs.met rel-move)
       ==
-    ::  bump case and append this walk's rel to logs
+    ::  bump case and append this walk's [time rel] to logs
     ::
     =.  cor
       %-  vlog
@@ -455,12 +486,12 @@
     =/  snap=data  (~(dip do dat) anc)
     ::  fan this bump out to gall/grow/eyre channels
     ::
-    =.  cor  (emit-node-effects anc new-met snap rel)
+    =.  cor  (emit-node-effects anc new-met snap rel-move)
     ::  fire subscribers of this ancestor, collecting their outputs
     ::
     =^  xfm-out=move  cor
-      (fire-subs-collect new-met snap rel life.new-met case.new-met)
-    ?:  =(~ xfm-out)
+      (fire-subs-collect new-met snap rel life.new-met case.new-met time)
+    ?:  =(~ chng-set.xfm-out)
       $(queue rest)
     ::  apply transformer output to data; filter to effective chngs
     ::
@@ -482,7 +513,9 @@
     ::
     ::  sub is a fully-qualified pith (starts with a ship iota);
     ::  the transformer output is prefixed with sub and applied
-    ::  via apply-move-qualified to avoid double-prefixing.
+    ::  via apply-move-qualified to avoid double-prefixing.  the
+    ::  input move and re-applied output both carry now-hlc.ax,
+    ::  the cause's frozen time (already ticked at ingress).
     ::
     |=  [sub=pith =view met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^+  cor
@@ -494,14 +527,17 @@
       (suspend-view sub view met p.xfm-res)
     =/  xfm=transformer  p.xfm-res
     =/  mine=data  (~(dip do dat) sub)
+    =/  time=hlc  now-hlc.ax
+    =/  in-move=move  [time mov]
     =/  result=(each move tang)
-      (mule |.((xfm [mine snap mov lyf cas])))
+      (mule |.((xfm [mine snap in-move lyf cas])))
     ?-  -.result
       %&
         =.  cod
           %+  ~(put ox cod)  sub
           met(lord `[app=app.u.lord.met view=view(lyf lyf, cas cas)])
-        (apply-move-qualified [(prefix-move sub p.result) %.y])
+        =/  prefixed=move  (prefix-move sub p.result)
+        (apply-move-qualified [prefixed(time time) %.y])
       ::
       %|
         (suspend-view sub view met p.result)
@@ -868,9 +904,16 @@
     =/  full-pax  `pith`[p+ship pax]
     =.  cor  (vlog "ae: hear-remote from {<ship>} at {(pate full-pax)}")
     ?.  (meta-allowed full-pax)  (reject-shallow "hear-remote" full-pax)
+    ::  merge the originator's hlc into our agent clock and re-stamp
+    ::  the move with the merged hlc.  any local downstream fan-out
+    ::  uses this merged time, so the receiver's logs record "when i
+    ::  learned this", not the originator's clock alone.
+    ::
+    =^  time=hlc  cor  (ingress-merge time.move)
+    =.  move  move(time time)
     =/  cod-before  cod
     =/  met=meta  (gut-meta full-pax)
-    =?  cor  |((gth life life.met) =(~ move))
+    =?  cor  |((gth life life.met) =(~ chng-set.move))
       =.  dat  (~(rep do dat) full-pax snap)
       =.  cod
         %+  ~(put ox cod)  full-pax
@@ -878,7 +921,7 @@
       =.  cor  (reset-submetas full-pax %.y)
       =/  new-met=meta  (gut-meta full-pax)
       =/  snp=data  (~(dip do dat) full-pax)
-      =.  cor  (emit-node-effects full-pax new-met snp ~)
+      =.  cor  (emit-node-effects full-pax new-met snp [*hlc ~])
       (reinstall-subs full-pax)
     =.  cor  (apply-move-qualified (prefix-move [p+ship ~] move) %.y)
     (emit-code-at-ancestors cod-before)
@@ -1019,12 +1062,13 @@
     ::
     ::  fire every subscriber of met's subs, collecting their
     ::  transformer outputs into one combined move.  suspended and
-    ::  absent views are skipped.
+    ::  absent views are skipped.  time is the cause's hlc; the
+    ::  combined output carries it.
     ::
-    |=  [met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
+    |=  [met=meta snap=data mov=(set chng) lyf=@ud cas=@ud time=hlc]
     ^-  [move _cor]
     =/  sub-list=(list pith)  ~(tap in subs.met)
-    =|  out=move
+    =/  out=move  [time ~]
     |-  ^+  [out cor]
     ?~  sub-list  [out cor]
     =/  sub=pith  i.sub-list
@@ -1034,17 +1078,21 @@
     ?>  ?=(%lens -.vw)
     ?:  ?=(^ err.vw)  $(sub-list t.sub-list)
     =^  maybe-out=(unit move)  cor
-      (run-xfm-collect sub vw sub-met snap mov lyf cas)
-    =?  out  ?=(^ maybe-out)  (~(uni in out) u.maybe-out)
+      (run-xfm-collect sub vw sub-met snap mov lyf cas time)
+    =?  out  ?=(^ maybe-out)
+      out(chng-set (~(uni in chng-set.out) chng-set.u.maybe-out))
     $(sub-list t.sub-list)
   ::
   ++  run-xfm-collect
     ::
     ::  run a subscriber's transformer.  on success, update the view
     ::  meta and return the prefixed output move.  on crash, suspend
-    ::  the view and return ~.
+    ::  the view and return ~.  the input move carries the cause's
+    ::  time so transformers can read it; the output is re-stamped
+    ::  with the same time -- transformers don't get to invent
+    ::  timestamps (otherwise replay diverges).
     ::
-    |=  [sub=pith =view met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
+    |=  [sub=pith =view met=meta snap=data mov=(set chng) lyf=@ud cas=@ud time=hlc]
     ^-  [(unit move) _cor]
     ?>  ?=(%lens -.view)
     ?>  ?=(^ lord.met)
@@ -1054,14 +1102,16 @@
       [~ (suspend-view sub view met p.xfm-res)]
     =/  xfm=transformer  p.xfm-res
     =/  mine=data  (~(dip do dat) sub)
+    =/  in-move=move  [time mov]
     =/  result=(each move tang)
-      (mule |.((xfm [mine snap mov lyf cas])))
+      (mule |.((xfm [mine snap in-move lyf cas])))
     ?-  -.result
       %&
         =.  cod
           %+  ~(put ox cod)  sub
           met(lord `[app=app.u.lord.met view=view(lyf lyf, cas cas)])
-        [`(prefix-move sub p.result) cor]
+        =/  prefixed=move  (prefix-move sub p.result)
+        [`prefixed(time time) cor]
       ::
       %|
         [~ (suspend-view sub view met p.result)]
@@ -1077,7 +1127,7 @@
     ^-  [(set chng) _cor]
     =/  d=data  dat
     =|  effective=(set chng)
-    =/  changes=(list chng)  ~(tap in mv)
+    =/  changes=(list chng)  ~(tap in chng-set.mv)
     |-
     ?~  changes
       =.  cor  cor(data.file.ax d)
