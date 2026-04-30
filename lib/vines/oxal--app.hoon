@@ -212,6 +212,7 @@
   ::
   ++  nid  (uid pax)
   ++  node-meta  (fall leaf.code.fap *meta)
+  ++  pate-stem  (pate ?~(pax ~ t.pax))
   ::
   ++  recurse
     ::
@@ -250,10 +251,10 @@
     ::
     |=  =node
     ;span
-      ;+  ?@  node  ;span.fs-2.o6:"%"
+      ;+  ?@  node  ;/("")
           ;span.fs-2.o6: {(print-aura node)}:
       ;+  ?:  ?=  [%pith *]  node
-            ;span
+            ;span.ml2
               ;*
               =;  =marl  ?^  marl  marl
                 ;=
@@ -310,6 +311,17 @@
           ?.  under-form
             (view-node u.leaf.data.fap)
           (edit-node u.leaf.data.fap)
+        ::
+        ;+
+          ?.  under-form  ;/  ""
+          ;form
+            =data-on_submit  post
+            ;input(type "hidden", name "op", value "bump");
+            ;input(type "hidden", name "pith", value pate-stem);
+            ;button.p2.br2.bd1.b3.hover
+              ; bump
+            ==
+          ==
         ::
         ;+
           ?~  lord.node-meta  ;/  ""
@@ -412,7 +424,7 @@
         =id  "editnode{nid}"
         =data-on_submit  post
         ;input(type "hidden", name "op", value "ins-node");
-        ;input(type "hidden", name "pith", value (pate ?~(pax ~ t.pax)));
+        ;input(type "hidden", name "pith", value pate-stem);
         ;feather-textarea.p2.mono.fs-2
           =required  ""
           =name  "value"
@@ -438,7 +450,7 @@
         ;form
           =data-on_submit  post
           ;input(type "hidden", name "op", value "del-node");
-          ;input(type "hidden", name "pith", value (pate ?~(pax ~ t.pax)));
+          ;input(type "hidden", name "pith", value pate-stem);
           ;button.b3.hover.p-2.f-1
             ; delete
           ==
@@ -479,7 +491,7 @@
         =name  "pith"
         =placeholder  "pith"
         =required  ""
-        =value  (pate ?~(pax ~ t.pax))
+        =value  pate-stem
         ;*  ~
       ==
       ;feather-textarea.p-1.mono.fs-2
