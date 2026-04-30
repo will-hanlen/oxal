@@ -917,7 +917,7 @@
   ++  ingress-bump
     ::
     ::  wipe data subtree, increment lifes, reset cases and logs.
-    ::  crashes if any views exist at or below pax.
+    ::  only valid within a %form view; rejected otherwise.
     ::  pax is user-facing (qualified with /[our]).
     ::
     |=  pax=pith
@@ -925,22 +925,20 @@
     =/  full-pax  (under-our pax)
     =.  cor  (vlog "ae: bump at {(pate full-pax)}")
     ?.  (meta-allowed full-pax)  (reject-shallow "bump" full-pax)
-    ::  check no ancestor of full-pax has a view
+    ::  the closest enclosing view (including self) must be a %form
     ::
-    ~|  %cannot-bump-an-installed-view
-    ?<  ?=(^ (~(anc ox cod) full-pax |=(m=_cod ?&(?=(^ leaf.m) ?=(^ lord.u.leaf.m)))))
-    ::  check no node at or below full-pax has a view
+    ~|  %bump-must-be-within-form-view
+    =/  ancs=(list (pair pith _cod))
+      %+  ~(anc ox cod)  full-pax
+      |=(m=_cod ?&(?=(^ leaf.m) ?=(^ lord.u.leaf.m)))
+    ?<  ?=(~ ancs)
+    ?>  ?=(^ leaf.q.i.ancs)
+    ?>  ?=(^ lord.u.leaf.q.i.ancs)
+    ?>  ?=(%form -.view.u.lord.u.leaf.q.i.ancs)
     ::
-    =/  subs=(list (pair pith meta))
-      ~(tap ox (~(dip ox cod) full-pax))
     =/  cod-before  cod
-    =.  cor
-      |-  ^+  cor
-      ?~  subs
-        =.  dat  (~(lop do dat) full-pax)
-        (reset-submetas full-pax %.n)
-      ?<  ?=(^ lord.q.i.subs)
-      $(subs t.subs)
+    =.  dat  (~(lop do dat) full-pax)
+    =.  cor  (reset-submetas full-pax %.n)
     (emit-code-at-ancestors cod-before)
   ::
   ++  build-rels
