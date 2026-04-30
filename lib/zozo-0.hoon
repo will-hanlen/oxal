@@ -983,6 +983,30 @@
   ~|  invalid-pith-cord+cord
   (rash cord stip)
 ::
+++  ream-pith
+  ::
+  |=  =cord
+  ^-  pith
+  =/  try=(unit pith)
+    %-  mole  |.
+    !<  pith
+    (slap !>(.) (ream cord))
+  ?^  try  u.try
+  (cord-to-pith cord)
+  ::
+::
+++  ream-node
+  ::
+  |=  =cord
+  ^-  node
+  =/  try=(unit node)
+    %-  mole  |.
+    !<  node
+    (slap !>(.) (ream cord))
+  ?^  try  u.try
+  (cord-to-node cord)
+  ::
+::
 ++  print-node-strict
   ::
   |=  =node

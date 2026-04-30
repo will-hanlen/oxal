@@ -48,16 +48,9 @@
       ::
       [%.y %ins-node]
         ::
-        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        =/  =pith  (ream-pith (~(got by body) 'pith'))
         =/  value=@t   (fix-newlines (~(got by body) 'value'))
-        =/  =node
-          =/  try=(unit node)
-            %-  mole  |.
-            !<  node
-            (slap !>(.) (ream value))
-          ?^  try  u.try
-          ~|  invalid-node/value
-          (cord-to-node value)
+        =/  =node  (ream-node value)
         =/  =move  (silt [%ins pith node]~)
         ;<  ~  bind:m  (poke-our:vio %do-move !>(move))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
@@ -68,7 +61,7 @@
       ::
       [%.y %del-node]
         ::
-        =/  =pith  (cord-to-pith (~(got by body) 'pith'))
+        =/  =pith  (ream-pith (~(got by body) 'pith'))
         =/  =move  (silt [%del pith]~)
         ;<  ~  bind:m  (poke-our:vio %do-move !>(move))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
@@ -256,10 +249,24 @@
   ++  render-node
     ::
     |=  =node
-    ;span.fr.ae
+    ;span
       ;+  ?@  node  ;span.fs-2.o6:"%"
           ;span.fs-2.o6: {(print-aura node)}:
-      ;span: {(print-node node)}
+      ;+  ?:  ?=  [%pith *]  node
+            ;span
+              ;*
+              =;  =marl  ?^  marl  marl
+                ;=
+                  ;-  "/"
+                ==
+              %+  turn  pith.node
+              |=  nod=^node
+              ;span
+                ;-  "/"
+                ;+  ^$(node nod)
+              ==
+            ==
+          ;span: {(print-node node)}
     ==
   ::
   ++  part-row
