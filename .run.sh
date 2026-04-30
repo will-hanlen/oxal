@@ -6,4 +6,4 @@ set -euo pipefail
 
 COMMAND="${1:?Usage: sh .run.sh <dojo-command>}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec "${SCRIPT_DIR}/.dojo.sh" oxal:master-migrev-dolseg 150 "${COMMAND}"
+exec "${SCRIPT_DIR}/.dojo.sh" oxal:ship 150 "${COMMAND}"

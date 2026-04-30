@@ -28,13 +28,21 @@ transformations.
 
 ## Development Setup
 
-The test pier is running at http://localhost:80.
+The test pier is running at http://localhost:80, with its dojo
+attached to the tmux target `oxal:ship`.
 
-After making a change to the source code, you can apply the change by
-running: `sh .commit.sh`
+Helper scripts (all wrap `.dojo.sh`, which sends a command to the
+tmux dojo and returns its output):
 
-To run an arbitrary dojo command on the test ship, run something
-like: `sh .run.sh "|hi ~zod"`
+- `sh .commit.sh` — rsync the source tree into the dev desk and
+  `|commit %oxal`. Run after editing any file in the repo.
+- `sh .run.sh "<dojo-command>"` — run an arbitrary dojo command on
+  the test ship without syncing (e.g. `sh .run.sh "|hi ~zod"`).
+- `sh .doctest.sh` — `.commit.sh` plus a GET to `/oxal/doctest` to
+  run the doctest suite and print its response.
+- `sh .dojo.sh <session:window> <timeout> <cmd> [--sync=<pier>]` —
+  the underlying primitive; reach for it only when the wrappers
+  don't fit (different ship, custom timeout, etc.).
 
 ## Style
 
