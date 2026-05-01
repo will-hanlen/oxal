@@ -1,3 +1,8 @@
+
+allow app-gate to mutate the data within forms and respond to moves in local and global.
+
+---
+
 gall subscriptions for all changes in an app
 
 ---
