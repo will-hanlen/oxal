@@ -6,4 +6,11 @@ set -euo pipefail
 
 COMMAND="${1:?Usage: sh .run.sh <dojo-command>}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec "${SCRIPT_DIR}/.dojo.sh" oxal:ship 150 "${COMMAND}"
+ENV_FILE="${SCRIPT_DIR}/.env"
+if [ ! -f "$ENV_FILE" ]; then
+  echo "Error: ${ENV_FILE} not found. Copy .env.example to .env and edit." >&2
+  exit 1
+fi
+set -a; . "$ENV_FILE"; set +a
+
+exec "${SCRIPT_DIR}/.dojo.sh" "${OXAL_TMUX_TARGET}" "${OXAL_TIMEOUT}" "${COMMAND}"

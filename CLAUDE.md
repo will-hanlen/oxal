@@ -29,7 +29,9 @@ transformations.
 ## Development Setup
 
 The test pier is running at http://localhost:80, with its dojo
-attached to the tmux target `oxal:ship`.
+attached to a tmux target. The wrapper scripts read the local
+setup (tmux target, pier path, default timeout) from `.env` in
+the repo root — copy `.env.example` to `.env` to bootstrap.
 
 Helper scripts (all wrap `.dojo.sh`, which sends a command to the
 tmux dojo and returns its output):
@@ -38,8 +40,8 @@ tmux dojo and returns its output):
   `|commit %oxal`. Run after editing any file in the repo.
 - `sh .run.sh "<dojo-command>"` — run an arbitrary dojo command on
   the test ship without syncing (e.g. `sh .run.sh "|hi ~zod"`).
-- `sh .doctest.sh` — `.commit.sh` plus a GET to `/oxal/doctest` to
-  run the doctest suite and print its response.
+- `sh .doctest.sh` — `.commit.sh` plus `+oxal!doctest-run` to run the
+  doctest suite and print its tang in the dojo.
 - `sh .dojo.sh <session:window> <timeout> <cmd> [--sync=<pier>]` —
   the underlying primitive; reach for it only when the wrappers
   don't fit (different ship, custom timeout, etc.).
