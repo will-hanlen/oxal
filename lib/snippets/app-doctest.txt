@@ -1,0 +1,24 @@
+|=  [our=@p name=@tas locals=data]
+%-  malt
+^-  (list [pith view])
+:~
+  :-  /doctest/rendered  :-  %lens
+    ^-  lens
+    %*  .  *lens
+      dep  [our ~[n+~ %doctest]]
+      sauc
+        '''
+        !:
+        %-  easy-transform
+        |%
+        ++  ins
+          |=  [=pith =node]
+          `[%ins pith node]
+        ++  del
+          |=  =pith
+          `[%del pith]
+        --
+        '''
+      ::
+    ==
+==
