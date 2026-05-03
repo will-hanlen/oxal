@@ -43,7 +43,7 @@
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
         =.  mesh  (got-mesh ax mesh-name)
-        ;<  ~  bind:m  (send-html-payload:vio part-file)
+        ;<  ~  bind:m  (send-html-payload:vio two-panels)
         (pure:m !>(~))
       ::
       [%.y %ins-node]
@@ -108,7 +108,7 @@
         (pure:m !>(~))
         ::
       ::
-      [%.n %delete-mesh]
+      [%.n %drop-mesh]
         ::
         ;<  ~  bind:m  (poke-our:vio %drop-mesh !>(mesh-name))
         ;<  ~  bind:m
@@ -151,10 +151,7 @@
     ;body.fc.bbv.hf
       ;+  part-header
       ;div#error;
-      ;feather-slide-panels.grow.scroll-none
-        ;+  part-file
-        ;+  part-source
-      ==
+      ;+  two-panels
     ==
   ==
   ::
@@ -184,24 +181,43 @@
     ;+  (render-tang u.error.mesh)
   ==
 ::
+++  two-panels
+  ;feather-slide-panels.grow.scroll-none
+    =id  "panels"
+    ;+  part-file
+    ;+  part-source
+  ==
+::
 ++  part-source
   ::
   ^-  manx
-  ;form.hf.fc.grow.bbv.scroll-none
+  ;div.hf.fc.grow.scroll-none
+    =id  "part-source"
     =data-show  "$edit"
-    =data-on_submit  post
-    =data-indicator  "_savesource"
-    =data-class_o7  "$_savesource"
-    :: ;+  part-error
-    ;input(type "hidden", name "op", value "set-source");
-    ;feather-text-editor.grow.fs-2
-      =auto-indent  ""
-      =name  "source"
-      ;-  (trip source.mesh)
+    ;form.fc.grow.bbv.scroll-none
+      =id  "mesh-source"
+      =data-on_submit  post
+      =data-indicator  "_savesource"
+      =data-class_o7  "$_savesource"
+      ;+  part-error
+      ;input(type "hidden", name "op", value "set-source");
+      ;feather-text-editor.grow.fs-2
+        =auto-indent  ""
+        =name  "source"
+        ;-  (trip source.mesh)
+      ==
     ==
-    ;button.p3.b3.hover
-      =data-attr_disabled  "$_savesource"
-      ; save
+    ;div.fr.bbh
+      ;button.p3.b3.hover.grow
+        =data-attr_disabled  "$_savesource"
+        =type  "submit"
+        =form  "mesh-source"
+        ; load
+      ==
+      ;form(method "post")
+        ;input(type "hidden", name "op", value "drop-mesh");
+        ;button.p-3.b3.hover.f-1: drop
+      ==
     ==
   ==
 ::
@@ -213,11 +229,6 @@
     |=  =pith
     [p+our.bowl pith]
   ;div#file.p4.pb20.fc.g3.grow.hf.scroll-y-always
-    ;form.fr(method "post")
-      ;input(type "hidden", name "op", value "delete-mesh");
-      ;button.p-2.br2.bd1.b3.hover.f-1: uninstall
-    ==
-    ;+  part-error
     ;+  (render-file [/ partial])
   ==
 ::
@@ -341,6 +352,7 @@
     ::
   ::
   ++  part-info
+    ::
     ^-  manx
     =/  infos=(list [tape (unit manx)])
       :~
@@ -385,6 +397,7 @@
     ==
   ::
   ++  info-lord
+    ::
     ^-  (unit manx)
     =/  node-meta=meta  node-meta
     ?~  lord.node-meta  ~
@@ -394,6 +407,7 @@
     ==
   ::
   ++  info-bump
+    ::
     ^-  (unit manx)
     ?.  under-form  ~
     :-  ~
@@ -407,6 +421,7 @@
     ==
   ::
   ++  info-data
+    ::
     ^-  (unit manx)
     ?~  leaf.data.fap  ~
     ?.  under-form
@@ -423,7 +438,7 @@
       =data-on_submit  post
       ;input(type "hidden", name "op", value "show-logs");
       ;input(type "hidden", name "pith", value (pate pax));
-      ;button.p2.br2.bd1.b3.hover.fs-2: view logs ({<case.node-meta>})
+      ;button.p2.br2.bd1.b3.hover: view logs ({<case.node-meta>})
     ==
     ::
   ::
@@ -436,7 +451,7 @@
         =data-on_submit  post
         ;input(type "hidden", name "op", value "hide-logs");
         ;input(type "hidden", name "pith", value (pate pax));
-        ;button.p2.br2.bd1.b3.hover.fs-2: hide logs
+        ;button.p2.br2.bd1.b3.hover: hide logs
       ==
       ::
       ;div.fc.bbv.br2.bd1.p2.fs-2

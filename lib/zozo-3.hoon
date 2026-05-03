@@ -24,7 +24,8 @@
   ::
   ::  output of stage-load: a fully-validated mesh ready for commit.
   ::    forms   declared form-stems from ++forms
-  ::    views   view layout returned by ++load (form + lens)
+  ::    views   view layout from ++load, with system-controlled fields
+  ::            (lyf/cas/err) defaulted from the user's view-specs
   ::    output  migration move returned by ++load
   ::
   $:  =mesh-core
@@ -53,11 +54,34 @@
 ++  call-load
   ::
   ::  invoke ++load with prior-forms.  the form-typed keys of the
-  ::  returned views must match ++forms exactly (caller validates).
+  ::  returned view-specs must match ++forms exactly (caller validates).
   ::
   |=  [=mesh-core our=@p name=term =prior-forms]
-  ^-  (each [views=(map stem view) output=move] tang)
+  ^-  (each [views=(map stem view-spec) output=move] tang)
   (mule |.((~(load mesh-core [our name]) prior-forms)))
+::
+++  view-from-spec
+  ::
+  ::  expand a user-authored view-spec into a full view, defaulting
+  ::  every system-controlled field.  lyf/cas start at 0 and err is
+  ::  ~ — the user picks out+in+dep+sauc on a lens and out on a form;
+  ::  everything else is engine bookkeeping.
+  ::
+  |=  =view-spec
+  ^-  view
+  ?-  -.view-spec
+    %form  [%form out=out.view-spec]
+    %lens
+      :*  %lens
+          out=out.view-spec
+          in=in.view-spec
+          sauc=sauc.view-spec
+          dep=dep.view-spec
+          lyf=0
+          cas=0
+          err=~
+      ==
+  ==
 ::
 ++  call-drop
   ::
@@ -770,11 +794,17 @@
     =/  lout  (call-load mesh-core our name prior-forms)
     ?:  ?=(%| -.lout)  [%| p.lout]
     ::
+    ::  expand user-authored view-specs into full views, defaulting
+    ::  every system-controlled field
+    ::
+    =/  views=(map stem view)
+      (~(run by views.p.lout) view-from-spec)
+    ::
     ::  validate form-keys ↔ ++forms strictness
     ::
     =/  returned-forms=(set stem)
       %-  silt
-      %+  murn  ~(tap by views.p.lout)
+      %+  murn  ~(tap by views)
       |=  [s=stem v=view]
       ?.(?=(%form -.v) ~ `s)
     ?.  =(returned-forms declared)
@@ -784,9 +814,9 @@
     ::
     ::  per-view validation (depth, beneath-view, lens self-faucet)
     ::
-    =/  view-validation=(unit @t)  (validate-mesh-views views.p.lout)
+    =/  view-validation=(unit @t)  (validate-mesh-views views)
     ?^  view-validation  [%| ~[leaf+(trip u.view-validation)]]
-    =/  st=staged  [mesh-core declared views.p.lout output.p.lout]
+    =/  st=staged  [mesh-core declared views output.p.lout]
     [%& st]
   ::
   ++  commit-load

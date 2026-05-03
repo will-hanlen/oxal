@@ -230,6 +230,26 @@
     err=(unit tang)
   ==
 ::
+::  view-spec is the user-authored projection of a view — only the
+::  fields a mesh-core may legitimately set.  the system fills in the
+::  rest (lyf, cas, err) with defaults before placement.
+::
++$  view-spec
+  $%  [%form form-spec]
+      [%lens lens-spec]
+  ==
++$  form-spec
+  $:
+    out=shape
+  ==
++$  lens-spec
+  $:
+    out=shape
+    in=shape
+    =sauc
+    dep=link
+  ==
+::
 +$  prior-form  $+  prior-form  [shape=(unit shape) =data]
 +$  prior-forms  $+  prior-forms  (map stem prior-form)
 ::
@@ -247,9 +267,12 @@
   ::            sample is keyed by (++forms ∪ outgoing form-view stems);
   ::            each entry carries the shape the outgoing version had
   ::            at that stem (~ on a stem with no prior form) and the
-  ::            data at the stem.  the form-typed keys of the returned
-  ::            views must equal ++forms exactly.  views are placed
-  ::            first, then output is applied with allow-view-write=%.n.
+  ::            data at the stem.  views are returned as view-specs
+  ::            (only the user-settable fields); the system supplies
+  ::            defaults for lyf, cas, err, and the lens in/out shapes.
+  ::            the form-typed keys of the returned specs must equal
+  ::            ++forms exactly.  views are placed first, then output
+  ::            is applied with allow-view-write=%.n.
   ::
   ::    +drop   terminal cleanup move.  required, but the body may
   ::            return *move to no-op.  views are torn down by the
@@ -260,7 +283,7 @@
   ++  forms  *(set stem)
   ++  load
     |~  =prior-forms
-    *[views=(map stem view) output=move]
+    *[views=(map stem view-spec) output=move]
   ++  drop
     |~  =prior-forms
     *move

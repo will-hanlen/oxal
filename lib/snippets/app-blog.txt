@@ -1,9 +1,5 @@
 |_  [our=@p name=@tas]
 ::
-::  stems are scoped under /[name] so the mesh works wherever it's
-::  installed: load as %blog → views land at /blog/...; load as
-::  %journal → /journal/...
-::
 ++  forms  (silt ~[/[name]/raw])
 ::
 ++  load
@@ -12,12 +8,12 @@
   =/  rendered  /[name]/rendered
   =/  toc       /[name]/toc
   :_  *move
-  ^-  (map stem view)
+  ^-  (map stem view-spec)
   %-  malt
-  :~  [raw `view`[%form ~]]
+  :~  [raw `view-spec`[%form ~]]
       :-  rendered  :-  %lens
-        ^-  lens
-        %*  .  *lens
+        ^-  lens-spec
+        %*  .  *lens-spec
           dep  [our raw]
           sauc
             '''
@@ -43,8 +39,8 @@
             '''
         ==
       :-  toc  :-  %lens
-        ^-  lens
-        %*  .  *lens
+        ^-  lens-spec
+        %*  .  *lens-spec
           dep  [our rendered]
           sauc
             '''
