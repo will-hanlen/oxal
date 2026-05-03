@@ -2,7 +2,7 @@
 %-  malt
 ^-  (list [pith view])
 :~
-  :-  /blog/raw  [%form ~ ~]
+  :-  /blog/raw  [%form ~]
   :-  /blog/rendered  :-  %lens
     ^-  lens
     %*  .  *lens

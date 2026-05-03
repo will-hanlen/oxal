@@ -2,5 +2,5 @@
 %-  malt
 ^-  (list [pith view])
 :~
-  :-  /test  [%form ~ ~]
+  :-  /test  [%form ~]
 ==

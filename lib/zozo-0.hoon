@@ -233,7 +233,6 @@
 +$  form
   $:
     out=shape
-    migrator=(unit $-(data data))
   ==
 +$  lens
   $:
@@ -246,7 +245,14 @@
     err=(unit tang)
   ==
 ::
-+$  app-gate  $-([our=@p name=term globals=data locals=data] (map stem view))
++$  app-gate
+  $-  [our=@p name=term globals=data locals=data]
+  (map stem view)
+::
+++  new-app-gate
+  $-  [our=@p forms=(map pith data) changed=[pith move] globals=data locals=data]
+  [form-data=(map pith data) views=(map pith view)]
+::
 +$  app
   $:  source=@t  :: xx this is for dynamic apps; there should be a static version like (map stem @t) or something
       local=shape
