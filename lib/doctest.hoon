@@ -6,6 +6,8 @@
 ::                         (set chng) ready for %do-move
 ::    +report-to-data    : project a $report into a single $data tree,
 ::                         suitable as the body of a [%data ...] node
+::    +reports-to-tang   : format a list of named reports as a tang
+::                         for printing in the dojo
 ::
 ::    the runner has no dependence on the oxal agent or its data
 ::    tree.  callers that want results in oxal call +report-to-changes
@@ -248,4 +250,80 @@
   ?~  cl  d
   ?>  ?=(%ins -.i.cl)
   $(cl t.cl, d (~(put do d) pith.i.cl node.i.cl))
+::
+++  reports-to-tang
+  ::
+  ::  format a list of [name report] pairs as a tang.  one header
+  ::  line summarises pass count; each script gets a status line, and
+  ::  failed scripts list each failing section's index, kind, and
+  ::  trace.
+  ::
+  ::  the dojo prints tangs in reverse list order (last element on
+  ::  top), so the list is built in the natural top-down display
+  ::  order and flopped at the end.  scripts are sorted by name for
+  ::  stable output.
+  ::
+  |=  reports=(list [name=@ta =report])
+  ^-  tang
+  =/  sorted=(list [name=@ta =report])
+    %+  sort  reports
+    |=  [a=[name=@ta *] b=[name=@ta *]]
+    (aor name.a name.b)
+  =/  total=@ud  (lent sorted)
+  =/  passed=@ud
+    %-  lent
+    %+  skim  sorted
+    |=  [@ta r=report]
+    pass.r
+  =/  header=tank
+    leaf+"doctest: {(scow %ud passed)}/{(scow %ud total)} scripts pass"
+  =|  body=tang
+  =.  body
+    |-  ^-  tang
+    ?~  sorted  body
+    =/  out=tang  (script-result-to-tang i.sorted)
+    $(sorted t.sorted, body (weld body out))
+  (flop [header body])
+::
+++  script-result-to-tang
+  ::
+  ::  one script's status line plus, on failure, the failing-section
+  ::  trace from each unit/full section.
+  ::
+  |=  [name=@ta =report]
+  ^-  tang
+  =/  status=tape  ?:(pass.report "PASS" "FAIL")
+  =/  hdr=tank
+    leaf+"  {status}  {(trip name)} - {(trip title.report)}"
+  ?:  pass.report  ~[hdr]
+  =|  body=tang
+  =|  i=@ud
+  =/  sects=(list section-result)  sections.report
+  |-
+  ?~  sects  [hdr body]
+  =/  out=tang  (failed-section-to-tang i i.sects)
+  $(sects t.sects, i +(i), body (weld body out))
+::
+++  failed-section-to-tang
+  ::
+  ::  index/kind header plus the section's trace, only for failing
+  ::  unit and full sections; everything else returns ~.
+  ::
+  |=  [i=@ud =section-result]
+  ^-  tang
+  ?-  -.section-result
+    %prose  ~
+    ::
+    %unit
+      =*  ur  unit-result.section-result
+      ?:  pass.ur  ~
+      :-  leaf+"    section {(scow %ud i)} [unit]"
+      tang.ur
+    ::
+    %full
+      =*  fr  full-result.section-result
+      ?:  pass.fr  ~
+      :-  leaf+"    section {(scow %ud i)} [full]"
+      tang.fr
+  ==
 --
