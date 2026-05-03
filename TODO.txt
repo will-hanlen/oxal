@@ -1,9 +1,27 @@
 
-allow app-gate to mutate the data within forms and respond to moves in local and global.
+update app-gate to be a full lifecycle mutator.
+the lifecycle should cover: app installed, app-re-installed, and local/global changed.
+part of its sample contains the current state and location of all %form views
+that were previously part of the app.
+it will also recieve information about what triggered in the local or globals if any.
+to indicate that the app-gate is being run because of a re-install or install, 
+the move set will be empty and the changed.
+
+---
+
+rename "app" to "mesh"
+
+---
+
+find a better word for "chng"
 
 ---
 
 gall subscriptions for all changes in an app
+
+---
+
+convert the serialization tests to doctest
 
 ---
 
