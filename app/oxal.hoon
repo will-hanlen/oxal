@@ -209,9 +209,9 @@
       ::
     %load-mesh
       ::
-      =+  !<  [name=term source=@t]  vase
+      =+  !<  [name=term =mesh-source]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-load-mesh:engine name source)
+        abet:(ingress-load-mesh:engine name mesh-source)
       (emil cz)
       ::
     %drop-mesh

@@ -289,8 +289,20 @@
     *move
   --
 ::
++$  mesh-source
+  ::
+  ::  source for a mesh.
+  ::    %mono   single hoon door @t (the user authors a mesh-core).
+  ::    %poly   per-view @t keyed by stem, each compiling to a
+  ::            view-spec.  meant for ui-driven, per-view editing —
+  ::            spreadsheet-style.
+  ::
+  $%  [%mono src=@t]
+      [%poly srcs=(map stem @t)]
+  ==
+::
 +$  mesh
-  $:  source=@t  :: xx this is for dynamic meshes; there should be a static version like (map stem @t) or something
+  $:  =mesh-source
       =mesh-core
       forms=(set stem)
       views=(map stem view)

@@ -38,8 +38,8 @@
       :::
       [%.y %set-source]
         ::
-        =/  source=@t   (fix-newlines (~(got by body) 'source'))
-        ;<  ~  bind:m  (poke-our:vio %load-mesh !>([mesh-name source]))
+        =/  src=@t      (fix-newlines (~(got by body) 'source'))
+        ;<  ~  bind:m  (poke-our:vio %load-mesh !>([mesh-name `mesh-source`[%mono src]]))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
         =.  mesh  (got-mesh ax mesh-name)
@@ -182,6 +182,7 @@
   ==
 ::
 ++  two-panels
+  ::
   ;feather-slide-panels.grow.scroll-none
     =id  "panels"
     ;+  part-file
@@ -204,7 +205,8 @@
       ;feather-text-editor.grow.fs-2
         =auto-indent  ""
         =name  "source"
-        ;-  (trip source.mesh)
+        ;-  ?:  ?=(%mono -.mesh-source.mesh)  (trip src.mesh-source.mesh)
+            ""
       ==
     ==
     ;div.fr.bbh
@@ -235,7 +237,6 @@
 ++  render-file
   :::
   =|  sug=(unit iota)
-  :: =|  pax=pith
   =|  under-view=_|
   =|  under-lens=_|
   =|  under-form=_|

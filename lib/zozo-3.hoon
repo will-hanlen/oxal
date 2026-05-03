@@ -36,11 +36,30 @@
 ::
 ++  build-mesh-core
   ::
-  ::  compile mesh source to a typed core.  errors land in tang.
+  ::  compile a %mono mesh source to a typed core.  errors land in
+  ::  tang.
   ::
-  |=  source=@t
+  |=  src=@t
   ^-  (each mesh-core tang)
-  (mule |.(!<(mesh-core (slap !>(.) (ream source)))))
+  (mule |.(!<(mesh-core (slap !>(.) (ream src)))))
+::
+++  build-poly-views
+  ::
+  ::  compile a %poly mesh's per-stem sources.  each @t evaluates to
+  ::  a view-spec.  on the first failure, prepend the offending stem
+  ::  to the tang so the user can locate the broken view.
+  ::
+  |=  srcs=(map stem @t)
+  ^-  (each (map stem view-spec) tang)
+  =|  out=(map stem view-spec)
+  =/  pairs=(list [stem @t])  ~(tap by srcs)
+  |-
+  ?~  pairs  [%& out]
+  =/  res=(each view-spec tang)
+    (mule |.(!<(view-spec (slap !>(.) (ream +.i.pairs)))))
+  ?:  ?=(%| -.res)
+    [%| leaf+"poly view at {(pate -.i.pairs)}" p.res]
+  $(out (~(put by out) -.i.pairs p.res), pairs t.pairs)
 ::
 ++  call-forms
   ::
@@ -755,14 +774,34 @@
   ::
   ++  stage-load
     ::
-    ::  plan-phase of a load.  no tree mutation.  builds and validates
-    ::  the new mesh-core fully against the current tree, capturing
-    ::  prior-forms over (declared ∪ outgoing-form-stems).  returns a
-    ::  staged bundle ready for commit, or a tang on any error.
+    ::  plan-phase of a load.  no tree mutation.  dispatches on the
+    ::  mesh-source kind:
     ::
-    |=  [name=term source=@t outgoing-views=(map stem view)]
+    ::    %mono  builds the user-authored door, calls ++forms +
+    ::           ++load, captures prior-forms over (declared ∪
+    ::           outgoing-form-stems).
+    ::    %poly  compiles each per-stem @t to a view-spec.  no door
+    ::           — declared form-stems are derived from the spec map,
+    ::           there's no migration move, and the staged mesh-core
+    ::           is the bunt (a no-op for ++drop later).
+    ::
+    ::  returns a staged bundle ready for commit, or a tang on any
+    ::  error.
+    ::
+    |=  [name=term =mesh-source outgoing-views=(map stem view)]
     ^-  (each staged tang)
-    =/  comp  (build-mesh-core source)
+    ?-  -.mesh-source
+      %mono  (stage-load-mono name src.mesh-source outgoing-views)
+      %poly  (stage-load-poly srcs.mesh-source)
+    ==
+  ::
+  ++  stage-load-mono
+    ::
+    ::  %mono path of stage-load.  see +stage-load for shape.
+    ::
+    |=  [name=term src=@t outgoing-views=(map stem view)]
+    ^-  (each staged tang)
+    =/  comp  (build-mesh-core src)
     ?:  ?=(%| -.comp)  [%| p.comp]
     =/  =mesh-core  p.comp
     =/  fout  (call-forms mesh-core our name)
@@ -819,6 +858,34 @@
     =/  st=staged  [mesh-core declared views output.p.lout]
     [%& st]
   ::
+  ++  stage-load-poly
+    ::
+    ::  %poly path of stage-load.  see +stage-load for shape.
+    ::
+    |=  srcs=(map stem @t)
+    ^-  (each staged tang)
+    =/  comp  (build-poly-views srcs)
+    ?:  ?=(%| -.comp)  [%| p.comp]
+    =/  specs=(map stem view-spec)  p.comp
+    ::
+    ::  declared form-stems are the spec keys whose value is %form.
+    ::
+    =/  declared=(set stem)
+      %-  silt
+      %+  murn  ~(tap by specs)
+      |=  [s=stem v=view-spec]
+      ?.(?=(%form -.v) ~ `s)
+    ::
+    ::  expand specs into views and run per-view validation.  no
+    ::  pre-validate step: validate-mesh-views covers depth +
+    ::  beneath-view + self-faucet uniformly across forms and lenses.
+    ::
+    =/  views=(map stem view)  (~(run by specs) view-from-spec)
+    =/  view-validation=(unit @t)  (validate-mesh-views views)
+    ?^  view-validation  [%| ~[leaf+(trip u.view-validation)]]
+    =/  st=staged  [*mesh-core declared views *move]
+    [%& st]
+  ::
   ++  commit-load
     ::
     ::  apply a staged load.  tear down outgoing views (no ++drop —
@@ -826,7 +893,7 @@
     ::  move, store the new entry replacing any prior of the same
     ::  name.
     ::
-    |=  [name=term source=@t st=staged outgoing-views=(map stem view)]
+    |=  [name=term =mesh-source st=staged outgoing-views=(map stem view)]
     ^+  cor
     =/  cod-before  cod
     ::
@@ -856,10 +923,10 @@
     ::  store entry, replacing any prior of the same name
     ::
     =/  =mesh  *mesh
-    =.  source.mesh     source
-    =.  mesh-core.mesh  mesh-core.st
-    =.  forms.mesh      forms.st
-    =.  views.mesh      views.st
+    =.  mesh-source.mesh  mesh-source
+    =.  mesh-core.mesh    mesh-core.st
+    =.  forms.mesh        forms.st
+    =.  views.mesh        views.st
     =.  meshes.ax
       %+  snoc
         %+  skip  meshes.ax
@@ -874,12 +941,12 @@
     ::  no tree changes.  partial mesh-core (may be *mesh-core if
     ::  compile failed before we had one).
     ::
-    |=  [name=term source=@t =mesh-core =tang]
+    |=  [name=term =mesh-source =mesh-core =tang]
     ^+  cor
     =/  =mesh  *mesh
-    =.  source.mesh     source
-    =.  mesh-core.mesh  mesh-core
-    =.  error.mesh      `tang
+    =.  mesh-source.mesh  mesh-source
+    =.  mesh-core.mesh    mesh-core
+    =.  error.mesh        `tang
     =.  meshes.ax  (snoc meshes.ax [name mesh])
     cor
   ::
@@ -905,18 +972,18 @@
     ::  fresh failure: store error entry, no tree change.  on mid-
     ::  life failure: keep old running, mark error.
     ::
-    |=  [name=term source=@t]
+    |=  [name=term =mesh-source]
     ^+  cor
     =.  cor  (vlog "ae: load-mesh {<name>}")
     =/  found=(unit mesh)  (get-mesh ax name)
     =/  outgoing-views=(map stem view)
       ?~  found  ~
       views.u.found
-    =/  out  (stage-load name source outgoing-views)
+    =/  out  (stage-load name mesh-source outgoing-views)
     ?:  ?=(%| -.out)
-      ?~  found  (store-fresh-failure name source *mesh-core p.out)
+      ?~  found  (store-fresh-failure name mesh-source *mesh-core p.out)
       (mark-mid-life-failure name p.out)
-    (commit-load name source p.out outgoing-views)
+    (commit-load name mesh-source p.out outgoing-views)
   ::
   ++  ingress-drop-mesh
     ::

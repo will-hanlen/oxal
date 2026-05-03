@@ -18,8 +18,8 @@
   =/  op=@t  (~(gut by form) 'op' '')
   ?:  =('new-mesh' op)
     =/  name=term   (~(got by form) 'name')
-    =/  source=@t   (fix-newlines (~(got by form) 'source'))
-    ;<  ~  bind:m  (poke-our:vio %load-mesh !>([name source]))
+    =/  src=@t      (fix-newlines (~(got by form) 'source'))
+    ;<  ~  bind:m  (poke-our:vio %load-mesh !>([name `mesh-source`[%mono src]]))
     ;<  ~  bind:m
       %+  send-simple-payload:vio
         [303 ['location' '/oxal/meshes']~]
@@ -40,7 +40,7 @@
     =/  name=term  (~(got by form) 'name')
     ;<  ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
     =/  =mesh  (got-mesh ax name)
-    ;<  ~  bind:m  (poke-our:vio %load-mesh !>([name source.mesh]))
+    ;<  ~  bind:m  (poke-our:vio %load-mesh !>([name mesh-source.mesh]))
     ;<  ~  bind:m
       %+  send-simple-payload:vio
         [303 ['location' '/oxal/meshes']~]

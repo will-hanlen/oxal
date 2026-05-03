@@ -139,7 +139,7 @@
         +:abet:(ingress-do-move:engine `move`[*hlc changes.i.ops])
       ::
       %load-mesh
-        +:abet:(ingress-load-mesh:engine name.i.ops source.i.ops)
+        +:abet:(ingress-load-mesh:engine name.i.ops [%mono source.i.ops])
       ::
       %drop-mesh
         +:abet:(ingress-drop-mesh:engine name.i.ops)
