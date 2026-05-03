@@ -1,16 +1,16 @@
-::  /sur/doctest: types for the structured doctest runner
+::  /sur/doctest: types for the doctest runner
 ::
 ::    a doctest is a hoon source file in /lib/doctests that produces
-::    a $script.  the runner walks every script, runs each section,
-::    and writes structured per-section results into the oxal data
-::    tree at /[our]/docs/<stem>.  rendering is left to lens views.
+::    a $script.  the runner walks each section and returns a $report
+::    — a plain hoon value, no oxal data tree involved.  callers that
+::    want to put results into oxal use +report-to-changes (in lib).
 ::
 /+  *zozo
 |%
-::  $script: a doctest source file produces a script.
 ::
-::    title: human-readable name; lands at /docs/<stem>/title
-::    steps: ordered sections to run
+::::  inputs
+::
+::  $script: a doctest source file produces a script.
 ::
 +$  script
   $:  title=cord
@@ -19,10 +19,6 @@
 ::
 ::  $section: one entry in a script's step list.
 ::
-::    %prose: pure markup; renderers can wrap or restyle
-::    %unit:  hoon source compiling to a tang; ~ = pass
-::    %full:  ingress-op sequence + acer-test gate over the result
-::
 +$  section
   $%  [%prose =manx]
       [%unit =unit-test]
@@ -30,7 +26,7 @@
   ==
 ::
 ::  $unit-test: code slaps to a vase; result is cast to tang.
-::    empty tang or a crash-free %.y leaves no trace = pass.
+::    empty tang = pass.
 ::
 +$  unit-test
   $:  description=manx
@@ -39,10 +35,6 @@
 ::
 ::  $full-test: drive the agent through ingress-ops on a fresh acer,
 ::    then run an acer-test gate against the resulting state.
-::
-::    show-file: also store data.file.acer at /file-snapshot
-::    ops:       sequence of agent pokes to apply, in order
-::    code:      source of an acer-test gate
 ::
 +$  full-test
   $:  description=manx
@@ -69,8 +61,49 @@
   ==
 ::
 ::  $acer-test: a check gate over the acer that results from running
-::    a full-test's ops.  empty tang = pass; non-empty tang is stored
-::    at /docs/<stem>/sections/[ud+i]/tang and is the failure trace.
+::    a full-test's ops.  empty tang = pass; non-empty tang is the
+::    failure trace.
 ::
 +$  acer-test  $-(acer tang)
+::
+::::  outputs
+::
+::  $report: result of running one $script.
+::
+::    a plain hoon value: title, aggregate pass flag, and one
+::    $section-result per step in input order.
+::
++$  report
+  $:  title=cord
+      pass=?
+      sections=(list section-result)
+  ==
+::
+::  $section-result: outcome of one section run.
+::
+::    %prose mirrors the input.  %unit and %full add a pass flag and
+::    the resulting tang (empty = success, non-empty = failure trace).
+::
++$  section-result
+  $%  [%prose =manx]
+      [%unit =unit-result]
+      [%full =full-result]
+  ==
+::
++$  unit-result
+  $:  description=manx
+      code=@t
+      pass=?
+      =tang
+  ==
+::
++$  full-result
+  $:  description=manx
+      show-file=?
+      ops=(list ingress-op)
+      code=@t
+      pass=?
+      =tang
+      file-snapshot=(unit data)
+  ==
 --

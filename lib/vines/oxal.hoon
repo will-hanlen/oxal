@@ -32,14 +32,12 @@
         ;*
         %+  turn
           ^-  (list path)
-          :~  /home-static
-              /home-reactive
-              /author
-              /apps
-              /gall/sky
-              /gall/sup
-              /eyre/cache
-              /eyre/bindings
+          :~
+            /apps
+            /gall/sky
+            /gall/sup
+            /eyre/cache
+            /eyre/bindings
           ==
         |=  =path
         ;a.underline.py3.b1.hover
