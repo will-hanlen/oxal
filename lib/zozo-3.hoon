@@ -159,6 +159,23 @@
     ^-  meta
     (fall (~(get ox cod) pax) *meta)
   ::
+  ++  merge-meta-on-place
+    ::
+    ::  build the meta to write when placing a mesh view at a stem.
+    ::  if there's a prior meta, preserve subs/view-subs/grow/eyre/gall
+    ::  and bump life iff grow was %.y; otherwise return a fresh meta
+    ::  with life=0.  lord is set unconditionally.
+    ::
+    |=  [old=(unit meta) new-lord=[mesh=term =view]]
+    ^-  meta
+    ?~  old
+      =/  m=meta  *meta
+      m(lord `new-lord)
+    %_  u.old
+      lord  `new-lord
+      life  ?:(grow.u.old +(life.u.old) life.u.old)
+    ==
+  ::
   ++  meta-significant-change
     ::
     ::  does the transition from old to new touch any structural field?
@@ -348,19 +365,20 @@
   ++  ingress-do-move
     ::
     ::  user-facing move: chng piths are bare, relative to /[our].
-    ::  qualify them and dispatch to apply-move-qualified.  wraps the
-    ::  dispatch to capture structural code changes produced by any
-    ::  transformer firings during propagate.  ticks the agent-level
-    ::  hlc once and freezes that time onto the move, so all log
-    ::  entries from this cause share one timestamp.
+    ::  qualify them and dispatch to apply-move-qualified, rejecting
+    ::  any writes at or beneath a %lens view (lens output is derived,
+    ::  not user-editable).  ticks the agent-level hlc once and freezes
+    ::  that time onto the move, so all log entries from this cause
+    ::  share one timestamp.  wraps the dispatch to capture structural
+    ::  code changes produced by transformer firings during propagate.
     ::
-    |=  [=move allow-view-write=?]
+    |=  =move
     ^+  cor
     =^  time=hlc  cor  ingress-tick
     =.  move  move(time time)
     =.  cor  (vlog "ae: do-move ({(scow %ud ~(wyt in chng-set.move))} changes)")
     =/  cod-before  cod
-    =.  cor  (apply-move-qualified (prefix-move [p+our ~] move) allow-view-write)
+    =.  cor  (apply-move-qualified [(prefix-move [p+our ~] move) %.n])
     (emit-code-at-ancestors cod-before)
   ::
   ++  apply-move-qualified
@@ -546,6 +564,31 @@
     ?~  out  cor
     (apply-move-qualified [u.out %.y])
   ::
+  ++  validate-mesh-views
+    ::
+    ::  pre-flight check on a mesh's view layout.  returns the first
+    ::  rejection message, or ~ if every view is placeable.  rules:
+    ::    - stem must be deep enough to carry meta (>= min-meta-depth)
+    ::    - stem must not sit at or beneath an existing view
+    ::    - %lens stem must not be at or above its own faucet
+    ::
+    |=  vws=(map stem view)
+    ^-  (unit @t)
+    =/  pairs=(list [stem view])  ~(tap by vws)
+    |-  ^-  (unit @t)
+    ?~  pairs  ~
+    =/  full-pax  (under-our -.i.pairs)
+    =/  vw=view   +.i.pairs
+    ?.  (meta-allowed full-pax)
+      `(crip "ae: install-mesh rejected: stem too shallow at {(pate full-pax)}")
+    ?:  (beneath-view full-pax cod)
+      `(crip "ae: install-mesh rejected: stem at or beneath existing view at {(pate full-pax)}")
+    ?:  ?&  ?=(%lens -.vw)
+            (~(is-ancestor-or-same th full-pax) (ref-to-pith dep.vw))
+        ==
+      `(crip "ae: install-mesh rejected: lens at {(pate full-pax)} has self or ancestor as faucet at {(pate (ref-to-pith dep.vw))}")
+    $(pairs t.pairs)
+  ::
   ++  place-mesh-view
     ::
     ::  install one view from mesh `name` at stem.  for %lens, wires
@@ -561,18 +604,7 @@
     ^+  cor
     =/  full-pax  (under-our stem)
     =/  old=(unit meta)  (~(get ox cod) full-pax)
-    =/  met=meta
-      %*  .  *meta
-        life       ?~  old  0
-                   ?:  grow.u.old  +(life.u.old)
-                   life.u.old
-        lord       `[mesh=name view=view]
-        subs       ?~(old ~ subs.u.old)
-        view-subs  ?~(old ~ view-subs.u.old)
-        grow       ?~(old %.n grow.u.old)
-        eyre       ?~(old ~ eyre.u.old)
-        gall       ?~(old ~ gall.u.old)
-      ==
+    =/  met=meta  (merge-meta-on-place old [mesh=name view=view])
     =.  cod  (~(put ox cod) full-pax met)
     ?:  ?=(%form -.view)  cor
     =.  dat  (~(lop do dat) full-pax)
@@ -634,20 +666,7 @@
     =/  output=move          output.p.run
     =/  vws=(map stem view)  views.p.run
     =/  pairs=(list [stem view])  ~(tap by vws)
-    =/  validation=(unit @t)
-      |-  ^-  (unit @t)
-      ?~  pairs  ~
-      =/  full-pax  (under-our -.i.pairs)
-      =/  vw=view   +.i.pairs
-      ?.  (meta-allowed full-pax)
-        `(crip "ae: install-mesh rejected: stem too shallow at {(pate full-pax)}")
-      ?:  (beneath-view full-pax cod)
-        `(crip "ae: install-mesh rejected: stem at or beneath existing view at {(pate full-pax)}")
-      ?:  ?&  ?=(%lens -.vw)
-              (~(is-ancestor-or-same th full-pax) (ref-to-pith dep.vw))
-          ==
-        `(crip "ae: install-mesh rejected: lens at {(pate full-pax)} has self or ancestor as faucet at {(pate (ref-to-pith dep.vw))}")
-      $(pairs t.pairs)
+    =/  validation=(unit @t)  (validate-mesh-views vws)
     ?^  validation
       %-  (slog leaf+(trip u.validation) ~)
       cor

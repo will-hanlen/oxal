@@ -136,7 +136,7 @@
   =/  new-ax=acer
     ?-  -.i.ops
       %do-move
-        +:abet:(ingress-do-move:engine [`move`[*hlc changes.i.ops] |])
+        +:abet:(ingress-do-move:engine `move`[*hlc changes.i.ops])
       ::
       %install-mesh
         +:abet:(ingress-install-mesh:engine name.i.ops source.i.ops)

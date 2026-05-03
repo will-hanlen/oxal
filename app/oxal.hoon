@@ -204,7 +204,7 @@
       ::
       =+  !<  changes=(set chng)  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-do-move:engine [[*hlc changes] %.n])
+        abet:(ingress-do-move:engine [*hlc changes])
       (emil cz)
       ::
     %install-mesh
