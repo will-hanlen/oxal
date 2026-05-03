@@ -4,21 +4,21 @@
 |%
 ++  zozo  %400
 ::
-++  get-app
+++  get-mesh
   ::
-  ::  linear scan of apps for a name match.
+  ::  linear scan of meshes for a name match.
   ::
   |=  [acer want=term]
-  ^-  (unit app)
-  ?~  apps  ~
-  ?:  =(name.i.apps want)  `app.i.apps
-  $(apps t.apps)
+  ^-  (unit mesh)
+  ?~  meshes  ~
+  ?:  =(name.i.meshes want)  `mesh.i.meshes
+  $(meshes t.meshes)
 ::
-++  got-app
+++  got-mesh
   ::
   |=  [=acer name=term]
-  ~|  app-not-found/name
-  (need (get-app acer name))
+  ~|  mesh-not-found/name
+  (need (get-mesh acer name))
 ::
 ++  ae
   :::
@@ -101,16 +101,16 @@
     ^-  meta
     (fall (~(get ox cod) pax) *meta)
   ::
-  ++  find-app
+  ++  find-mesh
     ::
-    ::  linear scan of apps.ax for an entry with the given name.
+    ::  linear scan of meshes.ax for an entry with the given name.
     ::
     |=  want=term
-    ^-  (unit app)
-    =/  aps  apps.ax
-    |-  ^-  (unit app)
+    ^-  (unit mesh)
+    =/  aps  meshes.ax
+    |-  ^-  (unit mesh)
     ?~  aps  ~
-    ?:  =(name.i.aps want)  `app.i.aps
+    ?:  =(name.i.aps want)  `mesh.i.aps
     $(aps t.aps)
   ::
   ++  meta-significant-change
@@ -175,7 +175,7 @@
     =.  cor  (faucet-unsub pax dep.view)
     =.  cod
       %+  ~(put ox cod)  pax
-      met(lord `[app=app.u.lord.met view=view(err `tang)])
+      met(lord `[mesh=mesh.u.lord.met view=view(err `tang)])
     cor
   ::
   ++  get-xfm
@@ -535,7 +535,7 @@
       %&
         =.  cod
           %+  ~(put ox cod)  sub
-          met(lord `[app=app.u.lord.met view=view(lyf lyf, cas cas)])
+          met(lord `[mesh=mesh.u.lord.met view=view(lyf lyf, cas cas)])
         =/  prefixed=move  (prefix-move sub p.result)
         (apply-move-qualified [prefixed(time time) %.y])
       ::
@@ -543,15 +543,15 @@
         (suspend-view sub view met p.result)
     ==
   ::
-  ++  place-app-view
+  ++  place-mesh-view
     ::
-    ::  install one view from app `name` at stem.  for %lens, wires
+    ::  install one view from mesh `name` at stem.  for %lens, wires
     ::  faucet subs, optional link subs, lops the prior data subtree
     ::  (lens output is derived, never user-data), and runs
     ::  initialize-from-snap.  for %form, writes the meta and leaves
-    ::  data in place — data is sovereign; an app declaring a form at
+    ::  data in place — data is sovereign; a mesh declaring a form at
     ::  a stem with pre-existing data is just structuring it.  pre-
-    ::  validated by ingress-install-app, so the meta-allowed and
+    ::  validated by ingress-install-mesh, so the meta-allowed and
     ::  beneath-view checks here are defensive.
     ::
     |=  [name=term stem=pith =view]
@@ -563,7 +563,7 @@
         life       ?~  old  0
                    ?:  grow.u.old  +(life.u.old)
                    life.u.old
-        lord       `[app=name view=view]
+        lord       `[mesh=name view=view]
         subs       ?~(old ~ subs.u.old)
         view-subs  ?~(old ~ view-subs.u.old)
         grow       ?~(old %.n grow.u.old)
@@ -582,51 +582,51 @@
       (link-sub full-pax (ref-to-pith sauc.view))
     (initialize-from-snap full-pax view faucet-met)
   ::
-  ++  ingress-install-app
+  ++  ingress-install-mesh
     ::
     ::  fresh install: no prior forms.
     ::
     |=  [name=term source=@t]
     ^+  cor
-    (install-app-with-priors name source ~)
+    (install-mesh-with-priors name source ~)
   ::
-  ++  install-app-with-priors
+  ++  install-mesh-with-priors
     ::
-    ::  compile app source, run the gate against prior-forms, apply
+    ::  compile mesh source, run the gate against prior-forms, apply
     ::  its output move, place all returned views, and append the
-    ::  app entry to acer.apps.  on compile or run failure, store the
+    ::  mesh entry to acer.meshes.  on compile or run failure, store the
     ::  entry with views=~ and error=`tang -- no tree changes.
     ::  rejects if `name` already exists, or if any returned stem
     ::  fails pre-validation (depth, beneath-view, or self-faucet).
     ::
     ::    .prior-forms  data subtree at each %form stem of the
-    ::                  outgoing app, captured by the caller before
+    ::                  outgoing mesh, captured by the caller before
     ::                  uninstall.  empty on first install.
     ::
     |=  [name=term source=@t prior-forms=(map stem data)]
     ^+  cor
-    =.  cor  (vlog "ae: install-app {<name>}")
-    ?:  ?=(^ (find-app name))
-      %-  (slog leaf+"ae: rejected install-app: {<name>} already exists" ~)
+    =.  cor  (vlog "ae: install-mesh {<name>}")
+    ?:  ?=(^ (find-mesh name))
+      %-  (slog leaf+"ae: rejected install-mesh: {<name>} already exists" ~)
       cor
     =/  cod-before  cod
-    =/  comp=(each app-gate tang)
-      (mule |.(!<(app-gate (slap !>(.) (ream source)))))
+    =/  comp=(each mesh-gate tang)
+      (mule |.(!<(mesh-gate (slap !>(.) (ream source)))))
     ?:  ?=(%| -.comp)
-      =/  =app  *app
-      =.  source.app  source
-      =.  error.app  `p.comp
-      =.  apps.ax  (snoc apps.ax [name app])
+      =/  =mesh  *mesh
+      =.  source.mesh  source
+      =.  error.mesh  `p.comp
+      =.  meshes.ax  (snoc meshes.ax [name mesh])
       cor
-    =/  =app-gate  p.comp
+    =/  =mesh-gate  p.comp
     =/  run=(each [output=move views=(map stem view)] tang)
-      (mule |.((app-gate [our name prior-forms])))
+      (mule |.((mesh-gate [our name prior-forms])))
     ?:  ?=(%| -.run)
-      =/  =app  *app
-      =.  source.app    source
-      =.  app-gate.app  app-gate
-      =.  error.app     `p.run
-      =.  apps.ax  (snoc apps.ax [name app])
+      =/  =mesh  *mesh
+      =.  source.mesh    source
+      =.  mesh-gate.mesh  mesh-gate
+      =.  error.mesh     `p.run
+      =.  meshes.ax  (snoc meshes.ax [name mesh])
       cor
     =/  output=move          output.p.run
     =/  vws=(map stem view)  views.p.run
@@ -637,13 +637,13 @@
       =/  full-pax  (under-our -.i.pairs)
       =/  vw=view   +.i.pairs
       ?.  (meta-allowed full-pax)
-        `(crip "ae: install-app rejected: stem too shallow at {(pate full-pax)}")
+        `(crip "ae: install-mesh rejected: stem too shallow at {(pate full-pax)}")
       ?:  (beneath-view full-pax cod)
-        `(crip "ae: install-app rejected: stem at or beneath existing view at {(pate full-pax)}")
+        `(crip "ae: install-mesh rejected: stem at or beneath existing view at {(pate full-pax)}")
       ?:  ?&  ?=(%lens -.vw)
               (~(is-ancestor-or-same th full-pax) (ref-to-pith dep.vw))
           ==
-        `(crip "ae: install-app rejected: lens at {(pate full-pax)} has self or ancestor as faucet at {(pate (ref-to-pith dep.vw))}")
+        `(crip "ae: install-mesh rejected: lens at {(pate full-pax)} has self or ancestor as faucet at {(pate (ref-to-pith dep.vw))}")
       $(pairs t.pairs)
     ?^  validation
       %-  (slog leaf+(trip u.validation) ~)
@@ -664,18 +664,18 @@
     =.  cor
       |-  ^+  cor
       ?~  pairs  cor
-      =.  cor  (place-app-view name -.i.pairs +.i.pairs)
+      =.  cor  (place-mesh-view name -.i.pairs +.i.pairs)
       $(pairs t.pairs)
-    =/  =app  *app
-    =.  source.app    source
-    =.  app-gate.app  app-gate
-    =.  views.app     vws
-    =.  apps.ax  (snoc apps.ax [name app])
+    =/  =mesh  *mesh
+    =.  source.mesh    source
+    =.  mesh-gate.mesh  mesh-gate
+    =.  views.mesh     vws
+    =.  meshes.ax  (snoc meshes.ax [name mesh])
     (emit-code-at-ancestors cod-before)
   ::
-  ++  uninstall-app-view
+  ++  uninstall-mesh-view
     ::
-    ::  remove a single app view: faucet/link unsub for %lens, then
+    ::  remove a single mesh view: faucet/link unsub for %lens, then
     ::  clear lord on meta.  preserves data.  stem is bare; qualified
     ::  with /[our] before lookup.
     ::
@@ -689,28 +689,28 @@
     =.  cod  (~(put ox cod) full-pax met(lord ~))
     cor
   ::
-  ++  ingress-uninstall-app
+  ++  ingress-uninstall-mesh
     ::
-    ::  remove every view placed by app `name` (faucet/link unsub,
-    ::  clear lord) and drop the entry from apps.ax.  preserves data.
+    ::  remove every view placed by mesh `name` (faucet/link unsub,
+    ::  clear lord) and drop the entry from meshes.ax.  preserves data.
     ::  no-op (with slog) if name not found.
     ::
     |=  name=term
     ^+  cor
-    =.  cor  (vlog "ae: uninstall-app {<name>}")
-    =/  found=(unit app)  (find-app name)
+    =.  cor  (vlog "ae: uninstall-mesh {<name>}")
+    =/  found=(unit mesh)  (find-mesh name)
     ?~  found
-      %-  (slog leaf+"ae: rejected uninstall-app: {<name>} not found" ~)
+      %-  (slog leaf+"ae: rejected uninstall-mesh: {<name>} not found" ~)
       cor
     =/  cod-before  cod
     =.  cor
       =/  pairs=(list [stem view])  ~(tap by views.u.found)
       |-  ^+  cor
       ?~  pairs  cor
-      =.  cor  (uninstall-app-view -.i.pairs +.i.pairs)
+      =.  cor  (uninstall-mesh-view -.i.pairs +.i.pairs)
       $(pairs t.pairs)
-    =.  apps.ax
-      %+  skip  apps.ax
+    =.  meshes.ax
+      %+  skip  meshes.ax
       |=  [n=term *]
       =(n name)
     (emit-code-at-ancestors cod-before)
@@ -718,8 +718,8 @@
   ++  capture-prior-forms
     ::
     ::  for each %form view in vs, snap the data subtree at its stem
-    ::  (qualified with /[our]).  used by reinstall and update-app to
-    ::  hand the new gate a view of what the old app had laid down,
+    ::  (qualified with /[our]).  used by reinstall and update-mesh to
+    ::  hand the new gate a view of what the old mesh had laid down,
     ::  so it can decide migrations before view placement.
     ::
     |=  vs=(map stem view)
@@ -731,9 +731,9 @@
     ?.  ?=(%form -.view)  ~
     `[stem (~(dip do dat) (under-our stem))]
   ::
-  ++  ingress-reinstall-app
+  ++  ingress-reinstall-mesh
     ::
-    ::  re-install app `name` from its stored source.  captures the
+    ::  re-install mesh `name` from its stored source.  captures the
     ::  data at every %form stem (data is sovereign and survives the
     ::  uninstall), uninstalls, and reruns the install path with that
     ::  prior-forms map handed to the gate.  no-op (with slog) if
@@ -741,31 +741,31 @@
     ::
     |=  name=term
     ^+  cor
-    =.  cor  (vlog "ae: reinstall-app {<name>}")
-    =/  found=(unit app)  (find-app name)
+    =.  cor  (vlog "ae: reinstall-mesh {<name>}")
+    =/  found=(unit mesh)  (find-mesh name)
     ?~  found
-      %-  (slog leaf+"ae: rejected reinstall-app: {<name>} not found" ~)
+      %-  (slog leaf+"ae: rejected reinstall-mesh: {<name>} not found" ~)
       cor
     =/  src=@t  source.u.found
     =/  priors=(map stem data)  (capture-prior-forms views.u.found)
-    =.  cor  (ingress-uninstall-app name)
-    (install-app-with-priors name src priors)
+    =.  cor  (ingress-uninstall-mesh name)
+    (install-mesh-with-priors name src priors)
   ::
-  ++  ingress-update-app
+  ++  ingress-update-mesh
     ::
-    ::  replace app `name`'s source: uninstall its current views, then
-    ::  install fresh from the new source.  if an app by that name
+    ::  replace mesh `name`'s source: uninstall its current views, then
+    ::  install fresh from the new source.  if a mesh by that name
     ::  already exists, captures its %form data first so the new
     ::  gate sees prior-forms; otherwise installs from scratch.
     ::
     |=  [name=term source=@t]
     ^+  cor
-    =.  cor  (vlog "ae: update-app {<name>}")
-    =/  found=(unit app)  (find-app name)
-    ?~  found  (ingress-install-app name source)
+    =.  cor  (vlog "ae: update-mesh {<name>}")
+    =/  found=(unit mesh)  (find-mesh name)
+    ?~  found  (ingress-install-mesh name source)
     =/  priors=(map stem data)  (capture-prior-forms views.u.found)
-    =.  cor  (ingress-uninstall-app name)
-    (install-app-with-priors name source priors)
+    =.  cor  (ingress-uninstall-mesh name)
+    (install-mesh-with-priors name source priors)
   ::
   ++  ingress-set-grow
     ::
@@ -1070,7 +1070,7 @@
       %&
         =.  cod
           %+  ~(put ox cod)  sub
-          met(lord `[app=app.u.lord.met view=view(lyf lyf, cas cas)])
+          met(lord `[mesh=mesh.u.lord.met view=view(lyf lyf, cas cas)])
         =/  prefixed=move  (prefix-move sub p.result)
         [`prefixed(time time) cor]
       ::

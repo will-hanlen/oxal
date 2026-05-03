@@ -1,8 +1,8 @@
-::  /ted/http-oxal--apps  :  list page (CRUD over all apps in the acer)
+::  /ted/http-oxal--meshes  :  list page (CRUD over all meshes in the acer)
 ::
-::    GET   /oxal/apps   list of apps + create form
-::    POST  /oxal/apps   op=new-app pokes oxal with %install-app;
-::                       other ops (update-app, delete-app) are no-ops.
+::    GET   /oxal/meshes   list of meshes + create form
+::    POST  /oxal/meshes   op=new-mesh pokes oxal with %install-mesh;
+::                       other ops (update-mesh, delete-mesh) are no-ops.
 ::
 /+  *vineio, *zozo
 ::
@@ -16,29 +16,29 @@
 ?:  =('POST' method.bowl)
   =/  form=(map @t @t)  formencoded-body:vio
   =/  op=@t  (~(gut by form) 'op' '')
-  ?:  =('new-app' op)
+  ?:  =('new-mesh' op)
     =/  name=term   (~(got by form) 'name')
     =/  source=@t   (fix-newlines (~(got by form) 'source'))
-    ;<  ~  bind:m  (poke-our:vio %install-app !>([name source]))
+    ;<  ~  bind:m  (poke-our:vio %install-mesh !>([name source]))
     ;<  ~  bind:m
       %+  send-simple-payload:vio
-        [303 ['location' '/oxal/apps']~]
+        [303 ['location' '/oxal/meshes']~]
       ~
     (pure:m !>(~))
-  ?:  =('delete-app' op)
+  ?:  =('delete-mesh' op)
     =/  name=term  (~(got by form) 'name')
-    ;<  ~  bind:m  (poke-our:vio %uninstall-app !>(name))
+    ;<  ~  bind:m  (poke-our:vio %uninstall-mesh !>(name))
     ;<  ~  bind:m
       %+  send-simple-payload:vio
-        [303 ['location' '/oxal/apps']~]
+        [303 ['location' '/oxal/meshes']~]
       ~
     (pure:m !>(~))
-  ?:  =('reinstall-app' op)
+  ?:  =('reinstall-mesh' op)
     =/  name=term  (~(got by form) 'name')
-    ;<  ~  bind:m  (poke-our:vio %reinstall-app !>(name))
+    ;<  ~  bind:m  (poke-our:vio %reinstall-mesh !>(name))
     ;<  ~  bind:m
       %+  send-simple-payload:vio
-        [303 ['location' '/oxal/apps']~]
+        [303 ['location' '/oxal/meshes']~]
       ~
     (pure:m !>(~))
   ::  unknown op: bounce back unchanged.
@@ -53,15 +53,15 @@
 ;<  ~  bind:m
   %-  send-simple-payload:vio
   %+  node-to-simple-payload  %manx
-  (render-list bowl apps.acer)
+  (render-list bowl meshes.acer)
 (pure:m !>(~))
 ::
 |%
 ++  render-list
   ::
-  ::  list page: header, app rows, create form.
+  ::  list page: header, mesh rows, create form.
   ::
-  |=  [bowl=http-bowl aps=(list [name=term =app])]
+  |=  [bowl=http-bowl aps=(list [name=term =mesh])]
   ^-  manx
   ;html
     ;head
@@ -75,39 +75,39 @@
                   "viewport-fit=cover"
         ;*  ~
       ==
-      ;title: oxal apps
+      ;title: oxal meshes
       ;link(rel "icon", href "data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\"/>");
       ;link(rel "stylesheet", href "/hawk-init/feather/1/style");
       ;script(type "module", src "/hawk-init/feather/1/textarea");
     ==
     ;body.p5.fc.g5.pb15
-      ;h1: apps
+      ;h1: meshes
       ;div.fr.g3.f4.o6
         ;span
-          ;-  "{(scow %ud (lent aps))} app"
-          ;-  ?:(=(1 (lent aps)) "" "s")
+          ;-  "{(scow %ud (lent aps))} mesh"
+          ;-  ?:(=(1 (lent aps)) "" "es")
         ==
       ==
       ;div.fc.g3
         ;*
         =;  =marl  ?^  marl  marl
           ;=
-            ;div.p3.bd1.br2.o6: no apps
+            ;div.p3.bd1.br2.o6: no meshes
           ==
         %+  turn  aps
-        |=  [name=term =app]
-        (render-row bowl name app)
+        |=  [name=term =mesh]
+        (render-row bowl name mesh)
       ==
       ;div.fc.g3.bdt1.pt5
-        ;h2: create app
+        ;h2: create mesh
         ;form.fc.g2(method "post")
-          ;input(type "hidden", name "op", value "new-app");
+          ;input(type "hidden", name "op", value "new-mesh");
           ;label.fc.g2
             ;span: name
             ;input.p-2.br2.bd1.mono
               =type  "text"
               =name  "name"
-              =placeholder  "my-app"
+              =placeholder  "my-mesh"
               =required  ""
               =spellcheck  "false"
               ;*  ~
@@ -134,12 +134,12 @@
 ::
 ++  render-row
   ::
-  ::  one row in the apps list: link, view-count, delete form.
+  ::  one row in the meshes list: link, view-count, delete form.
   ::
-  |=  [bowl=http-bowl name=term =app]
+  |=  [bowl=http-bowl name=term =mesh]
   ^-  manx
-  =/  href=tape  (trip (spat /oxal/app/[name]))
-  =/  views=@ud  ~(wyt by views.app)
+  =/  href=tape  (trip (spat /oxal/mesh/[name]))
+  =/  views=@ud  ~(wyt by views.mesh)
   ;div.fr.g3.p3.bd1.br2.b2.ac
     ;a.bold.mono.grow.hover
       =href  href
@@ -150,12 +150,12 @@
       ;-  ?:(=(1 views) "" "s")
     ==
     ;form(method "post")
-      ;input(type "hidden", name "op", value "reinstall-app");
+      ;input(type "hidden", name "op", value "reinstall-mesh");
       ;input(type "hidden", name "name", value (trip name));
       ;button.p-2.br2.bd1.b2.hover.f-1: reinstall
     ==
     ;form(method "post")
-      ;input(type "hidden", name "op", value "delete-app");
+      ;input(type "hidden", name "op", value "delete-mesh");
       ;input(type "hidden", name "name", value (trip name));
       ;button.p-2.br2.bd1.b3.hover.f-1: delete
     ==

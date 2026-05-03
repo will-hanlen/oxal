@@ -33,7 +33,7 @@
         %+  turn
           ^-  (list path)
           :~
-            /apps
+            /meshes
             /gall/sky
             /gall/sup
             /eyre/cache

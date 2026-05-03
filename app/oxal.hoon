@@ -193,7 +193,7 @@
     %wipe
       ::
       =.  file.acer  *file
-      =.  apps.acer  ~
+      =.  meshes.acer  ~
       %-  (slog 'oxal: wipe' ~)
       cor
     ::
@@ -207,32 +207,32 @@
         abet:(ingress-do-move:engine [[*hlc changes] %.n])
       (emil cz)
       ::
-    %install-app
+    %install-mesh
       ::
       =+  !<  [name=term source=@t]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-install-app:engine name source)
+        abet:(ingress-install-mesh:engine name source)
       (emil cz)
       ::
-    %uninstall-app
+    %uninstall-mesh
       ::
       =+  !<  name=term  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-uninstall-app:engine name)
+        abet:(ingress-uninstall-mesh:engine name)
       (emil cz)
       ::
-    %reinstall-app
+    %reinstall-mesh
       ::
       =+  !<  name=term  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-reinstall-app:engine name)
+        abet:(ingress-reinstall-mesh:engine name)
       (emil cz)
       ::
-    %update-app
+    %update-mesh
       ::
       =+  !<  [name=term source=@t]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-update-app:engine name source)
+        abet:(ingress-update-mesh:engine name source)
       (emil cz)
       ::
     %bump

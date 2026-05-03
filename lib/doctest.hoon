@@ -138,14 +138,14 @@
       %do-move
         +:abet:(ingress-do-move:engine [`move`[*hlc changes.i.ops] |])
       ::
-      %install-app
-        +:abet:(ingress-install-app:engine name.i.ops source.i.ops)
+      %install-mesh
+        +:abet:(ingress-install-mesh:engine name.i.ops source.i.ops)
       ::
-      %uninstall-app
-        +:abet:(ingress-uninstall-app:engine name.i.ops)
+      %uninstall-mesh
+        +:abet:(ingress-uninstall-mesh:engine name.i.ops)
       ::
-      %update-app
-        +:abet:(ingress-update-app:engine name.i.ops source.i.ops)
+      %update-mesh
+        +:abet:(ingress-update-mesh:engine name.i.ops source.i.ops)
       ::
       %bump
         +:abet:(ingress-bump:engine pax.i.ops)

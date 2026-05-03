@@ -230,7 +230,7 @@
     err=(unit tang)
   ==
 ::
-+$  app-gate
++$  mesh-gate
   ::
   ::  pure lifecycle declarer.  fires on install and reinstall only;
   ::  the running tree is reactive via lenses, not the gate.
@@ -240,18 +240,18 @@
   ::    output       a move applied before views are placed; lets the
   ::                 gate migrate or reshape data on reinstall.  may
   ::                 not write at or beneath a %lens view.
-  ::    views        the view layout the app declares.
+  ::    views        the view layout the mesh declares.
   ::
   $-  [our=@p name=term prior-forms=(map stem data)]
   [output=move views=(map stem view)]
 ::
-+$  app
-  $:  source=@t  :: xx this is for dynamic apps; there should be a static version like (map stem @t) or something
-      =app-gate
++$  mesh
+  $:  source=@t  :: xx this is for dynamic meshes; there should be a static version like (map stem @t) or something
+      =mesh-gate
       views=(map stem view)
       error=(unit tang)
   ==
-+$  apps  (list [name=term =app])  ::  all named apps
++$  meshes  (list [name=term =mesh])  ::  all named meshes
 +$  link  [=ship =root]            ::  location
 +$  sauc  $@(@t link)              ::  lambda code or [@t *] leaf location
 ::
@@ -273,7 +273,7 @@
       ::
       gall=(unit auth)     :: ~ no subcription facts, ^ who can subscribe
       ::
-      lord=(unit [app=term =view])
+      lord=(unit [mesh=term =view])
       ::
       subs=(set pith)        :: views subscribed to my log
       view-subs=(set pith)   :: views using my node as code
@@ -328,7 +328,7 @@
       ::  remote-subs=(jar link pith)
       ::
       ::  future field
-      =apps
+      =meshes
   ==
 ::
 +$  chng

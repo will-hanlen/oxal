@@ -192,7 +192,7 @@
   :-  ;p: nested pith
   '''
   ^-  tang
-  =/  p=pith  ~[%apps [%pith /foo/users] %view]
+  =/  p=pith  ~[%meshes [%pith /foo/users] %view]
   ?:  =(p (stib (pate p)))  ~
   ['pate/stib failed: nested pith' ~]
   '''

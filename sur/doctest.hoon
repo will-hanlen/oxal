@@ -49,9 +49,9 @@
 ::
 +$  ingress-op
   $%  [%do-move changes=(set chng)]
-      [%install-app name=term source=@t]
-      [%uninstall-app name=term]
-      [%update-app name=term source=@t]
+      [%install-mesh name=term source=@t]
+      [%uninstall-mesh name=term]
+      [%update-mesh name=term source=@t]
       [%bump pax=pith]
       [%set-grow pax=pith val=?]
       [%set-eyre pax=pith val=(unit auth)]

@@ -6,8 +6,8 @@
 ^-  form:m
 ::
 ;<  ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
-=/  app-name=@tas  ~|  %not-found  (head rest.bowl)
-=/  =app  (got-app ax app-name)
+=/  mesh-name=@tas  ~|  %not-found  (head rest.bowl)
+=/  =mesh  (got-mesh ax mesh-name)
 ::
 |^
   :::
@@ -39,10 +39,10 @@
       [%.y %set-source]
         ::
         =/  source=@t   (fix-newlines (~(got by body) 'source'))
-        ;<  ~  bind:m  (poke-our:vio %update-app !>([app-name source]))
+        ;<  ~  bind:m  (poke-our:vio %update-mesh !>([mesh-name source]))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
-        =.  app  (got-app ax app-name)
+        =.  mesh  (got-mesh ax mesh-name)
         ;<  ~  bind:m  (send-html-payload:vio part-file)
         (pure:m !>(~))
       ::
@@ -55,7 +55,7 @@
         ;<  ~  bind:m  (poke-our:vio %do-move !>(changes))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
-        =.  app  (got-app ax app-name)
+        =.  mesh  (got-mesh ax mesh-name)
         ;<  ~  bind:m  (send-html-payload:vio part-file)
         (pure:m !>(~))
       ::
@@ -66,7 +66,7 @@
         ;<  ~  bind:m  (poke-our:vio %do-move !>(changes))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
-        =.  app  (got-app ax app-name)
+        =.  mesh  (got-mesh ax mesh-name)
         ;<  ~  bind:m  (send-html-payload:vio part-file)
         (pure:m !>(~))
       ::
@@ -76,7 +76,7 @@
         ;<  ~  bind:m  (poke-our:vio %bump !>(pith))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
-        =.  app  (got-app ax app-name)
+        =.  mesh  (got-mesh ax mesh-name)
         ;<  ~  bind:m  (send-html-payload:vio part-file)
         (pure:m !>(~))
       ::
@@ -130,7 +130,7 @@
                   "viewport-fit=cover"
         ;*  ~
       ==
-      ;title: {(trip app-name)}
+      ;title: {(trip mesh-name)}
       ;link(rel "icon", href "data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\"/>");
       ;link(rel "stylesheet", href "/hawk-init/feather/1/style");
       ;script(type "module", src "/hawk-init/feather/1/textarea");
@@ -154,10 +154,10 @@
   ^-  manx
   ;header.fr.af.bbh.mono.b2
     ;a.b2.f3.hover.p-3
-      =href  "/oxal/apps"
+      =href  "/oxal/meshes"
       ; <
     ==
-    ;strong.grow.p-3: {"%"}{(trip app-name)}
+    ;strong.grow.p-3: {"%"}{(trip mesh-name)}
     ;button.p-3.b2.f-3.hover
       =data-on_click  "$edit = !$edit"
       =data-class_toggled  "$edit"
@@ -169,9 +169,9 @@
 ++  part-error
   ::
   ^-  manx
-  ?~  error.app  ;/  ""
+  ?~  error.mesh  ;/  ""
   ;div
-    ;+  (render-tang u.error.app)
+    ;+  (render-tang u.error.mesh)
   ==
 ::
 ++  part-source
@@ -187,7 +187,7 @@
     ;feather-text-editor.grow.fs-2
       =auto-indent  ""
       =name  "source"
-      ;-  (trip source.app)
+      ;-  (trip source.mesh)
     ==
     ;button.p3.b3.hover
       =data-attr_disabled  "$_savesource"
@@ -199,7 +199,7 @@
   ::
   =/  partial=file
     %-  ~(partial fe file.ax)
-    %-  ~(run in ~(key by views.app))
+    %-  ~(run in ~(key by views.mesh))
     |=  =pith
     [p+our.bowl pith]
   ;div#file.p4.pb20.fc.grow.hf.scroll-y-always
