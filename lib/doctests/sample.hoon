@@ -1,5 +1,8 @@
 ::  /lib/doctests/sample: smoke test for the doctest runner
 ::
+::  exercises the runner with a prose section, a unit test, and a
+::  full test that asserts a fresh acer is empty.
+::
 /-  *doctest
 ^-  script
 =/  prose-section=section

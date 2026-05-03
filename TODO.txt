@@ -1,38 +1,11 @@
 
-thinking about the lifecycle of a mesh.
-do we need a cleanup step when removing a mesh?
-if we do, that implies that install and re-install are different actions.
-re-install is more like on-load: an upgrade.
-if that's the case, then something like:
-|%
-++  enmesh  :: start from empty %form views
-++  update  :: 
-++  unmesh  :: remove all views, maybe remove data
---
+implement $shape schemas
 
----
-
-rename "app" to "mesh"
-
----
-
-find a better word for "chng"
+  static definition of what places below are allowed to have data
 
 ---
 
 gall subscriptions for all changes in a mesh
-
----
-
-convert the serialization tests to doctest
-
----
-
-rewrite the app viewer in a better way.
-
----
-
-bug: after installing app, file isn't cleaned up and some data is left orphaned
 
 ---
 

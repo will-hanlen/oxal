@@ -20,6 +20,53 @@
   ~|  mesh-not-found/name
   (need (get-mesh acer name))
 ::
++$  staged
+  ::
+  ::  output of stage-load: a fully-validated mesh ready for commit.
+  ::    forms   declared form-stems from ++forms
+  ::    views   view layout returned by ++load (form + lens)
+  ::    output  migration move returned by ++load
+  ::
+  $:  =mesh-core
+      forms=(set stem)
+      views=(map stem view)
+      output=move
+  ==
+::
+++  build-mesh-core
+  ::
+  ::  compile mesh source to a typed core.  errors land in tang.
+  ::
+  |=  source=@t
+  ^-  (each mesh-core tang)
+  (mule |.(!<(mesh-core (slap !>(.) (ream source)))))
+::
+++  call-forms
+  ::
+  ::  invoke ++forms against the door sample [our name].  pure;
+  ::  prior-forms is not in scope for this arm.
+  ::
+  |=  [=mesh-core our=@p name=term]
+  ^-  (each (set stem) tang)
+  (mule |.(~(forms mesh-core [our name])))
+::
+++  call-load
+  ::
+  ::  invoke ++load with prior-forms.  the form-typed keys of the
+  ::  returned views must match ++forms exactly (caller validates).
+  ::
+  |=  [=mesh-core our=@p name=term =prior-forms]
+  ^-  (each [views=(map stem view) output=move] tang)
+  (mule |.((~(load mesh-core [our name]) prior-forms)))
+::
+++  call-drop
+  ::
+  ::  same pattern for ++drop.
+  ::
+  |=  [=mesh-core our=@p name=term =prior-forms]
+  ^-  (each output=move tang)
+  (mule |.((~(drop mesh-core [our name]) prior-forms)))
+::
 ++  ae
   :::
   ::    acer engine
@@ -580,13 +627,13 @@
     =/  full-pax  (under-our -.i.pairs)
     =/  vw=view   +.i.pairs
     ?.  (meta-allowed full-pax)
-      `(crip "ae: install-mesh rejected: stem too shallow at {(pate full-pax)}")
+      `(crip "ae: load-mesh rejected: stem too shallow at {(pate full-pax)}")
     ?:  (beneath-view full-pax cod)
-      `(crip "ae: install-mesh rejected: stem at or beneath existing view at {(pate full-pax)}")
+      `(crip "ae: load-mesh rejected: stem at or beneath existing view at {(pate full-pax)}")
     ?:  ?&  ?=(%lens -.vw)
             (~(is-ancestor-or-same th full-pax) (ref-to-pith dep.vw))
         ==
-      `(crip "ae: install-mesh rejected: lens at {(pate full-pax)} has self or ancestor as faucet at {(pate (ref-to-pith dep.vw))}")
+      `(crip "ae: load-mesh rejected: lens at {(pate full-pax)} has self or ancestor as faucet at {(pate (ref-to-pith dep.vw))}")
     $(pairs t.pairs)
   ::
   ++  place-mesh-view
@@ -597,8 +644,8 @@
     ::  initialize-from-snap.  for %form, writes the meta and leaves
     ::  data in place — data is sovereign; a mesh declaring a form at
     ::  a stem with pre-existing data is just structuring it.  pre-
-    ::  validated by ingress-install-mesh, so the meta-allowed and
-    ::  beneath-view checks here are defensive.
+    ::  validated by stage-load, so the meta-allowed and beneath-view
+    ::  checks here are defensive.
     ::
     |=  [name=term stem=pith =view]
     ^+  cor
@@ -617,88 +664,11 @@
       (link-sub full-pax (ref-to-pith sauc.view))
     (initialize-from-snap full-pax view faucet-met)
   ::
-  ++  ingress-install-mesh
-    ::
-    ::  fresh install: no prior forms.
-    ::
-    |=  [name=term source=@t]
-    ^+  cor
-    (install-mesh-with-priors name source ~)
-  ::
-  ++  install-mesh-with-priors
-    ::
-    ::  compile mesh source, run the gate against prior-forms, apply
-    ::  its output move, place all returned views, and append the
-    ::  mesh entry to acer.meshes.  on compile or run failure, store the
-    ::  entry with views=~ and error=`tang -- no tree changes.
-    ::  rejects if `name` already exists, or if any returned stem
-    ::  fails pre-validation (depth, beneath-view, or self-faucet).
-    ::
-    ::    .prior-forms  data subtree at each %form stem of the
-    ::                  outgoing mesh, captured by the caller before
-    ::                  uninstall.  empty on first install.
-    ::
-    |=  [name=term source=@t prior-forms=(map stem data)]
-    ^+  cor
-    =.  cor  (vlog "ae: install-mesh {<name>}")
-    ?:  ?=(^ (get-mesh ax name))
-      %-  (slog leaf+"ae: rejected install-mesh: {<name>} already exists" ~)
-      cor
-    =/  cod-before  cod
-    =/  comp=(each mesh-gate tang)
-      (mule |.(!<(mesh-gate (slap !>(.) (ream source)))))
-    ?:  ?=(%| -.comp)
-      =/  =mesh  *mesh
-      =.  source.mesh  source
-      =.  error.mesh  `p.comp
-      =.  meshes.ax  (snoc meshes.ax [name mesh])
-      cor
-    =/  =mesh-gate  p.comp
-    =/  run=(each [output=move views=(map stem view)] tang)
-      (mule |.((mesh-gate [our name prior-forms])))
-    ?:  ?=(%| -.run)
-      =/  =mesh  *mesh
-      =.  source.mesh    source
-      =.  mesh-gate.mesh  mesh-gate
-      =.  error.mesh     `p.run
-      =.  meshes.ax  (snoc meshes.ax [name mesh])
-      cor
-    =/  output=move          output.p.run
-    =/  vws=(map stem view)  views.p.run
-    =/  pairs=(list [stem view])  ~(tap by vws)
-    =/  validation=(unit @t)  (validate-mesh-views vws)
-    ?^  validation
-      %-  (slog leaf+(trip u.validation) ~)
-      cor
-    ::
-    ::  apply the gate's output move first, so any data migration the
-    ::  gate decided on (based on prior-forms) lands before view
-    ::  placement decides what to lop or preserve.  allow-view-write
-    ::  is %.n: the gate writes through forms or unviewed paths, not
-    ::  through lenses.
-    ::
-    =?  cor  ?=(^ chng-set.output)
-      (apply-move-qualified [(prefix-move [p+our ~] output) %.n])
-    ::
-    ::  place all views: meta + lord; %lens wires faucet and runs
-    ::  initialize-from-snap; %form leaves data in place.
-    ::
-    =.  cor
-      |-  ^+  cor
-      ?~  pairs  cor
-      =.  cor  (place-mesh-view name -.i.pairs +.i.pairs)
-      $(pairs t.pairs)
-    =/  =mesh  *mesh
-    =.  source.mesh    source
-    =.  mesh-gate.mesh  mesh-gate
-    =.  views.mesh     vws
-    =.  meshes.ax  (snoc meshes.ax [name mesh])
-    (emit-code-at-ancestors cod-before)
-  ::
   ++  uninstall-mesh-view
     ::
-    ::  remove a single mesh view: faucet/link unsub for %lens, then
-    ::  clear lord on meta.  preserves data.  stem is bare; qualified
+    ::  graceful tear-down: faucet/link unsub for %lens, then clear
+    ::  lord on meta.  preserves data and the rest of the meta record
+    ::  (grow, eyre, gall, subs, view-subs).  stem is bare; qualified
     ::  with /[our] before lookup.
     ::
     |=  [stem=pith =view]
@@ -711,21 +681,250 @@
     =.  cod  (~(put ox cod) full-pax met(lord ~))
     cor
   ::
-  ++  ingress-uninstall-mesh
+  ++  wipe-mesh-view
     ::
-    ::  remove every view placed by mesh `name` (faucet/link unsub,
-    ::  clear lord) and drop the entry from meshes.ax.  preserves data.
-    ::  no-op (with slog) if name not found.
+    ::  failure-path tear-down: lop the data and delete the meta
+    ::  record entirely (not just clear lord).  for both form and
+    ::  lens views.  any grow/eyre/gall/subs state on the meta is
+    ::  gone.  used when ++drop fails — the mesh's territory burns.
+    ::
+    |=  [stem=pith =view]
+    ^+  cor
+    =/  full-pax  (under-our stem)
+    =?  cor  ?=(%lens -.view)
+      =.  cor  (faucet-unsub full-pax dep.view)
+      (maybe-link-unsub full-pax view)
+    =.  cod  (~(del ox cod) full-pax)
+    =.  dat  (~(lop do dat) full-pax)
+    cor
+  ::
+  ++  outgoing-form-stems
+    ::
+    ::  the form-typed stems of an outgoing mesh's stored views.
+    ::
+    |=  vs=(map stem view)
+    ^-  (set stem)
+    %-  silt
+    %+  murn  ~(tap by vs)
+    |=  [s=stem v=view]
+    ?.(?=(%form -.v) ~ `s)
+  ::
+  ++  capture-priors
+    ::
+    ::  build prior-forms keyed by `stems`.  each entry's data is the
+    ::  data subtree at the stem (qualified with /[our]); shape is
+    ::  recovered from the matching outgoing form view if present, ~
+    ::  otherwise.
+    ::
+    |=  [stems=(set stem) outgoing=(map stem view)]
+    ^-  prior-forms
+    %-  malt
+    %+  turn  ~(tap in stems)
+    |=  s=stem
+    :-  s
+    ^-  prior-form
+    =/  ovw=(unit view)  (~(get by outgoing) s)
+    =/  shp=(unit shape)
+      ?~  ovw  ~
+      ?.(?=(%form -.u.ovw) ~ `out.u.ovw)
+    [shp (~(dip do dat) (under-our s))]
+  ::
+  ++  stage-load
+    ::
+    ::  plan-phase of a load.  no tree mutation.  builds and validates
+    ::  the new mesh-core fully against the current tree, capturing
+    ::  prior-forms over (declared ∪ outgoing-form-stems).  returns a
+    ::  staged bundle ready for commit, or a tang on any error.
+    ::
+    |=  [name=term source=@t outgoing-views=(map stem view)]
+    ^-  (each staged tang)
+    =/  comp  (build-mesh-core source)
+    ?:  ?=(%| -.comp)  [%| p.comp]
+    =/  =mesh-core  p.comp
+    =/  fout  (call-forms mesh-core our name)
+    ?:  ?=(%| -.fout)  [%| p.fout]
+    =/  declared=(set stem)  p.fout
+    ::
+    ::  pre-validate declared form-stems
+    ::
+    =/  pre-validation=(unit @t)
+      =/  pairs=(list stem)  ~(tap in declared)
+      |-  ^-  (unit @t)
+      ?~  pairs  ~
+      =/  full-pax  (under-our i.pairs)
+      ?.  (meta-allowed full-pax)
+        `(crip "ae: load-mesh rejected: ++forms stem too shallow at {(pate full-pax)}")
+      ?:  (beneath-view full-pax cod)
+        `(crip "ae: load-mesh rejected: ++forms stem at or beneath existing view at {(pate full-pax)}")
+      $(pairs t.pairs)
+    ?^  pre-validation  [%| ~[leaf+(trip u.pre-validation)]]
+    ::
+    ::  capture prior-forms over (declared ∪ outgoing form-stems)
+    ::
+    =/  outgoing-fs=(set stem)  (outgoing-form-stems outgoing-views)
+    =/  all-stems=(set stem)  (~(uni in declared) outgoing-fs)
+    =/  =prior-forms  (capture-priors all-stems outgoing-views)
+    ::
+    ::  call ++load
+    ::
+    =/  lout  (call-load mesh-core our name prior-forms)
+    ?:  ?=(%| -.lout)  [%| p.lout]
+    ::
+    ::  validate form-keys ↔ ++forms strictness
+    ::
+    =/  returned-forms=(set stem)
+      %-  silt
+      %+  murn  ~(tap by views.p.lout)
+      |=  [s=stem v=view]
+      ?.(?=(%form -.v) ~ `s)
+    ?.  =(returned-forms declared)
+      :-  %|
+      :_  ~
+      leaf+"ae: load-mesh rejected: returned form-view keys must equal ++forms exactly"
+    ::
+    ::  per-view validation (depth, beneath-view, lens self-faucet)
+    ::
+    =/  view-validation=(unit @t)  (validate-mesh-views views.p.lout)
+    ?^  view-validation  [%| ~[leaf+(trip u.view-validation)]]
+    =/  st=staged  [mesh-core declared views.p.lout output.p.lout]
+    [%& st]
+  ::
+  ++  commit-load
+    ::
+    ::  apply a staged load.  tear down outgoing views (no ++drop —
+    ::  this is mid-life, not terminal), place new views, apply the
+    ::  move, store the new entry replacing any prior of the same
+    ::  name.
+    ::
+    |=  [name=term source=@t st=staged outgoing-views=(map stem view)]
+    ^+  cor
+    =/  cod-before  cod
+    ::
+    ::  tear down outgoing
+    ::
+    =.  cor
+      =/  pairs=(list [stem view])  ~(tap by outgoing-views)
+      |-  ^+  cor
+      ?~  pairs  cor
+      =.  cor  (uninstall-mesh-view -.i.pairs +.i.pairs)
+      $(pairs t.pairs)
+    ::
+    ::  place new views
+    ::
+    =.  cor
+      =/  pairs=(list [stem view])  ~(tap by views.st)
+      |-  ^+  cor
+      ?~  pairs  cor
+      =.  cor  (place-mesh-view name -.i.pairs +.i.pairs)
+      $(pairs t.pairs)
+    ::
+    ::  apply move (allow-view-write=%.n)
+    ::
+    =?  cor  ?=(^ chng-set.output.st)
+      (apply-move-qualified [(prefix-move [p+our ~] output.st) %.n])
+    ::
+    ::  store entry, replacing any prior of the same name
+    ::
+    =/  =mesh  *mesh
+    =.  source.mesh     source
+    =.  mesh-core.mesh  mesh-core.st
+    =.  forms.mesh      forms.st
+    =.  views.mesh      views.st
+    =.  meshes.ax
+      %+  snoc
+        %+  skip  meshes.ax
+        |=  [n=term *]
+        =(n name)
+      [name mesh]
+    (emit-code-at-ancestors cod-before)
+  ::
+  ++  store-fresh-failure
+    ::
+    ::  fresh-load failure: store an entry with views=~ and the tang.
+    ::  no tree changes.  partial mesh-core (may be *mesh-core if
+    ::  compile failed before we had one).
+    ::
+    |=  [name=term source=@t =mesh-core =tang]
+    ^+  cor
+    =/  =mesh  *mesh
+    =.  source.mesh     source
+    =.  mesh-core.mesh  mesh-core
+    =.  error.mesh      `tang
+    =.  meshes.ax  (snoc meshes.ax [name mesh])
+    cor
+  ::
+  ++  mark-mid-life-failure
+    ::
+    ::  mid-life load failure: keep old views in place, mark the
+    ::  existing entry's error field with the new tang.  source/views/
+    ::  forms unchanged.
+    ::
+    |=  [name=term =tang]
+    ^+  cor
+    =.  meshes.ax
+      %+  turn  meshes.ax
+      |=  [n=term m=mesh]
+      ?.  =(n name)  [n m]
+      [n m(error `tang)]
+    cor
+  ::
+  ++  ingress-load-mesh
+    ::
+    ::  fresh install, same-source reinstall, and new-source update in
+    ::  one entry.  detects fresh vs mid-life by name lookup.  on
+    ::  fresh failure: store error entry, no tree change.  on mid-
+    ::  life failure: keep old running, mark error.
+    ::
+    |=  [name=term source=@t]
+    ^+  cor
+    =.  cor  (vlog "ae: load-mesh {<name>}")
+    =/  found=(unit mesh)  (get-mesh ax name)
+    =/  outgoing-views=(map stem view)
+      ?~  found  ~
+      views.u.found
+    =/  out  (stage-load name source outgoing-views)
+    ?:  ?=(%| -.out)
+      ?~  found  (store-fresh-failure name source *mesh-core p.out)
+      (mark-mid-life-failure name p.out)
+    (commit-load name source p.out outgoing-views)
+  ::
+  ++  ingress-drop-mesh
+    ::
+    ::  terminal removal.  capture prior-forms over outgoing form-view
+    ::  stems, run ++drop, apply move, tear down views, drop entry.
+    ::  on ++drop failure (raise or move-apply error): skip the move,
+    ::  wipe data and meta at every view stem (form + lens), drop
+    ::  entry.
     ::
     |=  name=term
     ^+  cor
-    =.  cor  (vlog "ae: uninstall-mesh {<name>}")
+    =.  cor  (vlog "ae: drop-mesh {<name>}")
     =/  found=(unit mesh)  (get-mesh ax name)
     ?~  found
-      %-  (slog leaf+"ae: rejected uninstall-mesh: {<name>} not found" ~)
+      %-  (slog leaf+"ae: rejected drop-mesh: {<name>} not found" ~)
       cor
     =/  cod-before  cod
+    =/  =prior-forms
+      %+  capture-priors
+        (outgoing-form-stems views.u.found)
+      views.u.found
+    =/  drop-out  (call-drop mesh-core.u.found our name prior-forms)
     =.  cor
+      ?:  ?=(%| -.drop-out)
+        ::
+        ::  ++drop raised: wipe data + meta at every view stem
+        ::
+        =/  pairs=(list [stem view])  ~(tap by views.u.found)
+        |-  ^+  cor
+        ?~  pairs  cor
+        =.  cor  (wipe-mesh-view -.i.pairs +.i.pairs)
+        $(pairs t.pairs)
+      ::
+      ::  ++drop succeeded: apply move, then graceful tear-down
+      ::
+      =/  out=move  output.p.drop-out
+      =?  cor  ?=(^ chng-set.out)
+        (apply-move-qualified [(prefix-move [p+our ~] out) %.n])
       =/  pairs=(list [stem view])  ~(tap by views.u.found)
       |-  ^+  cor
       ?~  pairs  cor
@@ -736,58 +935,6 @@
       |=  [n=term *]
       =(n name)
     (emit-code-at-ancestors cod-before)
-  ::
-  ++  capture-prior-forms
-    ::
-    ::  for each %form view in vs, snap the data subtree at its stem
-    ::  (qualified with /[our]).  used by reinstall and update-mesh to
-    ::  hand the new gate a view of what the old mesh had laid down,
-    ::  so it can decide migrations before view placement.
-    ::
-    |=  vs=(map stem view)
-    ^-  (map stem data)
-    %-  malt
-    %+  murn  ~(tap by vs)
-    |=  [stem=pith =view]
-    ^-  (unit [pith data])
-    ?.  ?=(%form -.view)  ~
-    `[stem (~(dip do dat) (under-our stem))]
-  ::
-  ++  ingress-reinstall-mesh
-    ::
-    ::  re-install mesh `name` from its stored source.  captures the
-    ::  data at every %form stem (data is sovereign and survives the
-    ::  uninstall), uninstalls, and reruns the install path with that
-    ::  prior-forms map handed to the gate.  no-op (with slog) if
-    ::  name not found.
-    ::
-    |=  name=term
-    ^+  cor
-    =.  cor  (vlog "ae: reinstall-mesh {<name>}")
-    =/  found=(unit mesh)  (get-mesh ax name)
-    ?~  found
-      %-  (slog leaf+"ae: rejected reinstall-mesh: {<name>} not found" ~)
-      cor
-    =/  src=@t  source.u.found
-    =/  priors=(map stem data)  (capture-prior-forms views.u.found)
-    =.  cor  (ingress-uninstall-mesh name)
-    (install-mesh-with-priors name src priors)
-  ::
-  ++  ingress-update-mesh
-    ::
-    ::  replace mesh `name`'s source: uninstall its current views, then
-    ::  install fresh from the new source.  if a mesh by that name
-    ::  already exists, captures its %form data first so the new
-    ::  gate sees prior-forms; otherwise installs from scratch.
-    ::
-    |=  [name=term source=@t]
-    ^+  cor
-    =.  cor  (vlog "ae: update-mesh {<name>}")
-    =/  found=(unit mesh)  (get-mesh ax name)
-    ?~  found  (ingress-install-mesh name source)
-    =/  priors=(map stem data)  (capture-prior-forms views.u.found)
-    =.  cor  (ingress-uninstall-mesh name)
-    (install-mesh-with-priors name source priors)
   ::
   ++  ingress-set-grow
     ::

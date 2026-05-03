@@ -1,8 +1,8 @@
 ::  /ted/http-oxal--meshes  :  list page (CRUD over all meshes in the acer)
 ::
 ::    GET   /oxal/meshes   list of meshes + create form
-::    POST  /oxal/meshes   op=new-mesh pokes oxal with %install-mesh;
-::                       other ops (update-mesh, delete-mesh) are no-ops.
+::    POST  /oxal/meshes   op=new-mesh / reinstall-mesh poke oxal with
+::                         %load-mesh; op=delete-mesh pokes %drop-mesh.
 ::
 /+  *vineio, *zozo
 ::
@@ -19,7 +19,7 @@
   ?:  =('new-mesh' op)
     =/  name=term   (~(got by form) 'name')
     =/  source=@t   (fix-newlines (~(got by form) 'source'))
-    ;<  ~  bind:m  (poke-our:vio %install-mesh !>([name source]))
+    ;<  ~  bind:m  (poke-our:vio %load-mesh !>([name source]))
     ;<  ~  bind:m
       %+  send-simple-payload:vio
         [303 ['location' '/oxal/meshes']~]
@@ -27,15 +27,20 @@
     (pure:m !>(~))
   ?:  =('delete-mesh' op)
     =/  name=term  (~(got by form) 'name')
-    ;<  ~  bind:m  (poke-our:vio %uninstall-mesh !>(name))
+    ;<  ~  bind:m  (poke-our:vio %drop-mesh !>(name))
     ;<  ~  bind:m
       %+  send-simple-payload:vio
         [303 ['location' '/oxal/meshes']~]
       ~
     (pure:m !>(~))
   ?:  =('reinstall-mesh' op)
+    ::
+    ::  ux convenience: read stored source and re-poke %load-mesh.
+    ::
     =/  name=term  (~(got by form) 'name')
-    ;<  ~  bind:m  (poke-our:vio %reinstall-mesh !>(name))
+    ;<  ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+    =/  =mesh  (got-mesh ax name)
+    ;<  ~  bind:m  (poke-our:vio %load-mesh !>([name source.mesh]))
     ;<  ~  bind:m
       %+  send-simple-payload:vio
         [303 ['location' '/oxal/meshes']~]
@@ -118,7 +123,7 @@
             ;feather-textarea.p3.mono.br2.bd1.fs-2
               =name  "source"
               =rows  "18"
-              =placeholder  "|=  [our=@p name=term prior-forms=(map pith data)]  ..."
+              =placeholder  "|_  [our=@p name=term]  ++  forms  ...  ++  load  |=(=prior-forms ...)  ++  drop  |=(=prior-forms ...)  --"
               =required  ""
               =spellcheck  "false"
               ;*  ~

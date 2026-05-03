@@ -1,63 +1,74 @@
-|=  [our=@p name=@tas prior-forms=(map pith data)]
-:-  *move
-%-  malt
-^-  (list [pith view])
-:~
-  :-  /blog/raw  [%form ~]
-  :-  /blog/rendered  :-  %lens
-    ^-  lens
-    %*  .  *lens
-      dep  [our /blog/raw]
-      sauc
-        '''
-        !:
-        %-  easy-transform
-        |%
-        ++  ins
-          |=  [=pith =node]
-          ^-  (unit chng)
-          ?.  ?=([%t *] node)  ~
-          =/  =(each manx tang)
-            %-  mule  |.
-            !<  manx
-            (slap !>(.) (ream t.node))
-          :-  ~
-          :+  %ins  pith
-          ?:  ?=(%.y -.each)  manx+p.each
-          tang+p.each
-        ++  del
-          |=  =pith
-          `[%del pith]
-        --
-        '''
-      ::
-    ==
-  :-  /blog/toc  :-  %lens
-    ^-  lens
-    %*  .  *lens
-      dep  [our /blog/rendered]
-      sauc
-        '''
-        !:
-        |=  [data snap=data mov=move *]
-        ^-  move
-        :-  time.mov
-        %-  silt
-        :_  ~
-        :+  %ins  /
-        :-  %manx
-        ;div
-          ;*
-          %+  murn  ~(tap do snap)
-          |=  [=pith =node]
-          ?.  ?=  [%manx *]  node  ~
-          :-  ~
-          ;div
-            ;-  (pate pith)
-          ==
+|_  [our=@p name=@tas]
+::
+::  stems are scoped under /[name] so the mesh works wherever it's
+::  installed: load as %blog → views land at /blog/...; load as
+::  %journal → /journal/...
+::
+++  forms  (silt ~[/[name]/raw])
+::
+++  load
+  |=  =prior-forms
+  =/  raw       /[name]/raw
+  =/  rendered  /[name]/rendered
+  =/  toc       /[name]/toc
+  :_  *move
+  ^-  (map stem view)
+  %-  malt
+  :~  [raw `view`[%form ~]]
+      :-  rendered  :-  %lens
+        ^-  lens
+        %*  .  *lens
+          dep  [our raw]
+          sauc
+            '''
+            !:
+            %-  easy-transform
+            |%
+            ++  ins
+              |=  [=pith =node]
+              ^-  (unit chng)
+              ?.  ?=([%t *] node)  ~
+              =/  =(each manx tang)
+                %-  mule  |.
+                !<  manx
+                (slap !>(.) (ream t.node))
+              :-  ~
+              :+  %ins  pith
+              ?:  ?=(%.y -.each)  manx+p.each
+              tang+p.each
+            ++  del
+              |=  =pith
+              `[%del pith]
+            --
+            '''
         ==
-        '''
-      ::
-    ==
-  ::
-==
+      :-  toc  :-  %lens
+        ^-  lens
+        %*  .  *lens
+          dep  [our rendered]
+          sauc
+            '''
+            !:
+            |=  [data snap=data mov=move *]
+            ^-  move
+            :-  time.mov
+            %-  silt
+            :_  ~
+            :+  %ins  /
+            :-  %manx
+            ;div
+              ;*
+              %+  murn  ~(tap do snap)
+              |=  [=pith =node]
+              ?.  ?=  [%manx *]  node  ~
+              :-  ~
+              ;div
+                ;-  (pate pith)
+              ==
+            ==
+            '''
+        ==
+  ==
+::
+++  drop  |=(=prior-forms *move)
+--

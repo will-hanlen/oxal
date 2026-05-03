@@ -1,7 +1,9 @@
-|=  [our=@p name=@tas prior-forms=(map pith data)]
-:-  *move
-%-  malt
-^-  (list [pith view])
-:~
-  :-  /test  [%form ~]
-==
+|_  [our=@p name=@tas]
+++  forms  (silt ~[/test])
+++  load
+  |=  =prior-forms
+  :_  *move
+  ^-  (map stem view)
+  (malt ~[[/test `view`[%form ~]]])
+++  drop  |=(=prior-forms *move)
+--

@@ -1,25 +1,30 @@
-|=  [our=@p name=@tas prior-forms=(map pith data)]
-:-  *move
-%-  malt
-^-  (list [pith view])
-:~
-  :-  /doctest/rendered  :-  %lens
-    ^-  lens
-    %*  .  *lens
-      dep  [our ~[n+~ %doctest]]
-      sauc
-        '''
-        !:
-        %-  easy-transform
-        |%
-        ++  ins
-          |=  [=pith =node]
-          `[%ins pith node]
-        ++  del
-          |=  =pith
-          `[%del pith]
-        --
-        '''
-      ::
-    ==
-==
+|_  [our=@p name=@tas]
+++  forms  ~
+++  load
+  |=  =prior-forms
+  :_  *move
+  ^-  (map stem view)
+  %-  malt
+  :~
+    :-  /doctest/rendered  :-  %lens
+      ^-  lens
+      %*  .  *lens
+        dep  [our ~[n+~ %doctest]]
+        sauc
+          '''
+          !:
+          %-  easy-transform
+          |%
+          ++  ins
+            |=  [=pith =node]
+            `[%ins pith node]
+          ++  del
+            |=  =pith
+            `[%del pith]
+          --
+          '''
+        ::
+      ==
+  ==
+++  drop  |=(=prior-forms *move)
+--

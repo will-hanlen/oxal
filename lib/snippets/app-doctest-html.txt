@@ -1,49 +1,54 @@
-|=  [our=@p name=@tas prior-forms=(map pith data)]
-:-  *move
-%-  malt
-^-  (list [pith view])
-:~
-  :-  /docs-html  :-  %lens
-    ^-  lens
-    %*  .  *lens
-      dep  [our /docs]
-      sauc
-        '''
-        !:
-        |=  [mine=data snap=data =move *]
-        ^-  ^move
-        :-  time.move
-        %-  silt
-        :_  ~
-        :+  %ins  /
-        :-  %manx
-        ;section
-          ;h1: doctests
-          ;ul
-            ;*
-            %+  turn  ~(kid-list do snap)
-            |=  [stem-iota=iota stem-data=data]
-            =/  stem-do  ~(. do stem-data)
-            =/  title-cord=@t
-              =/  nod  (get:stem-do /title)
-              ?~  nod  ''
-              ?.  ?=([%t *] u.nod)  ''
-              t.u.nod
-            =/  pass-flag=?
-              =/  nod  (get:stem-do /pass)
-              ?~  nod  |
-              ?.  ?=([%f *] u.nod)  |
-              f.u.nod
-            ;li
-              ;span: {(trip title-cord)}
-              ;span: " "
-              ;span
-                ;-  ?:(pass-flag "(pass)" "(fail)")
+|_  [our=@p name=@tas]
+++  forms  ~
+++  load
+  |=  =prior-forms
+  :_  *move
+  ^-  (map stem view)
+  %-  malt
+  :~
+    :-  /docs-html  :-  %lens
+      ^-  lens
+      %*  .  *lens
+        dep  [our /docs]
+        sauc
+          '''
+          !:
+          |=  [mine=data snap=data =move *]
+          ^-  ^move
+          :-  time.move
+          %-  silt
+          :_  ~
+          :+  %ins  /
+          :-  %manx
+          ;section
+            ;h1: doctests
+            ;ul
+              ;*
+              %+  turn  ~(kid-list do snap)
+              |=  [stem-iota=iota stem-data=data]
+              =/  stem-do  ~(. do stem-data)
+              =/  title-cord=@t
+                =/  nod  (get:stem-do /title)
+                ?~  nod  ''
+                ?.  ?=([%t *] u.nod)  ''
+                t.u.nod
+              =/  pass-flag=?
+                =/  nod  (get:stem-do /pass)
+                ?~  nod  |
+                ?.  ?=([%f *] u.nod)  |
+                f.u.nod
+              ;li
+                ;span: {(trip title-cord)}
+                ;span: " "
+                ;span
+                  ;-  ?:(pass-flag "(pass)" "(fail)")
+                ==
               ==
             ==
           ==
-        ==
-        '''
-      ::
-    ==
-==
+          '''
+        ::
+      ==
+  ==
+++  drop  |=(=prior-forms *move)
+--

@@ -230,24 +230,46 @@
     err=(unit tang)
   ==
 ::
-+$  mesh-gate
++$  prior-form  $+  prior-form  [shape=(unit shape) =data]
++$  prior-forms  $+  prior-forms  (map stem prior-form)
+::
++$  mesh-core
   ::
-  ::  pure lifecycle declarer.  fires on install and reinstall only;
-  ::  the running tree is reactive via lenses, not the gate.
-  ::    .prior-forms  data subtree at each previously-declared %form
-  ::                  stem.  empty map on first install.  the gate
-  ::                  inspects this to decide migrations.
-  ::    output       a move applied before views are placed; lets the
-  ::                 gate migrate or reshape data on reinstall.  may
-  ::                 not write at or beneath a %lens view.
-  ::    views        the view layout the mesh declares.
+  ::  pure lifecycle declarer.  authored as a door over [our name].
   ::
-  $-  [our=@p name=term prior-forms=(map stem data)]
-  [output=move views=(map stem view)]
+  ::    +forms  declares the mesh's form-view stem locations — its
+  ::            data-bearing footprint.  lens stems are not declared
+  ::            here; they're discovered from the views ++load returns.
+  ::            must be data-independent (the system invokes ++forms
+  ::            without binding any prior data).
+  ::
+  ::    +load   produces the view layout and a migration move.  the
+  ::            sample is keyed by (++forms ∪ outgoing form-view stems);
+  ::            each entry carries the shape the outgoing version had
+  ::            at that stem (~ on a stem with no prior form) and the
+  ::            data at the stem.  the form-typed keys of the returned
+  ::            views must equal ++forms exactly.  views are placed
+  ::            first, then output is applied with allow-view-write=%.n.
+  ::
+  ::    +drop   terminal cleanup move.  required, but the body may
+  ::            return *move to no-op.  views are torn down by the
+  ::            system after.
+  ::
+  $_  ^|
+  |_  [our=@p name=term]
+  ++  forms  *(set stem)
+  ++  load
+    |~  =prior-forms
+    *[views=(map stem view) output=move]
+  ++  drop
+    |~  =prior-forms
+    *move
+  --
 ::
 +$  mesh
   $:  source=@t  :: xx this is for dynamic meshes; there should be a static version like (map stem @t) or something
-      =mesh-gate
+      =mesh-core
+      forms=(set stem)
       views=(map stem view)
       error=(unit tang)
   ==

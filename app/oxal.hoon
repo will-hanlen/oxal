@@ -207,32 +207,18 @@
         abet:(ingress-do-move:engine [*hlc changes])
       (emil cz)
       ::
-    %install-mesh
+    %load-mesh
       ::
       =+  !<  [name=term source=@t]  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-install-mesh:engine name source)
+        abet:(ingress-load-mesh:engine name source)
       (emil cz)
       ::
-    %uninstall-mesh
+    %drop-mesh
       ::
       =+  !<  name=term  vase
       =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-uninstall-mesh:engine name)
-      (emil cz)
-      ::
-    %reinstall-mesh
-      ::
-      =+  !<  name=term  vase
-      =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-reinstall-mesh:engine name)
-      (emil cz)
-      ::
-    %update-mesh
-      ::
-      =+  !<  [name=term source=@t]  vase
-      =^  cz=(list card:agent:gall)  acer
-        abet:(ingress-update-mesh:engine name source)
+        abet:(ingress-drop-mesh:engine name)
       (emil cz)
       ::
     %bump

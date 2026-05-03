@@ -39,7 +39,7 @@
       [%.y %set-source]
         ::
         =/  source=@t   (fix-newlines (~(got by body) 'source'))
-        ;<  ~  bind:m  (poke-our:vio %update-mesh !>([mesh-name source]))
+        ;<  ~  bind:m  (poke-our:vio %load-mesh !>([mesh-name source]))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
         =.  ax  new-ax
         =.  mesh  (got-mesh ax mesh-name)
@@ -143,7 +143,7 @@
       ;div#error;
       ;feather-slide-panels.grow.scroll-none
         ;+  part-file
-        ;+  part-source 
+        ;+  part-source
       ==
     ==
   ==
@@ -182,7 +182,7 @@
     =data-on_submit  post
     =data-indicator  "_savesource"
     =data-class_o7  "$_savesource"
-    ;+  part-error
+    :: ;+  part-error
     ;input(type "hidden", name "op", value "set-source");
     ;feather-text-editor.grow.fs-2
       =auto-indent  ""
@@ -203,6 +203,7 @@
     |=  =pith
     [p+our.bowl pith]
   ;div#file.p4.pb20.fc.grow.hf.scroll-y-always
+    ;+  part-error
     ;+  (render-file [/ partial])
   ==
 ::
