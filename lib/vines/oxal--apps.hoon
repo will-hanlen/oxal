@@ -118,7 +118,7 @@
             ;feather-textarea.p3.mono.br2.bd1.fs-2
               =name  "source"
               =rows  "18"
-              =placeholder  "|=  [our=@p name=term globals=data locals=data]  ..."
+              =placeholder  "|=  [our=@p name=term locals=data]  ..."
               =required  ""
               =spellcheck  "false"
               ;*  ~

@@ -603,10 +603,9 @@
       =.  apps.ax  (snoc apps.ax [name app])
       cor
     =/  =app-gate  p.comp
-    =/  globals=data  (~(dip do dat) ~[p+our [%n ~] %globals])
     =/  locals=data   (~(dip do dat) ~[p+our [%n ~] %app name])
     =/  run=(each (map stem view) tang)
-      (mule |.((app-gate [our name globals locals])))
+      (mule |.((app-gate [our name locals])))
     ?:  ?=(%| -.run)
       =/  =app  *app
       =.  source.app    source

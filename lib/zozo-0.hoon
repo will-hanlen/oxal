@@ -209,21 +209,6 @@
 +$  code  $+  code  (oxal meta)
 ::
 ::
-::: shape of the namepsace
-::
-::
-::  first level: identies and system nodes
-::      @p tree owner
-::    or /global       :: tree of global data that all "app-shapes" depend on
-::       /apps/[name]  :: tree of local data that a single "app-shape" depends on
-::
-::     when something in /global or /apps changes, first the app-templates are
-::       re-run, then the data deps are re-run.
-::
-:::
-::
-::  new
-::
 +$  shape  (list %not-implemented)
 +$  view
   $%  [%form form]  :: base data
@@ -246,12 +231,8 @@
   ==
 ::
 +$  app-gate
-  $-  [our=@p name=term globals=data locals=data]
+  $-  [our=@p name=term locals=data]
   (map stem view)
-::
-++  new-app-gate
-  $-  [our=@p forms=(map pith data) changed=[pith move] globals=data locals=data]
-  [form-data=(map pith data) views=(map pith view)]
 ::
 +$  app
   $:  source=@t  :: xx this is for dynamic apps; there should be a static version like (map stem @t) or something

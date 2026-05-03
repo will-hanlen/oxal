@@ -107,7 +107,7 @@
   (expect-eq !>(pa) !>((round-pith-tape pa)))
 ::
 ++  test-pith-nested
-  =/  pa=pith  ~[%apps [%pith /global/users] %view]
+  =/  pa=pith  ~[%apps [%pith /foo/users] %view]
   (expect-eq !>(pa) !>((round-pith-tape pa)))
 ::
 ::  ::  ::  ::  ::  ::  ::  ::  ::

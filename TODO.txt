@@ -1,11 +1,11 @@
 
 update app-gate to be a full lifecycle mutator.
-the lifecycle should cover: app installed, app-re-installed, and local/global changed.
+the lifecycle should cover: app installed, app-re-installed, and locals changed.
 part of its sample contains the current state and location of all %form views
 that were previously part of the app.
-it will also recieve information about what triggered in the local or globals if any.
-to indicate that the app-gate is being run because of a re-install or install, 
-the move set will be empty and the changed.
+it will also recieve information about what triggered in the locals if any.
+to indicate that the app-gate is being run because of a re-install or install,
+the changed unit will be ~.
 
 ---
 

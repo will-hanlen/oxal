@@ -122,8 +122,8 @@ For nested piths, use `[pith+...]` (wide-form cell), not `[%pith
 ...]` (which the path parser won't read):
 
 ```
-> [#/apps/[pith+[#/global/users]]/view]
-[%apps [%pith %global %users ~] %view ~]
+> [#/apps/[pith+[#/foo/users]]/view]
+[%apps [%pith %foo %users ~] %view ~]
 ```
 
 Don't use `~[...]` for piths in source — it's a tuple, not a typed

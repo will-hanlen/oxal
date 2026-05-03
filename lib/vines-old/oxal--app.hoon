@@ -261,29 +261,27 @@
 ::
 ++  render-namespace-views
   ::
-  ::  one section showing the globals subtree (/~/globals) and the
-  ::  locals subtree (/~/<name>) — the two $data trees that feed into
-  ::  the app-gate when an app is installed/reinstalled.  rendered the
-  ::  same way as %form views: pith, data tree, put-data form.
+  ::  one section showing the locals subtree (/~/<name>) — the $data
+  ::  tree that feeds into the app-gate when an app is installed or
+  ::  reinstalled.  rendered the same way as %form views: pith, data
+  ::  tree, put-data form.
   ::
   |=  [this-url=tape name=@ta our=ship dat=data cod=code]
   ^-  manx
-  =/  globals-stem=pith  ~[[%n ~] %globals]
   =/  locals-stem=pith   ~[[%n ~] (cord-to-iota name)]
   ;section.fc.g2
     ;h2: namespace
     ;div.fc.g3
-      ;+  (render-namespace-row this-url "%globals" our dat cod globals-stem)
       ;+  (render-namespace-row this-url "%locals" our dat cod locals-stem)
     ==
   ==
 ::
 ++  render-namespace-row
   ::
-  ::  one row per namespace subtree (globals or locals): shows the
-  ::  bare pith, label, count, then the data tree and a put-data form.
-  ::  same shape as render-form-row but with a customizable label and
-  ::  no lord-meta lookup (these subtrees are not view roots).
+  ::  one row per namespace subtree: shows the bare pith, label, count,
+  ::  then the data tree and a put-data form.  same shape as
+  ::  render-form-row but with a customizable label and no lord-meta
+  ::  lookup (these subtrees are not view roots).
   ::
   |=  [this-url=tape label=tape our=ship dat=data cod=code =stem]
   ^-  manx
