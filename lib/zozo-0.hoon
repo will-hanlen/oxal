@@ -231,12 +231,22 @@
   ==
 ::
 +$  app-gate
-  $-  [our=@p name=term locals=data]
-  (map stem view)
+  ::
+  ::  pure lifecycle declarer.  fires on install and reinstall only;
+  ::  the running tree is reactive via lenses, not the gate.
+  ::    .prior-forms  data subtree at each previously-declared %form
+  ::                  stem.  empty map on first install.  the gate
+  ::                  inspects this to decide migrations.
+  ::    output       a move applied before views are placed; lets the
+  ::                 gate migrate or reshape data on reinstall.  may
+  ::                 not write at or beneath a %lens view.
+  ::    views        the view layout the app declares.
+  ::
+  $-  [our=@p name=term prior-forms=(map stem data)]
+  [output=move views=(map stem view)]
 ::
 +$  app
   $:  source=@t  :: xx this is for dynamic apps; there should be a static version like (map stem @t) or something
-      local=shape
       =app-gate
       views=(map stem view)
       error=(unit tang)

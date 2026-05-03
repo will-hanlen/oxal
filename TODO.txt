@@ -1,11 +1,14 @@
 
-update app-gate to be a full lifecycle mutator.
-the lifecycle should cover: app installed, app-re-installed, and locals changed.
-part of its sample contains the current state and location of all %form views
-that were previously part of the app.
-it will also recieve information about what triggered in the locals if any.
-to indicate that the app-gate is being run because of a re-install or install,
-the changed unit will be ~.
+thinking about the lifecycle of a mesh.
+do we need a cleanup step when removing a mesh?
+if we do, that implies that install and re-install are different actions.
+re-install is more like on-load: an upgrade.
+if that's the case, then something like:
+|%
+++  enmesh  :: start from empty %form views
+++  update  :: 
+++  unmesh  :: remove all views, maybe remove data
+--
 
 ---
 
@@ -17,7 +20,7 @@ find a better word for "chng"
 
 ---
 
-gall subscriptions for all changes in an app
+gall subscriptions for all changes in a mesh
 
 ---
 

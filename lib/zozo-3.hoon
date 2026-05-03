@@ -546,9 +546,12 @@
   ++  place-app-view
     ::
     ::  install one view from app `name` at stem.  for %lens, wires
-    ::  faucet subs, optional link subs, and runs initialize-from-snap.
-    ::  for %form, just writes the meta (no faucet, no transformer).
-    ::  pre-validated by ingress-install-app, so the meta-allowed and
+    ::  faucet subs, optional link subs, lops the prior data subtree
+    ::  (lens output is derived, never user-data), and runs
+    ::  initialize-from-snap.  for %form, writes the meta and leaves
+    ::  data in place — data is sovereign; an app declaring a form at
+    ::  a stem with pre-existing data is just structuring it.  pre-
+    ::  validated by ingress-install-app, so the meta-allowed and
     ::  beneath-view checks here are defensive.
     ::
     |=  [name=term stem=pith =view]
@@ -568,8 +571,8 @@
         gall       ?~(old ~ gall.u.old)
       ==
     =.  cod  (~(put ox cod) full-pax met)
-    =.  dat  (~(lop do dat) full-pax)
     ?:  ?=(%form -.view)  cor
+    =.  dat  (~(lop do dat) full-pax)
     =/  full-dep=pith    (ref-to-pith dep.view)
     =/  faucet-met=meta  (gut-meta full-dep)
     =.  cod
@@ -581,13 +584,26 @@
   ::
   ++  ingress-install-app
     ::
-    ::  compile app source, run it with empty data, place all returned
-    ::  views, and append the app entry to acer.apps.  on compile or
-    ::  run failure, store the entry with views=~ and error=`tang —
-    ::  no tree changes.  rejects if `name` already exists, or if any
-    ::  returned stem fails pre-validation (depth or beneath-view).
+    ::  fresh install: no prior forms.
     ::
     |=  [name=term source=@t]
+    ^+  cor
+    (install-app-with-priors name source ~)
+  ::
+  ++  install-app-with-priors
+    ::
+    ::  compile app source, run the gate against prior-forms, apply
+    ::  its output move, place all returned views, and append the
+    ::  app entry to acer.apps.  on compile or run failure, store the
+    ::  entry with views=~ and error=`tang -- no tree changes.
+    ::  rejects if `name` already exists, or if any returned stem
+    ::  fails pre-validation (depth, beneath-view, or self-faucet).
+    ::
+    ::    .prior-forms  data subtree at each %form stem of the
+    ::                  outgoing app, captured by the caller before
+    ::                  uninstall.  empty on first install.
+    ::
+    |=  [name=term source=@t prior-forms=(map stem data)]
     ^+  cor
     =.  cor  (vlog "ae: install-app {<name>}")
     ?:  ?=(^ (find-app name))
@@ -603,9 +619,8 @@
       =.  apps.ax  (snoc apps.ax [name app])
       cor
     =/  =app-gate  p.comp
-    =/  locals=data   (~(dip do dat) ~[p+our [%n ~] %app name])
-    =/  run=(each (map stem view) tang)
-      (mule |.((app-gate [our name locals])))
+    =/  run=(each [output=move views=(map stem view)] tang)
+      (mule |.((app-gate [our name prior-forms])))
     ?:  ?=(%| -.run)
       =/  =app  *app
       =.  source.app    source
@@ -613,21 +628,8 @@
       =.  error.app     `p.run
       =.  apps.ax  (snoc apps.ax [name app])
       cor
-    =/  vws=(map stem view)  p.run
-    ::
-    ::  inject the system-owned locals view at /[our]/~/app/[name].
-    ::  bare stem; under-our qualifies it during placement.  reject
-    ::  if the app-gate already declared a view at this exact stem.
-    ::
-    =/  locals-stem=stem  ~[[%n ~] %app name]
-    ?:  (~(has by vws) locals-stem)
-      =/  =app  *app
-      =.  source.app    source
-      =.  app-gate.app  app-gate
-      =.  error.app     `~[leaf+"app may not declare view at locals stem"]
-      =.  apps.ax       (snoc apps.ax [name app])
-      cor
-    =.  vws  (~(put by vws) locals-stem [%form ~])
+    =/  output=move          output.p.run
+    =/  vws=(map stem view)  views.p.run
     =/  pairs=(list [stem view])  ~(tap by vws)
     =/  validation=(unit @t)
       |-  ^-  (unit @t)
@@ -647,11 +649,19 @@
       %-  (slog leaf+(trip u.validation) ~)
       cor
     ::
-    ::  place all views: meta + lop; lens wires faucet and runs
-    ::  initialize-from-snap.
+    ::  apply the gate's output move first, so any data migration the
+    ::  gate decided on (based on prior-forms) lands before view
+    ::  placement decides what to lop or preserve.  allow-view-write
+    ::  is %.n: the gate writes through forms or unviewed paths, not
+    ::  through lenses.
+    ::
+    =?  cor  ?=(^ chng-set.output)
+      (apply-move-qualified [(prefix-move [p+our ~] output) %.n])
+    ::
+    ::  place all views: meta + lord; %lens wires faucet and runs
+    ::  initialize-from-snap; %form leaves data in place.
     ::
     =.  cor
-      =/  pairs=(list [stem view])  ~(tap by vws)
       |-  ^+  cor
       ?~  pairs  cor
       =.  cor  (place-app-view name -.i.pairs +.i.pairs)
@@ -705,11 +715,29 @@
       =(n name)
     (emit-code-at-ancestors cod-before)
   ::
+  ++  capture-prior-forms
+    ::
+    ::  for each %form view in vs, snap the data subtree at its stem
+    ::  (qualified with /[our]).  used by reinstall and update-app to
+    ::  hand the new gate a view of what the old app had laid down,
+    ::  so it can decide migrations before view placement.
+    ::
+    |=  vs=(map stem view)
+    ^-  (map stem data)
+    %-  malt
+    %+  murn  ~(tap by vs)
+    |=  [stem=pith =view]
+    ^-  (unit [pith data])
+    ?.  ?=(%form -.view)  ~
+    `[stem (~(dip do dat) (under-our stem))]
+  ::
   ++  ingress-reinstall-app
     ::
-    ::  re-install app `name` from its stored source: remove all of
-    ::  its current views, then rerun install-app with the same source.
-    ::  no-op (with slog) if name not found.
+    ::  re-install app `name` from its stored source.  captures the
+    ::  data at every %form stem (data is sovereign and survives the
+    ::  uninstall), uninstalls, and reruns the install path with that
+    ::  prior-forms map handed to the gate.  no-op (with slog) if
+    ::  name not found.
     ::
     |=  name=term
     ^+  cor
@@ -719,21 +747,25 @@
       %-  (slog leaf+"ae: rejected reinstall-app: {<name>} not found" ~)
       cor
     =/  src=@t  source.u.found
+    =/  priors=(map stem data)  (capture-prior-forms views.u.found)
     =.  cor  (ingress-uninstall-app name)
-    (ingress-install-app name src)
+    (install-app-with-priors name src priors)
   ::
   ++  ingress-update-app
     ::
     ::  replace app `name`'s source: uninstall its current views, then
-    ::  install fresh from the new source.  installs from scratch if
-    ::  no app by that name exists.
+    ::  install fresh from the new source.  if an app by that name
+    ::  already exists, captures its %form data first so the new
+    ::  gate sees prior-forms; otherwise installs from scratch.
     ::
     |=  [name=term source=@t]
     ^+  cor
     =.  cor  (vlog "ae: update-app {<name>}")
     =/  found=(unit app)  (find-app name)
-    =?  cor  ?=(^ found)  (ingress-uninstall-app name)
-    (ingress-install-app name source)
+    ?~  found  (ingress-install-app name source)
+    =/  priors=(map stem data)  (capture-prior-forms views.u.found)
+    =.  cor  (ingress-uninstall-app name)
+    (install-app-with-priors name source priors)
   ::
   ++  ingress-set-grow
     ::

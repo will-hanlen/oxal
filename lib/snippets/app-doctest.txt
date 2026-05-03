@@ -1,4 +1,5 @@
-|=  [our=@p name=@tas locals=data]
+|=  [our=@p name=@tas prior-forms=(map pith data)]
+:-  *move
 %-  malt
 ^-  (list [pith view])
 :~
