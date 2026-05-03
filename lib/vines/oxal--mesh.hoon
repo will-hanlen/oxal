@@ -108,6 +108,16 @@
         (pure:m !>(~))
         ::
       ::
+      [%.n %delete-mesh]
+        ::
+        ;<  ~  bind:m  (poke-our:vio %drop-mesh !>(mesh-name))
+        ;<  ~  bind:m
+          %+  send-simple-payload:vio
+            [303 ['location' '/oxal/meshes']~]
+          ~
+        (pure:m !>(~))
+        ::
+      ::
     ==
   ::
   ;<  ~  bind:m  (send-html-payload:vio hymn)
@@ -202,7 +212,11 @@
     %-  ~(run in ~(key by views.mesh))
     |=  =pith
     [p+our.bowl pith]
-  ;div#file.p4.pb20.fc.grow.hf.scroll-y-always
+  ;div#file.p4.pb20.fc.g3.grow.hf.scroll-y-always
+    ;form.fr(method "post")
+      ;input(type "hidden", name "op", value "delete-mesh");
+      ;button.p-2.br2.bd1.b3.hover.f-1: uninstall
+    ==
     ;+  part-error
     ;+  (render-file [/ partial])
   ==
