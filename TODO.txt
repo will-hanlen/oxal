@@ -1,3 +1,9 @@
+should a mesh's views be prefixed by the mesh's name to prevent all colisions?
+it depends on how the oxal namespace relates to the static namespaces.
+do the static namespaces get populated based on metadata flags or by their location
+in the oxal tree?
+
+---
 
 implement $shape schemas
 

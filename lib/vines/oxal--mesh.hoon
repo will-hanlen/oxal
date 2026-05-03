@@ -85,7 +85,7 @@
         =/  =pith  (stib (trip (~(got by body) 'pith')))
         ;<  ~  bind:m
           %-  send-html-payload:vio
-          %~  part-logs-full  render-file
+          %~  info-logs-full  render-file
           [pith (~(dip fe file.ax) pith)]
         (pure:m !>(~))
         ::
@@ -95,7 +95,7 @@
         =/  =pith  (stib (trip (~(got by body) 'pith')))
         ;<  ~  bind:m
           %-  send-html-payload:vio
-          %~  part-logs-stub  render-file
+          %~  info-logs-stub  render-file
           [pith (~(dip fe file.ax) pith)]
         (pure:m !>(~))
         ::
@@ -326,37 +326,7 @@
           ==
         ==
       ==
-      ;div.fc.g2.mr5.ml3.p2.br2.bd1.b2
-        =style  hid
-        =data-show  "$_rowopen{nid}"
-        ::
-        ;+  part-logs-stub
-        ::
-        ;+
-          ?~  leaf.data.fap  ;/  ""
-          ?.  under-form
-            (view-node u.leaf.data.fap)
-          (edit-node u.leaf.data.fap)
-        ::
-        ;+
-          ?.  under-form  ;/  ""
-          ;form
-            =data-on_submit  post
-            ;input(type "hidden", name "op", value "bump");
-            ;input(type "hidden", name "pith", value pate-stem);
-            ;button.p2.br2.bd1.b3.hover
-              ; bump
-            ==
-          ==
-        ::
-        ;+
-          ?~  lord.node-meta  ;/  ""
-          ?-  -.view.u.lord.node-meta
-            %lens  (edit-lens +.view.u.lord.node-meta)
-            %form  (edit-form +.view.u.lord.node-meta)
-          ==
-        ::
-      ==
+      ;+  part-info
     ==
   ::
   ++  part-indicators
@@ -370,8 +340,84 @@
     ;div.f-1: •
     ::
   ::
-  ++  part-logs-stub
+  ++  part-info
+    ^-  manx
+    =/  infos=(list [tape (unit manx)])
+      :~
+        :-  "data"  info-data
+        :-  "view"  info-lord
+        :-  "logs"  info-logs
+        :-  "bump"  info-bump
+      ==
+    =/  first=tape
+      |-
+      ?~  infos  "none"
+      ?~  +.i.infos  $(infos t.infos)
+      -.i.infos
+    ;div.fc.bbv.mr5.ml3.br2.bd1.b2.scroll-none
+      =style  hid
+      =data-show  "$_rowopen{nid}"
+      ::
+      ;div.fr.bbh
+        =data-signals  "\{'_info{nid}': '{first}'}"
+        ;*
+        %+  murn  infos
+        |=  [label=tape =(unit manx)]
+        ?~  unit  ~
+        :-  ~
+        ;button.p-2.b3.hover
+          =data-on_click  "$_info{nid} = '{label}'"
+          =data-class_toggled  "$_info{nid} == '{label}'"
+          ;-  label
+        ==
+      ==
+      ::
+      ;*
+      %+  murn  infos
+      |=  [label=tape =(unit manx)]
+      ?~  unit  ~
+      :-  ~
+      ;div.fc.p2
+        =data-show  "$_info{nid} == '{label}'"
+        =style  hid
+        ;+  u.unit
+      ==
+    ==
+  ::
+  ++  info-lord
+    ^-  (unit manx)
+    =/  node-meta=meta  node-meta
+    ?~  lord.node-meta  ~
+    ?-  -.view.u.lord.node-meta
+      %lens  `(edit-lens +.view.u.lord.node-meta)
+      %form  `(edit-form +.view.u.lord.node-meta)
+    ==
+  ::
+  ++  info-bump
+    ^-  (unit manx)
+    ?.  under-form  ~
+    :-  ~
+    ;form
+      =data-on_submit  post
+      ;input(type "hidden", name "op", value "bump");
+      ;input(type "hidden", name "pith", value pate-stem);
+      ;button.p2.br2.bd1.b3.hover
+        ; bump
+      ==
+    ==
+  ::
+  ++  info-data
+    ^-  (unit manx)
+    ?~  leaf.data.fap  ~
+    ?.  under-form
+      `(view-node u.leaf.data.fap)
+    `(edit-node u.leaf.data.fap)
+  ::
+  ++  info-logs  `info-logs-stub
+  ::
+  ++  info-logs-stub
     ::
+    ^-  manx
     =/  node-meta=meta  node-meta
     ;form(id "logs{nid}")
       =data-on_submit  post
@@ -381,7 +427,7 @@
     ==
     ::
   ::
-  ++  part-logs-full
+  ++  info-logs-full
     ::
     =/  node-meta=meta  node-meta
     ;div.fc.g2
