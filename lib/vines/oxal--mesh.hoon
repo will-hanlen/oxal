@@ -106,6 +106,22 @@
         ;<  ~  bind:m  (send-html-payload:vio part-file)
         (pure:m !>(~))
       ::
+      [%.y %set-auth]
+        ::
+        =/  =pith    (stib (trip (~(got by body) 'pith')))
+        =/  kind=@t  (~(got by body) 'kind')
+        =/  val=(unit auth)
+          ?:  =('none' kind)     ~
+          ?:  =('private' kind)  `[%white ~]
+          ?:  =('public' kind)   `[%black ~]
+          ~|  bad-auth-kind/kind  !!
+        ;<  ~  bind:m  (poke-our:vio %set-gall !>([pith val]))
+        ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+        =.  ax  new-ax
+        =.  mesh  (got-mesh ax mesh-name)
+        ;<  ~  bind:m  (send-html-payload:vio part-file)
+        (pure:m !>(~))
+      ::
       [%.y %show-logs]
         ::
         =/  =pith  (stib (trip (~(got by body) 'pith')))
@@ -419,6 +435,11 @@
           ;+  part-indicators
           ;div.grow;
           ;div
+            ;-  ^-  tape
+                ?~  gall.node-meta  ""
+                <kind.u.gall.node-meta>
+          ==
+          ;div
             ;-  <case.node-meta>
             ;-  ":"
             ;-  <life.node-meta>
@@ -448,6 +469,7 @@
         info-view
         info-logs
         info-bump
+        info-auth
       ==
     =/  first=tape
       |-
@@ -576,6 +598,46 @@
       ;button.p2.br2.bd1.b3.hover
         ; bump
       ==
+    ==
+  ::
+  ++  info-auth
+    ::
+    ::  configure gall (subscription) auth on this node:
+    ::    none     no subscriptions allowed
+    ::    private  only this ship can subscribe
+    ::    public   any ship can subscribe
+    ::
+    ^-  (unit [tape manx])
+    =/  node-meta=meta  node-meta
+    =/  current=tape
+      ?~  gall.node-meta  "none"
+      ?:  ?=(%white kind.u.gall.node-meta)  "private"
+      ?:  ?=(%black kind.u.gall.node-meta)  "public"
+      "custom"
+    :-  ~
+    :-  "auth"
+    ;div.fr.g2
+      ;+  (auth-button "none" current)
+      ;+  (auth-button "private" current)
+      ;+  (auth-button "public" current)
+    ==
+  ::
+  ++  auth-button
+    ::
+    ::  one of the three quick-auth buttons.  highlights when its
+    ::  kind matches the node's current gall auth state.
+    ::
+    |=  [kind=tape current=tape]
+    ^-  manx
+    ;form
+      =data-on_submit  post
+      ;input(type "hidden", name "op", value "set-auth");
+      ;input(type "hidden", name "pith", value pate-stem);
+      ;input(type "hidden", name "kind", value kind);
+      ;+  %^  add-class-if  =(kind current)  "b3"
+          ;button.p2.br2.bd1.hover
+            ;-  kind
+          ==
     ==
   ::
   ++  info-node
