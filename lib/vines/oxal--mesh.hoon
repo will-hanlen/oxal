@@ -71,7 +71,12 @@
         ::
         =/  =pith  !<(pith (slap !>(.) (ream (~(got by body) 'pith'))))
         =/  value=@t   (fix-newlines (~(got by body) 'value'))
-        =/  =node  !<(node (slap !>(.) (ream value)))
+        =/  =node
+          =/  try=(unit node)
+            %-  mole  |.
+            !<(node (slap !>(.) (ream value)))
+          ?^  try  u.try
+          (sily (trip value))
         =/  changes=(set chng)  (silt [%ins pith node]~)
         ;<  ~  bind:m  (poke-our:vio %do-move !>(changes))
         ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
@@ -437,10 +442,9 @@
   ++  part-info
     ::
     ^-  manx
-    =/  infos=(list [tape (unit manx)])
+    =/  infos=(list (unit [tape manx]))
       :~
         info-node
-        info-lord
         info-view
         info-logs
         info-bump
@@ -448,8 +452,8 @@
     =/  first=tape
       |-
       ?~  infos  "none"
-      ?~  +.i.infos  $(infos t.infos)
-      -.i.infos
+      ?~  i.infos  $(infos t.infos)
+      -.u.i.infos
     ;div.fc.bbv.mr5.ml3.br2.bd1.b2.scroll-none
       =style  hid
       =data-show  "$_rowopen{nid}"
@@ -458,51 +462,78 @@
         =data-signals  "\{'_info{nid}': '{first}'}"
         ;*
         %+  murn  infos
-        |=  [label=tape =(unit manx)]
-        ?~  unit  ~
+        |=  i=(unit [label=tape body=manx])
+        ?~  i  ~
         :-  ~
         ;button.p-2.b3.hover
-          =data-on_click  "$_info{nid} = '{label}'"
-          =data-class_toggled  "$_info{nid} == '{label}'"
-          ;-  label
+          =data-on_click  "$_info{nid} = '{label.u.i}'"
+          =data-class_toggled  "$_info{nid} == '{label.u.i}'"
+          ;-  label.u.i
         ==
       ==
       ::
       ;*
       %+  murn  infos
-      |=  [label=tape =(unit manx)]
-      ?~  unit  ~
+      |=  i=(unit [label=tape body=manx])
+      ?~  i  ~
       :-  ~
       ;div.fc.p2
-        =data-show  "$_info{nid} == '{label}'"
+        =data-show  "$_info{nid} == '{label.u.i}'"
         =style  hid
-        ;+  u.unit
+        ;+  body.u.i
       ==
-    ==
-  ::
-  ++  info-lord
-    ::
-    ^-  [tape (unit manx)]
-    :-  "lord"
-    =/  node-meta=meta  node-meta
-    ?~  lord.node-meta  ~
-    ?-  -.view.u.lord.node-meta
-      %lens  `(edit-lens +.view.u.lord.node-meta)
-      %form  `(edit-form +.view.u.lord.node-meta)
     ==
   ::
   ++  info-view
     ::
-    ::  poly view source editor.  shown at piths that are poly view
-    ::  stems; lets the user edit the source or delete the view.
     ::
-    ^-  [tape (unit manx)]
-    :-  "view"
-    ?.  ?=(%poly -.mesh-source.mesh)  ~
-    =/  s=pith  ?~(pax ~ t.pax)
-    =/  src=(unit @t)  (~(get by srcs.mesh-source.mesh) s)
-    ?~  src  ~
-    :-  ~
+    ::    mono+lens  read-only display: source/sauc, dep, lyf:cas,
+    ::               in/out shape placeholders, error tang if any.
+    ::    mono+form  out-shape placeholder + html form for adding
+    ::               data below.
+    ::    poly+lens  editor for the view's poly source.
+    ::    poly+form  html form for adding data + editor for the
+    ::               view's poly source.
+    ::
+    ^-  (unit [tape manx])
+    =/  node-meta=meta  node-meta
+    ?~  lord.node-meta  ~
+    =/  v  view.u.lord.node-meta
+    ?-  -.v
+      %lens
+        :-  ~
+        :-  "lens"
+        ?:  is-poly
+          ;div.fc.g2
+            ;+  (lens-err err.+.v)
+            ;+  poly-edit
+          ==
+        (mono-lens +.v)
+      %form
+        :-  ~
+        :-  "form"
+        ?:  is-poly
+          ;div.fc.g2
+            ;+  data-add
+            ;+  poly-edit
+          ==
+        ;div.fc.g2
+          ;div.fs-2.o6: out: -
+          ;+  data-add
+        ==
+    ==
+  ::
+  ++  poly-edit
+    ::
+    ::  editor for a poly mesh's per-view source code.  reads the
+    ::  source for this stem from mesh-source; renders empty if no
+    ::  source yet.  delete button removes the view.
+    ::
+    ^-  manx
+    =/  src=@t
+      ?.  ?=(%poly -.mesh-source.mesh)  ''
+      =/  s=pith  ?~(pax ~ t.pax)
+      (~(gut by srcs.mesh-source.mesh) s '')
     ;div.fc.bbv.br2.bd1.scroll-none
       ;form.fc.bbv
         =id  "polysrc{nid}"
@@ -512,7 +543,7 @@
         ;feather-textarea.p2.mono.fs-2
           =required  ""
           =name  "source"
-          ;-  (trip u.src)
+          ;-  (trip src)
         ==
       ==
       ;div.fr.bbh
@@ -534,10 +565,10 @@
   ::
   ++  info-bump
     ::
-    ^-  [tape (unit manx)]
-    :-  "bump"
+    ^-  (unit [tape manx])
     ?.  under-form  ~
     :-  ~
+    :-  "bump"
     ;form
       =data-on_submit  post
       ;input(type "hidden", name "op", value "bump");
@@ -549,14 +580,15 @@
   ::
   ++  info-node
     ::
-    ^-  [tape (unit manx)]
-    :-  "node"
+    ^-  (unit [tape manx])
     ?~  leaf.data.fap  ~
+    :-  ~
+    :-  "node"
     ?.  under-form
-      `(view-node u.leaf.data.fap)
-    `(edit-node u.leaf.data.fap)
+      (view-node u.leaf.data.fap)
+    (edit-node u.leaf.data.fap)
   ::
-  ++  info-logs  ["logs" `info-logs-stub]
+  ++  info-logs  `["logs" info-logs-stub]
   ::
   ++  info-logs-stub
     ::
@@ -646,16 +678,7 @@
           =required  ""
           =name  "value"
           =placeholder  "ud+88"
-          ;-
-          ?+  node  (nate node)
-            [%t *]
-                """
-                :-  %t
-                '''
-                {(trip t.node)}
-                '''
-                """
-          ==
+          ;-  (nare node)
         ==
       ==
       ;div.fr.bbh
@@ -676,17 +699,26 @@
     ==
     ::
   ::
-  ++  edit-lens
+  ++  lens-err
+    ::
+    ::  error tang block for a lens; empty when no err.
+    ::
+    |=  err=(unit tang)
+    ^-  manx
+    ?~  err  ;/  ""
+    ;div.br2.bd1.p2.scroll-none.lh0.fs-1
+      ;+  (render-tang u.err)
+    ==
+  ::
+  ++  mono-lens
+    ::
+    ::  read-only display for a mono-mesh lens lord: source/sauc,
+    ::  dep, lyf:cas, error tang, and in/out shape placeholders.
     ::
     |=  =lens
     ;div.fc.g2
-      ;+
-        ?~  err.lens  ;/  ""
-        ;div.br2.bd1.p2.scroll-none.lh0.fs-1
-          ;+  (render-tang u.err.lens)
-        ==
-      ::
-    ;div.fc.bbv.br2.bd1.scroll-none
+      ;+  (lens-err err.lens)
+      ;div.fc.bbv.br2.bd1.scroll-none
         ;div.p2
           ; /{(scow %p ship.dep.lens)}{(pate root.dep.lens)}
           ; = {<cas.lens>}:{<lyf.lens>}
@@ -696,11 +728,18 @@
               <sauc.lens>
         ==
       ==
+      ;div.fr.g2.fs-2.o6
+        ;span: in: -
+        ;span: out: -
+      ==
     ==
   ::
-  ++  edit-form
+  ++  data-add
     ::
-    |=  =form
+    ::  html form for inserting a node at a child pith.  pith input
+    ::  pre-fills with the current node's stem; the user appends a
+    ::  child segment to land the new node below.
+    ::
     ;form.fc.bbv.br2.bd1.scroll-none
       =data-on_submit  post
       ;input(type "hidden", name "op", value "ins-node");
