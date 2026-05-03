@@ -985,6 +985,43 @@
       (mark-mid-life-failure name p.out)
     (commit-load name mesh-source p.out outgoing-views)
   ::
+  ++  ingress-set-poly-view
+    ::
+    ::  upsert one (stem, src) entry in a poly mesh's srcs map and
+    ::  re-run +ingress-load-mesh.  if the mesh doesn't exist, creates
+    ::  a fresh poly mesh holding just this entry.  rejects mono
+    ::  meshes — convert via %load-mesh first.
+    ::
+    |=  [name=term stem=pith src=@t]
+    ^+  cor
+    =/  found=(unit mesh)  (get-mesh ax name)
+    =/  current-srcs=(map ^stem @t)
+      ?~  found  ~
+      ?-  -.mesh-source.u.found
+        %mono  ~|("ae: set-poly-view rejected: mesh {<name>} is mono" !!)
+        %poly  srcs.mesh-source.u.found
+      ==
+    =/  new-srcs=(map ^stem @t)  (~(put by current-srcs) stem src)
+    (ingress-load-mesh name [%poly new-srcs])
+  ::
+  ++  ingress-del-poly-view
+    ::
+    ::  remove one stem from a poly mesh's srcs map and re-run
+    ::  +ingress-load-mesh.  no-op if the mesh is missing.  rejects
+    ::  mono meshes.
+    ::
+    |=  [name=term stem=pith]
+    ^+  cor
+    =/  found=(unit mesh)  (get-mesh ax name)
+    ?~  found  cor
+    =/  current-srcs=(map ^stem @t)
+      ?-  -.mesh-source.u.found
+        %mono  ~|("ae: del-poly-view rejected: mesh {<name>} is mono" !!)
+        %poly  srcs.mesh-source.u.found
+      ==
+    =/  new-srcs=(map ^stem @t)  (~(del by current-srcs) stem)
+    (ingress-load-mesh name [%poly new-srcs])
+  ::
   ++  ingress-drop-mesh
     ::
     ::  terminal removal.  capture prior-forms over outgoing form-view

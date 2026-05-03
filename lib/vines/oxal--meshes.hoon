@@ -25,6 +25,14 @@
         [303 ['location' '/oxal/meshes']~]
       ~
     (pure:m !>(~))
+  ?:  =('new-poly-mesh' op)
+    =/  name=term  (~(got by form) 'name')
+    ;<  ~  bind:m  (poke-our:vio %load-mesh !>([name `mesh-source`[%poly ~]]))
+    ;<  ~  bind:m
+      %+  send-simple-payload:vio
+        [303 ['location' (crip "/oxal/mesh/{(trip name)}")]~]
+      ~
+    (pure:m !>(~))
   ?:  =('delete-mesh' op)
     =/  name=term  (~(got by form) 'name')
     ;<  ~  bind:m  (poke-our:vio %drop-mesh !>(name))
@@ -124,6 +132,26 @@
               =name  "source"
               =rows  "18"
               =placeholder  "|_  [our=@p name=term]  ++  forms  ...  ++  load  |=(=prior-forms ...)  ++  drop  |=(=prior-forms ...)  --"
+              =required  ""
+              =spellcheck  "false"
+              ;*  ~
+            ==
+          ==
+          ;div.fr.g2.ac
+            ;button.p-2.br2.bd1.b2.hover: create
+          ==
+        ==
+      ==
+      ;div.fc.g3.bdt1.pt5
+        ;h2: create poly mesh
+        ;form.fc.g2(method "post")
+          ;input(type "hidden", name "op", value "new-poly-mesh");
+          ;label.fc.g2
+            ;span: name
+            ;input.p-2.br2.bd1.mono
+              =type  "text"
+              =name  "name"
+              =placeholder  "my-poly-mesh"
               =required  ""
               =spellcheck  "false"
               ;*  ~

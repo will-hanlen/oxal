@@ -214,6 +214,20 @@
         abet:(ingress-load-mesh:engine name mesh-source)
       (emil cz)
       ::
+    %set-poly-view
+      ::
+      =+  !<  [name=term stem=pith src=@t]  vase
+      =^  cz=(list card:agent:gall)  acer
+        abet:(ingress-set-poly-view:engine name stem src)
+      (emil cz)
+      ::
+    %del-poly-view
+      ::
+      =+  !<  [name=term stem=pith]  vase
+      =^  cz=(list card:agent:gall)  acer
+        abet:(ingress-del-poly-view:engine name stem)
+      (emil cz)
+      ::
     %drop-mesh
       ::
       =+  !<  name=term  vase

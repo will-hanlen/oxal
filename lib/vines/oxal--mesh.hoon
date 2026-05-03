@@ -46,6 +46,27 @@
         ;<  ~  bind:m  (send-html-payload:vio two-panels)
         (pure:m !>(~))
       ::
+      [%.y %set-poly-view]
+        ::
+        =/  =pith  !<(pith (slap !>(.) (ream (~(got by body) 'pith'))))
+        =/  src=@t  (fix-newlines (~(got by body) 'source'))
+        ;<  ~  bind:m  (poke-our:vio %set-poly-view !>([mesh-name pith src]))
+        ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+        =.  ax  new-ax
+        =.  mesh  (got-mesh ax mesh-name)
+        ;<  ~  bind:m  (send-html-payload:vio two-panels)
+        (pure:m !>(~))
+      ::
+      [%.y %del-poly-view]
+        ::
+        =/  =pith  !<(pith (slap !>(.) (ream (~(got by body) 'pith'))))
+        ;<  ~  bind:m  (poke-our:vio %del-poly-view !>([mesh-name pith]))
+        ;<  new-ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
+        =.  ax  new-ax
+        =.  mesh  (got-mesh ax mesh-name)
+        ;<  ~  bind:m  (send-html-payload:vio two-panels)
+        (pure:m !>(~))
+      ::
       [%.y %ins-node]
         ::
         =/  =pith  !<(pith (slap !>(.) (ream (~(got by body) 'pith'))))
@@ -126,6 +147,8 @@
 ::
 ++  post  "@post('{(pate (welp [prefix rest]:bowl))}', \{contentType: 'form'})"
 ::
+++  is-poly  ?=(%poly -.mesh-source.mesh)
+::
 ++  hymn
   ::
   ;html
@@ -192,6 +215,7 @@
 ++  part-source
   ::
   ^-  manx
+  ?:  is-poly  part-source-poly
   ;div.hf.fc.grow.scroll-none
     =id  "part-source"
     =data-show  "$edit"
@@ -223,6 +247,28 @@
     ==
   ==
 ::
+++  part-source-poly
+  ::
+  ::  right panel for poly meshes.  per-view editors live inline in
+  ::  +part-info; this panel just holds the bootstrap "add view"
+  ::  form and a drop button.
+  ::
+  ^-  manx
+  ;div.hf.fc.grow.scroll-none
+    =id  "part-source"
+    =data-show  "$edit"
+    ;div.fc.g3.p3.scroll-y.grow
+      ;+  part-error
+      ;+  part-poly-add-view
+    ==
+    ;div.fr.bbh
+      ;form(method "post")
+        ;input(type "hidden", name "op", value "drop-mesh");
+        ;button.p-3.b3.hover.f-1.grow: drop
+      ==
+    ==
+  ==
+::
 ++  part-file
   ::
   =/  partial=file
@@ -233,6 +279,42 @@
   ;div#file.p4.pb20.fc.g3.grow.hf.scroll-y-always
     ;+  (render-file [/ partial])
   ==
+::
+++  part-poly-add-view
+  ::
+  ::  inline form for adding a new view to a poly mesh.  pith input
+  ::  is parsed by +slap (so [#/foo/bar] etc. work); source is any
+  ::  hoon expression evaluating to a view-spec.
+  ::
+  ;div.fc.g2.bd1.br2.p2
+    ;form.fc.g2(data-on_submit post)
+      ;input(type "hidden", name "op", value "set-poly-view");
+      ;label.fc.g1
+        ;span.fs-2.o6: pith
+        ;input.p-2.br2.bd1.mono
+          =type  "text"
+          =name  "pith"
+          =placeholder  "[#/foo/bar]"
+          =required  ""
+          =spellcheck  "false"
+          ;*  ~
+        ==
+      ==
+      ;label.fc.g1
+        ;span.fs-2.o6: source
+        ;feather-textarea.p2.mono.fs-2.bd1.br2
+          =rows  "8"
+          =name  "source"
+          =placeholder  "[%form ~]"
+          =required  ""
+          =spellcheck  "false"
+          ;*  ~
+        ==
+      ==
+      ;button.p-2.br2.bd1.b3.hover: add view
+    ==
+  ==
+  ::
 ::
 ++  render-file
   :::
@@ -357,10 +439,11 @@
     ^-  manx
     =/  infos=(list [tape (unit manx)])
       :~
-        :-  "data"  info-data
-        :-  "view"  info-lord
-        :-  "logs"  info-logs
-        :-  "bump"  info-bump
+        info-node
+        info-lord
+        info-view
+        info-logs
+        info-bump
       ==
     =/  first=tape
       |-
@@ -399,7 +482,8 @@
   ::
   ++  info-lord
     ::
-    ^-  (unit manx)
+    ^-  [tape (unit manx)]
+    :-  "lord"
     =/  node-meta=meta  node-meta
     ?~  lord.node-meta  ~
     ?-  -.view.u.lord.node-meta
@@ -407,9 +491,51 @@
       %form  `(edit-form +.view.u.lord.node-meta)
     ==
   ::
+  ++  info-view
+    ::
+    ::  poly view source editor.  shown at piths that are poly view
+    ::  stems; lets the user edit the source or delete the view.
+    ::
+    ^-  [tape (unit manx)]
+    :-  "view"
+    ?.  ?=(%poly -.mesh-source.mesh)  ~
+    =/  s=pith  ?~(pax ~ t.pax)
+    =/  src=(unit @t)  (~(get by srcs.mesh-source.mesh) s)
+    ?~  src  ~
+    :-  ~
+    ;div.fc.bbv.br2.bd1.scroll-none
+      ;form.fc.bbv
+        =id  "polysrc{nid}"
+        =data-on_submit  post
+        ;input(type "hidden", name "op", value "set-poly-view");
+        ;input(type "hidden", name "pith", value pare-stem);
+        ;feather-textarea.p2.mono.fs-2
+          =required  ""
+          =name  "source"
+          ;-  (trip u.src)
+        ==
+      ==
+      ;div.fr.bbh
+        ;button.b3.hover.p2.grow
+          =form  "polysrc{nid}"
+          =type  "submit"
+          ; save
+        ==
+        ;form
+          =data-on_submit  post
+          ;input(type "hidden", name "op", value "del-poly-view");
+          ;input(type "hidden", name "pith", value pare-stem);
+          ;button.b3.hover.p-2.f-1
+            ; delete
+          ==
+        ==
+      ==
+    ==
+  ::
   ++  info-bump
     ::
-    ^-  (unit manx)
+    ^-  [tape (unit manx)]
+    :-  "bump"
     ?.  under-form  ~
     :-  ~
     ;form
@@ -421,15 +547,16 @@
       ==
     ==
   ::
-  ++  info-data
+  ++  info-node
     ::
-    ^-  (unit manx)
+    ^-  [tape (unit manx)]
+    :-  "node"
     ?~  leaf.data.fap  ~
     ?.  under-form
       `(view-node u.leaf.data.fap)
     `(edit-node u.leaf.data.fap)
   ::
-  ++  info-logs  `info-logs-stub
+  ++  info-logs  ["logs" `info-logs-stub]
   ::
   ++  info-logs-stub
     ::

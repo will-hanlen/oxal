@@ -250,7 +250,7 @@
     dep=link
   ==
 ::
-+$  prior-form  $+  prior-form  [shape=(unit shape) =data]
++$  prior-form   $+  prior-form  [shape=(unit shape) =data]
 +$  prior-forms  $+  prior-forms  (map stem prior-form)
 ::
 +$  mesh-core
