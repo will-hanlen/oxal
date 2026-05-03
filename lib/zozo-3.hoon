@@ -84,6 +84,64 @@
     ^-  ?
     (gte (lent full-pax) min-meta-depth)
   ::
+  ++  ancestor-depths
+    ::
+    ::  valid ancestor depths for a pith of given length; empty if
+    ::  shallower than min-meta-depth.
+    ::
+    |=  len=@ud
+    ^-  (list @ud)
+    ?:  (lth len min-meta-depth)  ~
+    (gulf min-meta-depth len)
+  ::
+  ++  rebase-chng
+    ::
+    ::  replace the pith on a chng.  both arms have a pith field;
+    ::  the case split is required by hoon's $% mutator rules.
+    ::
+    |=  [c=chng new=pith]
+    ^-  chng
+    ?-(-.c %ins c(pith new), %del c(pith new))
+  ::
+  ++  rebase-meta-chng
+    ::
+    ::  replace the pith on a meta-chng.
+    ::
+    |=  [c=meta-chng new=pith]
+    ^-  meta-chng
+    ?-(-.c %ins c(pith new), %del c(pith new))
+  ::
+  ++  step-chngs
+    ::
+    ::  apply each chng to data, returning the new data and the
+    ::  subset of chngs that wasn't a no-op.
+    ::
+    |=  [d=data chs=(set chng)]
+    ^-  [data (set chng)]
+    =|  effective=(set chng)
+    =/  changes=(list chng)  ~(tap in chs)
+    |-
+    ?~  changes  [d effective]
+    ?-  -.i.changes
+      %ins
+        ?:  =(`node.i.changes (~(get do d) pith.i.changes))
+          $(changes t.changes)
+        %=  $
+          changes    t.changes
+          d          (~(put do d) pith.i.changes node.i.changes)
+          effective  (~(put in effective) i.changes)
+        ==
+      ::
+      %del
+        ?.  (~(has do d) pith.i.changes)
+          $(changes t.changes)
+        %=  $
+          changes    t.changes
+          d          (~(del do d) pith.i.changes)
+          effective  (~(put in effective) i.changes)
+        ==
+    ==
+  ::
   ++  reject-shallow
     ::
     ::  slog a depth-rejection message and pass through cor
@@ -100,18 +158,6 @@
     |=  pax=pith
     ^-  meta
     (fall (~(get ox cod) pax) *meta)
-  ::
-  ++  find-mesh
-    ::
-    ::  linear scan of meshes.ax for an entry with the given name.
-    ::
-    |=  want=term
-    ^-  (unit mesh)
-    =/  aps  meshes.ax
-    |-  ^-  (unit mesh)
-    ?~  aps  ~
-    ?:  =(name.i.aps want)  `mesh.i.aps
-    $(aps t.aps)
   ::
   ++  meta-significant-change
     ::
@@ -386,42 +432,23 @@
   ::
   ++  apply-changes
     ::
-    ::  apply each change to data, filtering to effective ones.
-    ::  skip changes at or beneath a %lens view unless allow-view-write:
-    ::  do-move only writes to base data (under forms or unview'd).
+    ::  user-facing change application.  reject writes at or beneath
+    ::  any %lens view (lens output is derived, not user-editable),
+    ::  unless allow-view-write -- transformer-produced output is
+    ::  already prefixed with the view's own pith and gets through.
     ::
     |=  [=move allow-view-write=?]
     ^-  [data (set chng)]
-    =/  d=data  dat
-    =/  c=code  cod
-    =/  is-at-or-beneath-lens=$-([pith code] ?)  at-or-beneath-lens
-    =/  effective=(set chng)  ~
-    =/  changes=(list chng)  ~(tap in chng-set.move)
-    |-
-    ?~  changes  [d effective]
-    =/  p=pith  (pith-of-chng i.changes)
-    ?:  ?&(!allow-view-write (is-at-or-beneath-lens p c))
-      ~|  "fe: rejected write at or beneath lens at {(pate p)}"
-      !!
-    ?-  -.i.changes
-      %ins
-        ?:  =(`node.i.changes (~(get do d) pith.i.changes))
-          $(changes t.changes)
-        %=  $
-          changes    t.changes
-          d          (~(put do d) pith.i.changes node.i.changes)
-          effective  (~(put in effective) i.changes)
-        ==
-      ::
-      %del
-        ?.  (~(has do d) pith.i.changes)
-          $(changes t.changes)
-        %=  $
-          changes    t.changes
-          d          (~(del do d) pith.i.changes)
-          effective  (~(put in effective) i.changes)
-        ==
-    ==
+    ?.  allow-view-write
+      =/  cs=(list chng)  ~(tap in chng-set.move)
+      |-
+      ?~  cs  (step-chngs dat chng-set.move)
+      =/  p=pith  (pith-of-chng i.cs)
+      ?:  (at-or-beneath-lens p cod)
+        ~|  "fe: rejected write at or beneath lens at {(pate p)}"
+        !!
+      $(cs t.cs)
+    (step-chngs dat chng-set.move)
   ::
   ++  propagate
     ::
@@ -507,41 +534,17 @@
   ::
   ++  run-xfm
     ::
-    ::  apply one transformer invocation to a subscriber view.
-    ::  on success: update view lyf/cas, apply prefixed output.
-    ::  on failure: unsub from faucet and suspend view.
-    ::
-    ::  sub is a fully-qualified pith (starts with a ship iota);
-    ::  the transformer output is prefixed with sub and applied
-    ::  via apply-move-qualified to avoid double-prefixing.  the
-    ::  input move and re-applied output both carry now-hlc.ax,
-    ::  the cause's frozen time (already ticked at ingress).
+    ::  fire a transformer and apply its output if any.  used by
+    ::  initialize-from-snap; propagation invokes run-xfm-collect
+    ::  directly so it can merge outputs into the merge-walk.
     ::
     |=  [sub=pith =view met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^+  cor
-    ?>  ?=(%lens -.view)
-    ?>  ?=(^ lord.met)
-    =.  cor  (vlog "ae: run-xfm at {(pate sub)}")
-    =^  xfm-res=(each transformer tang)  cor  (get-xfm (resolve-code view))
-    ?:  ?=(%| -.xfm-res)
-      (suspend-view sub view met p.xfm-res)
-    =/  xfm=transformer  p.xfm-res
-    =/  mine=data  (~(dip do dat) sub)
     =/  time=hlc  now-hlc.ax
-    =/  in-move=move  [time mov]
-    =/  result=(each move tang)
-      (mule |.((xfm [mine snap in-move lyf cas])))
-    ?-  -.result
-      %&
-        =.  cod
-          %+  ~(put ox cod)  sub
-          met(lord `[mesh=mesh.u.lord.met view=view(lyf lyf, cas cas)])
-        =/  prefixed=move  (prefix-move sub p.result)
-        (apply-move-qualified [prefixed(time time) %.y])
-      ::
-      %|
-        (suspend-view sub view met p.result)
-    ==
+    =^  out=(unit move)  cor
+      (run-xfm-collect sub view met snap mov lyf cas time)
+    ?~  out  cor
+    (apply-move-qualified [u.out %.y])
   ::
   ++  place-mesh-view
     ::
@@ -606,7 +609,7 @@
     |=  [name=term source=@t prior-forms=(map stem data)]
     ^+  cor
     =.  cor  (vlog "ae: install-mesh {<name>}")
-    ?:  ?=(^ (find-mesh name))
+    ?:  ?=(^ (get-mesh ax name))
       %-  (slog leaf+"ae: rejected install-mesh: {<name>} already exists" ~)
       cor
     =/  cod-before  cod
@@ -698,7 +701,7 @@
     |=  name=term
     ^+  cor
     =.  cor  (vlog "ae: uninstall-mesh {<name>}")
-    =/  found=(unit mesh)  (find-mesh name)
+    =/  found=(unit mesh)  (get-mesh ax name)
     ?~  found
       %-  (slog leaf+"ae: rejected uninstall-mesh: {<name>} not found" ~)
       cor
@@ -742,7 +745,7 @@
     |=  name=term
     ^+  cor
     =.  cor  (vlog "ae: reinstall-mesh {<name>}")
-    =/  found=(unit mesh)  (find-mesh name)
+    =/  found=(unit mesh)  (get-mesh ax name)
     ?~  found
       %-  (slog leaf+"ae: rejected reinstall-mesh: {<name>} not found" ~)
       cor
@@ -761,7 +764,7 @@
     |=  [name=term source=@t]
     ^+  cor
     =.  cor  (vlog "ae: update-mesh {<name>}")
-    =/  found=(unit mesh)  (find-mesh name)
+    =/  found=(unit mesh)  (get-mesh ax name)
     ?~  found  (ingress-install-mesh name source)
     =/  priors=(map stem data)  (capture-prior-forms views.u.found)
     =.  cor  (ingress-uninstall-mesh name)
@@ -947,9 +950,9 @@
   ::
   ++  build-rels
     ::
-    ::  map each ancestor pith of each chng (the chng pith itself,
-    ::  every prefix, and the root ~) to the set of chngs relativized
-    ::  to that ancestor.
+    ::  map each ancestor pith of each chng (every prefix of length
+    ::  >= min-meta-depth) to the set of chngs relativized to that
+    ::  ancestor.
     ::
     |=  chs=(set chng)
     ^-  (map pith (set chng))
@@ -959,20 +962,13 @@
     ?~  cl  out
     =/  ch=chng  i.cl
     =/  p=pith  (pith-of-chng ch)
-    =/  depths=(list @ud)
-      ?:  (lth (lent p) min-meta-depth)  ~
-      (gulf min-meta-depth (lent p))
+    =/  depths=(list @ud)  (ancestor-depths (lent p))
     =.  out
       |-  ^+  out
       ?~  depths  out
       =/  d=@ud  i.depths
       =/  anc=pith  (scag d p)
-      =/  rp=pith   (slag d p)
-      =/  rel-chng=chng
-        ?-  -.ch
-          %ins  ch(pith rp)
-          %del  ch(pith rp)
-        ==
+      =/  rel-chng=chng  (rebase-chng ch (slag d p))
       =/  have=(set chng)  (fall (~(get by out) anc) ~)
       =.  out  (~(put by out) anc (~(put in have) rel-chng))
       $(depths t.depths)
@@ -1080,38 +1076,15 @@
   ::
   ++  apply-extra-changes
     ::
-    ::  apply a transformer output move to data, returning the set
-    ::  of effective (non-no-op) chngs.  beneath-view filtering is
-    ::  skipped: output is already prefixed with the view's own pith.
+    ::  apply a transformer output move; output is already prefixed
+    ::  with the view's own pith, so no lens-write filtering.  commits
+    ::  the new data to cor and returns the effective set.
     ::
     |=  mv=move
     ^-  [(set chng) _cor]
-    =/  d=data  dat
-    =|  effective=(set chng)
-    =/  changes=(list chng)  ~(tap in chng-set.mv)
-    |-
-    ?~  changes
-      =.  cor  cor(data.file.ax d)
-      [effective cor]
-    ?-  -.i.changes
-      %ins
-        ?:  =(`node.i.changes (~(get do d) pith.i.changes))
-          $(changes t.changes)
-        %=  $
-          changes    t.changes
-          d          (~(put do d) pith.i.changes node.i.changes)
-          effective  (~(put in effective) i.changes)
-        ==
-      ::
-      %del
-        ?.  (~(has do d) pith.i.changes)
-          $(changes t.changes)
-        %=  $
-          changes    t.changes
-          d          (~(del do d) pith.i.changes)
-          effective  (~(put in effective) i.changes)
-        ==
-    ==
+    =/  [d=data effective=(set chng)]  (step-chngs dat chng-set.mv)
+    =.  cor  cor(data.file.ax d)
+    [effective cor]
   ::
   ++  initial-watch-response
     ::
@@ -1135,22 +1108,14 @@
   ::  all emission paths strip the leading ship iota of full-pax,
   ::  so subscribers and urls are ship-less.
   ::
-  ++  bare-pax
-    ::
-    ::  drop the leading ship iota from a fully-qualified pax.
-    ::
-    |=  full-pax=pith
-    ^-  pith
-    ?>  ?=(^ full-pax)
-    t.full-pax
-  ::
   ++  bare-path
     ::
     ::  path rendering of full-pax minus its leading ship iota.
     ::
     |=  full-pax=pith
     ^-  path
-    (pout (bare-pax full-pax))
+    ?>  ?=(^ full-pax)
+    (pout t.full-pax)
   ::
   ++  eyre-cached
     ::
@@ -1305,10 +1270,7 @@
       ?~  cs  rels
       =/  pax=pith       -.i.cs
       =/  mc=meta-chng   +.i.cs
-      =/  len=@ud        (lent pax)
-      =/  depths=(list @ud)
-        ?:  (lth len min-meta-depth)  ~
-        (gulf min-meta-depth len)
+      =/  depths=(list @ud)  (ancestor-depths (lent pax))
       =.  rels
         |-  ^+  rels
         ?~  depths  rels
@@ -1317,12 +1279,7 @@
         =/  anc-met=meta  (gut-meta anc)
         ?~  gall.anc-met
           $(depths t.depths)
-        =/  rp=pith   (slag d pax)
-        =/  rel=meta-chng
-          ?-  -.mc
-            %ins  mc(pith rp)
-            %del  mc(pith rp)
-          ==
+        =/  rel=meta-chng  (rebase-meta-chng mc (slag d pax))
         =/  have=meta-move  (fall (~(get by rels) anc) ~)
         =.  rels  (~(put by rels) anc (~(put in have) rel))
         $(depths t.depths)
