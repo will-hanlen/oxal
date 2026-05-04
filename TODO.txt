@@ -1,13 +1,12 @@
-the semantics of bumping are wrong i think.
+make a real blog app, then modify its form config to prove that inplace migrations work
 
 ---
 
-should a mesh's views be prefixed by the mesh's name to prevent all colisions?
-it depends on how the oxal namespace relates to the static namespaces.
-do the static namespaces get populated based on metadata flags or by their location
-in the oxal tree?
-i think i'll probably swing back to configuring static namespaces in the meta,
-but not doing it manually, instead, doing it as part of the mesh definition.
+render doctests fully
+
+---
+
+the semantics of bumping are wrong i think.
 
 ---
 

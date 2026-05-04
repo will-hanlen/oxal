@@ -28,23 +28,36 @@ transformations.
 
 ## Development Setup
 
-The test pier is running at http://localhost:80, with its dojo
-attached to a tmux target. The wrapper scripts read the local
-setup (tmux target, pier path, default timeout) from `.env` in
-the repo root — copy `.env.example` to `.env` to bootstrap.
+Test piers run as tmux windows in a shared session. The wrapper
+scripts read the local setup from `.env` in the repo root — copy
+`.env.example` to `.env` to bootstrap. The relevant vars:
 
-Helper scripts (all wrap `.dojo.sh`, which sends a command to the
-tmux dojo and returns its output):
+- `OXAL_TMUX_SESSION` — shared tmux session name.
+- `OXAL_SHIPS` — space-separated list of ship aliases. Each alias
+  is also the tmux window name, so `${OXAL_TMUX_SESSION}:${ship}`
+  is the dojo target.
+- `OXAL_<ship>_PIER` — pier path (relative to repo root) for each
+  listed ship. Used by `--sync` runs to rsync the source tree in.
+- `OXAL_TIMEOUT` — default dojo command timeout in seconds.
 
-- `sh .commit.sh` — rsync the source tree into the dev desk and
+Helper scripts. All but `.dojo.sh` fan their command out to every
+ship in `OXAL_SHIPS` *in parallel*, buffer per-ship output, and
+print labeled blocks (`=== ship: <name> ===`) in declared order.
+Exit is non-zero if any ship's run failed.
+
+- `sh .commit.sh` — rsync the source tree into each ship's desk and
   `|commit %oxal`. Run after editing any file in the repo.
 - `sh .run.sh "<dojo-command>"` — run an arbitrary dojo command on
-  the test ship without syncing (e.g. `sh .run.sh "|hi ~zod"`).
+  every ship without syncing (e.g. `sh .run.sh "|hi ~zod"`).
 - `sh .doctest.sh` — `.commit.sh` plus `+oxal!doctest-run` to run the
-  doctest suite and print its tang in the dojo.
+  doctest suite on every ship and print each tang.
+- `sh .dojo-fan.sh <cmd> [--sync]` — the fan-out primitive that the
+  three wrappers above are built on; reach for it only when you need
+  a different command + sync combination than they offer.
 - `sh .dojo.sh <session:window> <timeout> <cmd> [--sync=<pier>]` —
-  the underlying primitive; reach for it only when the wrappers
-  don't fit (different ship, custom timeout, etc.).
+  the single-ship primitive `.dojo-fan.sh` shells out to; reach for
+  it only when targeting one specific ship outside the `.env` set
+  (different ship, custom timeout, etc.).
 
 ## Typed dojo testing via `-build-file`
 

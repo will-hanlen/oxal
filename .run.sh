@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
-# Run an arbitrary dojo command on the test ship (no sync).
-# Thin wrapper over .dojo.sh.
+# Run an arbitrary dojo command on every ship listed in .env's
+# OXAL_SHIPS (no sync). Thin shim over .dojo-fan.sh.
 
 set -euo pipefail
 
 COMMAND="${1:?Usage: sh .run.sh <dojo-command>}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ENV_FILE="${SCRIPT_DIR}/.env"
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Error: ${ENV_FILE} not found. Copy .env.example to .env and edit." >&2
-  exit 1
-fi
-set -a; . "$ENV_FILE"; set +a
-
-exec "${SCRIPT_DIR}/.dojo.sh" "${OXAL_TMUX_TARGET}" "${OXAL_TIMEOUT}" "${COMMAND}"
+exec "${SCRIPT_DIR}/.dojo-fan.sh" "${COMMAND}"
