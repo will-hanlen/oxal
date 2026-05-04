@@ -624,13 +624,13 @@
     =.  cor  (emit-node-effects anc new-met snap rel-move)
     ::  fire subscribers of this ancestor, collecting their outputs
     ::
-    =^  xfm-out=move  cor
+    =^  xfm-chngs=(set chng)  cor
       (fire-subs-collect new-met snap rel life.new-met case.new-met time)
-    ?:  =(~ chng-set.xfm-out)
+    ?:  =(~ xfm-chngs)
       $(queue rest)
     ::  apply transformer output to data; filter to effective chngs
     ::
-    =^  xfm-effective=(set chng)  cor  (apply-extra-changes xfm-out)
+    =^  xfm-effective=(set chng)  cor  (apply-extra-changes xfm-chngs)
     ?:  =(~ xfm-effective)
       $(queue rest)
     =.  combined  (~(uni in combined) xfm-effective)
@@ -649,10 +649,10 @@
     |=  [sub=pith =view met=meta snap=data mov=(set chng) lyf=@ud cas=@ud]
     ^+  cor
     =/  time=hlc  now-hlc.ax
-    =^  out=(unit move)  cor
+    =^  out=(unit (set chng))  cor
       (run-xfm-collect sub view met snap mov lyf cas time)
     ?~  out  cor
-    (apply-move-qualified [u.out %.y])
+    (apply-move-qualified [[time u.out] %.y])
   ::
   ++  validate-mesh-views
     ::
@@ -1333,14 +1333,16 @@
   ++  fire-subs-collect
     ::
     ::  fire every subscriber of met's subs, collecting their
-    ::  transformer outputs into one combined move.  suspended and
-    ::  absent views are skipped.  time is the cause's hlc; the
-    ::  combined output carries it.
+    ::  transformer outputs into one unioned chng-set.  suspended
+    ::  and absent views are skipped.  time is the cause's hlc and
+    ::  is passed through to each transformer's input move; it does
+    ::  not appear in the output -- the engine attaches it at the
+    ::  boundary.
     ::
     |=  [met=meta snap=data mov=(set chng) lyf=@ud cas=@ud time=hlc]
-    ^-  [move _cor]
+    ^-  [(set chng) _cor]
     =/  sub-list=(list pith)  ~(tap in subs.met)
-    =/  out=move  [time ~]
+    =|  out=(set chng)
     |-  ^+  [out cor]
     ?~  sub-list  [out cor]
     =/  sub=pith  i.sub-list
@@ -1349,23 +1351,24 @@
     =*  vw  view.u.lord.sub-met
     ?>  ?=(%lens -.vw)
     ?:  ?=(^ err.vw)  $(sub-list t.sub-list)
-    =^  maybe-out=(unit move)  cor
+    =^  maybe-out=(unit (set chng))  cor
       (run-xfm-collect sub vw sub-met snap mov lyf cas time)
     =?  out  ?=(^ maybe-out)
-      out(chng-set (~(uni in chng-set.out) chng-set.u.maybe-out))
+      (~(uni in out) u.maybe-out)
     $(sub-list t.sub-list)
   ::
   ++  run-xfm-collect
     ::
     ::  run a subscriber's transformer.  on success, update the view
-    ::  meta and return the prefixed output move.  on crash, suspend
+    ::  meta and return the prefixed output chngs.  on crash, suspend
     ::  the view and return ~.  the input move carries the cause's
-    ::  time so transformers can read it; the output is re-stamped
-    ::  with the same time -- transformers don't get to invent
-    ::  timestamps (otherwise replay diverges).
+    ::  time so transformers can read it; the output is just a set
+    ::  of changes -- transformers don't get to invent timestamps
+    ::  (otherwise replay diverges), so the engine attaches the
+    ::  cause's time at the boundary.
     ::
     |=  [sub=pith =view met=meta snap=data mov=(set chng) lyf=@ud cas=@ud time=hlc]
-    ^-  [(unit move) _cor]
+    ^-  [(unit (set chng)) _cor]
     ?>  ?=(%lens -.view)
     ?>  ?=(^ lord.met)
     =.  cor  (vlog "ae: fire xfm at {(pate sub)}")
@@ -1375,15 +1378,14 @@
     =/  xfm=transformer  p.xfm-res
     =/  mine=data  (~(dip do dat) sub)
     =/  in-move=move  [time mov]
-    =/  result=(each move tang)
+    =/  result=(each (set chng) tang)
       (mule |.((xfm [mine snap in-move lyf cas])))
     ?-  -.result
       %&
         =.  cod
           %+  ~(put ox cod)  sub
           met(lord `[mesh=mesh.u.lord.met view=view(lyf lyf, cas cas)])
-        =/  prefixed=move  (prefix-move sub p.result)
-        [`prefixed(time time) cor]
+        [`(prefix-chngs sub p.result) cor]
       ::
       %|
         [~ (suspend-view sub view met p.result)]
@@ -1391,13 +1393,13 @@
   ::
   ++  apply-extra-changes
     ::
-    ::  apply a transformer output move; output is already prefixed
-    ::  with the view's own pith, so no lens-write filtering.  commits
+    ::  apply a transformer's output chngs; already prefixed with
+    ::  the view's own pith, so no lens-write filtering.  commits
     ::  the new data to cor and returns the effective set.
     ::
-    |=  mv=move
+    |=  chngs=(set chng)
     ^-  [(set chng) _cor]
-    =/  [d=data effective=(set chng)]  (step-chngs dat chng-set.mv)
+    =/  [d=data effective=(set chng)]  (step-chngs dat chngs)
     =.  cor  cor(data.file.ax d)
     [effective cor]
   ::

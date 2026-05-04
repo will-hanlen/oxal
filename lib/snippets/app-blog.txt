@@ -46,8 +46,7 @@
             '''
             !:
             |=  [data snap=data mov=move *]
-            ^-  move
-            :-  time.mov
+            ^-  (set chng)
             %-  silt
             :_  ~
             :+  %ins  /

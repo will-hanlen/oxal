@@ -400,7 +400,7 @@
       [%del =pith]
   ==
 +$  meta-move  $+(meta-move (set meta-chng))
-+$  transformer  $-([mine=data snap=data =move life=@ case=@] move)
++$  transformer  $-([mine=data snap=data =move life=@ case=@] (set chng))
 ::
 ++  ref-to-pith
   ::
@@ -418,20 +418,27 @@
   ^-  pith
   ?-(-.chng %ins pith.chng, %del pith.chng)
 ::
+++  prefix-chngs
+  ::
+  ::  weld a prefix pith onto every chng in a set.
+  ::
+  |=  [pre=pith chngs=(set chng)]
+  ^-  (set chng)
+  %-  silt
+  %+  turn  ~(tap in chngs)
+  |=  =chng
+  ?-  -.chng
+    %ins  chng(pith (weld pre pith.chng))
+    %del  chng(pith (weld pre pith.chng))
+  ==
+::
 ++  prefix-move
   ::
   ::  weld a prefix pith onto every chng in a move; preserve time.
   ::
   |=  [pre=pith =move]
   ^-  ^move
-  :-  time.move
-  %-  silt
-  %+  turn  ~(tap in chng-set.move)
-  |=  =chng
-  ?-  -.chng
-    %ins  chng(pith (weld pre pith.chng))
-    %del  chng(pith (weld pre pith.chng))
-  ==
+  move(chng-set (prefix-chngs pre chng-set.move))
 ::
 +$  bond  (pair pith node)
 +$  bonds  (list bond)
@@ -1642,8 +1649,7 @@
   |=  ec=easy-core
   ^-  transformer
   |=  [mine=data snap=data =move *]
-  ^+  move
-  :-  time.move
+  ^-  (set chng)
   %-  silt
   ^-  (list chng)
   ?:  =(~ chng-set.move)  (~(mur do snap) ins:ec)
