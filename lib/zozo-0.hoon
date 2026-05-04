@@ -244,10 +244,10 @@
   ==
 +$  lens-spec
   $:
+    dep=link
     out=shape
     in=shape
     =sauc
-    dep=link
   ==
 ::
 +$  prior-form   $+  prior-form  [shape=(unit shape) =data]
@@ -1654,4 +1654,15 @@
     %del  (del:ec pith.chng)
     %ins  (ins:ec pith.chng node.chng)
   ==
+::
+++  easy-mirror
+  %-  easy-transform
+  |%
+  ++  ins
+    |=  [=pith =node]
+    `[%ins pith node]
+  ++  del
+    |=  =pith
+    `[%del pith]
+  --
 --
