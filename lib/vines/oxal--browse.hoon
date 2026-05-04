@@ -89,10 +89,10 @@
       ;script(type "module", src "/hawk-init/feather/1/datastar");
     ==
     ;body.fc.bbv.hf
-      ;header.fr.af.g2.bbh.mono.b2.p-3
-        ;form.fr.g2.grow.ac
+      ;header.fr.af.g2.bbh.mono.b2
+        ;form.fr.grow.af.bbh
           =onsubmit  "event.preventDefault();location.href='/oxal/browse/'+this.ship.value+'/'+this.mesh.value;return false"
-          ;input.p-2.br2.bd1.mono.fs-2
+          ;input.p-2.mono.fs-2.grow
             =type  "text"
             =name  "ship"
             =value  (scow %p ship)
@@ -101,7 +101,7 @@
             =spellcheck  "false"
             ;*  ~
           ==
-          ;input.p-2.br2.bd1.mono.fs-2.grow
+          ;input.p-2.mono.fs-2.grow
             =type  "text"
             =name  "mesh"
             =value  (trip mesh)
