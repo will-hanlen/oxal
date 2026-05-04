@@ -659,10 +659,11 @@
     ::  pre-flight check on a mesh's view layout.  returns the first
     ::  rejection message, or ~ if every view is placeable.  rules:
     ::    - stem must be deep enough to carry meta (>= min-meta-depth)
+    ::    - stem must lie under the mesh's territory /[our]/[name]
     ::    - stem must not sit at or beneath an existing view
     ::    - %lens stem must not be at or above its own faucet
     ::
-    |=  vws=(map stem view)
+    |=  [name=term vws=(map stem view)]
     ^-  (unit @t)
     =/  pairs=(list [stem view])  ~(tap by vws)
     |-  ^-  (unit @t)
@@ -671,6 +672,8 @@
     =/  vw=view   +.i.pairs
     ?.  (meta-allowed full-pax)
       `(crip "ae: load-mesh rejected: stem too shallow at {(pate full-pax)}")
+    ?.  (under-mesh name -.i.pairs)
+      `(crip "ae: load-mesh rejected: stem at {(pate full-pax)} must lie under /{(trip (scot %p our))}/{(trip name)}")
     ?:  (beneath-view full-pax cod)
       `(crip "ae: load-mesh rejected: stem at or beneath existing view at {(pate full-pax)}")
     ?:  ?&  ?=(%lens -.vw)
@@ -678,6 +681,16 @@
         ==
       `(crip "ae: load-mesh rejected: lens at {(pate full-pax)} has self or ancestor as faucet at {(pate (ref-to-pith dep.vw))}")
     $(pairs t.pairs)
+  ::
+  ++  under-mesh
+    ::
+    ::  is `stem` placed under the mesh `name`'s territory?  the first
+    ::  iota of stem must be the mesh name (a bare term).
+    ::
+    |=  [name=term stem=pith]
+    ^-  ?
+    ?~  stem  %.n
+    =(name i.stem)
   ::
   ++  place-mesh-view
     ::
@@ -792,7 +805,7 @@
     ^-  (each staged tang)
     ?-  -.mesh-source
       %mono  (stage-load-mono name src.mesh-source outgoing-views)
-      %poly  (stage-load-poly srcs.mesh-source)
+      %poly  (stage-load-poly name srcs.mesh-source)
     ==
   ::
   ++  stage-load-mono
@@ -817,6 +830,8 @@
       =/  full-pax  (under-our i.pairs)
       ?.  (meta-allowed full-pax)
         `(crip "ae: load-mesh rejected: ++forms stem too shallow at {(pate full-pax)}")
+      ?.  (under-mesh name i.pairs)
+        `(crip "ae: load-mesh rejected: ++forms stem at {(pate full-pax)} must lie under /{(trip (scot %p our))}/{(trip name)}")
       ?:  (beneath-view full-pax cod)
         `(crip "ae: load-mesh rejected: ++forms stem at or beneath existing view at {(pate full-pax)}")
       $(pairs t.pairs)
@@ -853,7 +868,7 @@
     ::
     ::  per-view validation (depth, beneath-view, lens self-faucet)
     ::
-    =/  view-validation=(unit @t)  (validate-mesh-views views)
+    =/  view-validation=(unit @t)  (validate-mesh-views name views)
     ?^  view-validation  [%| ~[leaf+(trip u.view-validation)]]
     =/  st=staged  [mesh-core declared views output.p.lout]
     [%& st]
@@ -862,7 +877,7 @@
     ::
     ::  %poly path of stage-load.  see +stage-load for shape.
     ::
-    |=  srcs=(map stem @t)
+    |=  [name=term srcs=(map stem @t)]
     ^-  (each staged tang)
     =/  comp  (build-poly-views srcs)
     ?:  ?=(%| -.comp)  [%| p.comp]
@@ -881,7 +896,7 @@
     ::  beneath-view + self-faucet uniformly across forms and lenses.
     ::
     =/  views=(map stem view)  (~(run by specs) view-from-spec)
-    =/  view-validation=(unit @t)  (validate-mesh-views views)
+    =/  view-validation=(unit @t)  (validate-mesh-views name views)
     ?^  view-validation  [%| ~[leaf+(trip u.view-validation)]]
     =/  st=staged  [*mesh-core declared views *move]
     [%& st]
