@@ -1,17 +1,24 @@
 ::  /lib/doctest: pure runner and oxal-data conversion for doctests
 ::
-::    +run-script        : evaluate one $script, return a $report
-::    +parse-stem-name   : decode a filename like a-b---c to a pith
-::    +report-to-changes : project a $report under a base pith into a
-::                         (set chng) ready for %do-move
-::    +report-to-data    : project a $report into a single $data tree,
-::                         suitable as the body of a [%data ...] node
-::    +reports-to-tang   : format a list of named reports as a tang
-::                         for printing in the dojo
+::    +run-script           : evaluate one $script, return a $report
+::    +parse-stem-name      : decode a filename like a-b---c to a pith
+::    +report-to-changes    : project a $report under a base pith into
+::                            a (set chng) ready for %do-move
+::    +report-to-data       : project a $report into a single $data
+::                            tree (layout matches +report-to-changes)
+::    +reports-to-tang      : format a list of named reports as a tang
+::                            for printing in the dojo
+::    +data-to-doctest-chngs : convert a doctest-mesh data subtree
+::                            into a (set chng) with /doctest prefix
+::    +doctest-mesh-source  : fixed %mono mesh-core text for the
+::                            %doctest mesh.  declares one form at
+::                            /doctest; ++drop wipes its data subtree
+::                            so dropping the mesh leaves no orphans
 ::
 ::    the runner has no dependence on the oxal agent or its data
-::    tree.  callers that want results in oxal call +report-to-changes
-::    and poke %do-move.
+::    tree.  the agent's %doctest-build poke chains drop-mesh,
+::    load-mesh (with +doctest-mesh-source), and do-move (with
+::    +data-to-doctest-chngs of the supplied data).
 ::
 /-  *doctest
 /+  *zozo
@@ -236,8 +243,9 @@
 ++  report-to-data
   ::
   ::  project a report into a single $data tree, sharing layout with
-  ::  +report-to-changes.  the output is a value (not a chng set), so
-  ::  callers can wrap it as a [%data ...] node and poke %do-move.
+  ::  +report-to-changes.  the output is a value (not a chng set);
+  ::  callers +rep this into a larger tree (e.g. the doctest mesh's
+  ::  form) and poke %do-move or %load-mesh.
   ::
   |=  =report
   ^-  data
@@ -247,6 +255,55 @@
   ?~  cl  d
   ?>  ?=(%ins -.i.cl)
   $(cl t.cl, d (~(put do d) pith.i.cl node.i.cl))
+::
+++  data-to-doctest-chngs
+  ::
+  ::  convert a doctest-mesh data subtree (relative to /doctest) into
+  ::  a (set chng) with the /doctest prefix welded on.  used by the
+  ::  agent's %doctest-build poke to populate the mesh's form via
+  ::  ingress-do-move.
+  ::
+  |=  d=data
+  ^-  (set chng)
+  %-  silt
+  %+  turn  ~(tap do d)
+  |=  [p=pith n=node]
+  ^-  chng
+  [%ins (welp /doctest p) n]
+::
+++  doctest-mesh-source
+  ::
+  ::  fixed %mono mesh-core text for the %doctest mesh.  declares
+  ::  one form-stem at /doctest; ++load is a no-op on data (the
+  ::  agent's %doctest-build sequence drops the mesh first to wipe
+  ::  prior data, then loads, then pokes do-move).  ++drop walks the
+  ::  prior data subtree at /doctest and emits %del for every leaf,
+  ::  so dropping the mesh leaves no orphans behind.
+  ::
+  ^-  @t
+  '''
+  |_  [our=@p name=@tas]
+  ::
+  ++  forms  (silt ~[/doctest])
+  ::
+  ++  load
+    |=  =prior-forms
+    =/  vs=(map stem view-spec)  (malt ~[[/doctest [%form ~]]])
+    [vs *move]
+  ::
+  ++  drop
+    |=  =prior-forms
+    =/  prior=data  data:(~(got by prior-forms) /doctest)
+    =/  del-chngs=(set chng)
+      %-  silt
+      %+  turn  ~(tap do prior)
+      |=  [p=pith *]
+      ^-  chng
+      [%del (welp /doctest p)]
+    ^-  move
+    [*hlc del-chngs]
+  --
+  '''
 ::
 ++  reports-to-tang
   ::
