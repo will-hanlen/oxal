@@ -4,7 +4,7 @@
 :-  time.mov
 %-  silt
 ?^  chng-set.mov
-  %+  murn  ~(tap in chng-set.mov)
+  %+  murn  ~(tap in `(set chng)`chng-set.mov)
   |=  =chng
   ?-  -.chng
     %del  `chng
