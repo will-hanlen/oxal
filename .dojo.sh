@@ -79,12 +79,12 @@ capture_pane() {
 
 first_match_line() {
   local text="$1" pattern="$2"
-  echo "$text" | grep -nF -- "$pattern" | head -1 | cut -d: -f1
+  echo "$text" | grep -anF -- "$pattern" | head -1 | cut -d: -f1
 }
 
 last_match_line() {
   local text="$1" pattern="$2"
-  echo "$text" | grep -nF -- "$pattern" | tail -1 | cut -d: -f1
+  echo "$text" | grep -anF -- "$pattern" | tail -1 | cut -d: -f1
 }
 
 clear_input() {
@@ -106,8 +106,8 @@ CLEAN=false
 while [ "$CLEAN_ELAPSED" -lt 10 ]; do
   sleep 1
   CLEAN_ELAPSED=$((CLEAN_ELAPSED + 1))
-  LAST_LINE=$(capture_pane | grep -v '^\s*$' | tail -1)
-  if echo "$LAST_LINE" | grep -qE ':dojo[^>]*>\s*$'; then
+  LAST_LINE=$(capture_pane | grep -av '^\s*$' | tail -1)
+  if echo "$LAST_LINE" | grep -aqE ':dojo[^>]*>\s*$'; then
     CLEAN=true
     break
   fi
@@ -127,7 +127,7 @@ START_OK=false
 while [ "$START_WAIT" -lt 5 ]; do
   sleep 1
   START_WAIT=$((START_WAIT + 1))
-  if capture_pane | grep -qF -- "$START_ECHO"; then
+  if capture_pane | grep -aqF -- "$START_ECHO"; then
     START_OK=true
     break
   fi
@@ -168,7 +168,7 @@ while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
   ELAPSED=$((ELAPSED + INTERVAL))
   OUTPUT=$(capture_pane)
 
-  echo "$OUTPUT" | grep -qF -- "$DONE_ECHO" || continue
+  echo "$OUTPUT" | grep -aqF -- "$DONE_ECHO" || continue
 
   # Find both sentinel echoes (unique per invocation — no false matches)
   START_LINE=$(first_match_line "$OUTPUT" "$START_ECHO") || true
@@ -185,9 +185,9 @@ while [ "$ELAPSED" -lt "$TIMEOUT" ]; do
   end=$((DONE_LINE - 1))
   if [ "$start" -le "$end" ]; then
     echo "$OUTPUT" | sed -n "${start},${end}p" \
-      | grep -vF -- "$START_SENT" \
-      | grep -v ':dojo[^>]*>' \
-      | grep -vxF -- "> ${COMMAND}" \
+      | grep -avF -- "$START_SENT" \
+      | grep -av ':dojo[^>]*>' \
+      | grep -avxF -- "> ${COMMAND}" \
       | trim_blank || true
   fi
 
