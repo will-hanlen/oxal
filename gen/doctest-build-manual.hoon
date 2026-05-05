@@ -1,7 +1,7 @@
 ::  /gen/doctest-build-manual: run all doctests and install the
 ::                              %doctest mesh holding their results
 ::
-::    `:oxal +doctest-build-manual` builds every script in
+::    `:oxal!doctest-build-manual` builds every script in
 ::    /lib/doctests, runs each through the pure runner, converts the
 ::    resulting $report to a $data via +report-to-data, and +rep's
 ::    each script's data into a single mesh-data tree at the script's

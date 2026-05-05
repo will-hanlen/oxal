@@ -236,25 +236,7 @@
         abet:(ingress-drop-mesh:engine name)
       (emil cz)
       ::
-    %doctest-build
-      ::
-      ::  install/refresh the %doctest mesh from a single $data input.
-      ::  drops any existing %doctest mesh (which wipes its prior data
-      ::  via the mesh's ++drop), loads a fresh %doctest mesh declaring
-      ::  one form at /doctest, then do-moves the input data into the
-      ::  form by welping /doctest onto each leaf's pith.
-      ::
-      =+  !<  mesh-data=data  vase
-      =/  src=@t  doctest-mesh-source:dt
-      =/  chngs=(set chng)  (data-to-doctest-chngs:dt mesh-data)
-      =^  cz1=(list card:agent:gall)  acer
-        abet:(ingress-drop-mesh:engine %doctest)
-      =^  cz2=(list card:agent:gall)  acer
-        abet:(ingress-load-mesh:engine %doctest [%mono src])
-      =^  cz3=(list card:agent:gall)  acer
-        abet:(ingress-do-move:engine [*hlc chngs])
-      (emil :(welp cz1 cz2 cz3))
-      ::
+    ::
     %bump
       ::
       =+  !<  pax=pith  vase
@@ -301,6 +283,26 @@
       =^  cz=(list card:agent:gall)  acer
         abet:(ingress-hear-remote-code:engine ship pax snap meta-move life case)
       (emil cz)
+      ::
+    ::
+    %doctest-build
+      ::
+      ::  install/refresh the %doctest mesh from a single $data input.
+      ::  drops any existing %doctest mesh (which wipes its prior data
+      ::  via the mesh's ++drop), loads a fresh %doctest mesh declaring
+      ::  one form at /doctest, then do-moves the input data into the
+      ::  form by welping /doctest onto each leaf's pith.
+      ::
+      =+  !<  mesh-data=data  vase
+      =/  src=@t  doctest-mesh-source:dt
+      =/  chngs=(set chng)  (data-to-doctest-chngs:dt mesh-data)
+      =^  cz1=(list card:agent:gall)  acer
+        abet:(ingress-drop-mesh:engine %doctest)
+      =^  cz2=(list card:agent:gall)  acer
+        abet:(ingress-load-mesh:engine %doctest [%mono src])
+      =^  cz3=(list card:agent:gall)  acer
+        abet:(ingress-do-move:engine [*hlc chngs])
+      (emil :(welp cz1 cz2 cz3))
       ::
     ::
     %handle-http-request

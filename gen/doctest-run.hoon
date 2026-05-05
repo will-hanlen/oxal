@@ -1,6 +1,6 @@
 ::  /gen/doctest-run: run all doctests and print a summary to the dojo
 ::
-::    `+doctest-run` builds every script in /lib/doctests, runs each
+::    `+oxal!doctest-run` builds every script in /lib/doctests, runs each
 ::    through the pure runner, and returns a $tang summarising
 ::    pass/fail counts plus the failing-section traces.  unlike
 ::    +doctest-build-manual, this generator does not poke oxal — it is
