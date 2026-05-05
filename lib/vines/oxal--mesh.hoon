@@ -8,6 +8,7 @@
 ;<  ax=acer  bind:m  (scry ,acer /gx/oxal/acer/noun)
 =/  mesh-name=@tas  ~|  %not-found  (head rest.bowl)
 =/  =mesh  (got-mesh ax mesh-name)
+=/  start=pith  #/[p+our.bowl]/[mesh-name]
 ::
 |^
   :::
@@ -293,12 +294,14 @@
 ++  part-file
   ::
   =/  partial=file
+    %.  start
+    %~  dip  fe
     %-  ~(partial fe file.ax)
     %-  ~(run in ~(key by views.mesh))
     |=  =pith
     [p+our.bowl pith]
   ;div#file.p4.pb20.fc.g3.grow.hf.scroll-y-always
-    ;+  (render-file [/ partial])
+    ;+  (render-file [start partial])
   ==
 ::
 ++  part-poly-add-view
