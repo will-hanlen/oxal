@@ -930,10 +930,15 @@
       =.  cor  (place-mesh-view name -.i.pairs +.i.pairs)
       $(pairs t.pairs)
     ::
-    ::  apply move (allow-view-write=%.n)
+    ::  apply move (allow-view-write=%.n).  re-stamp the user-authored
+    ::  migration move with a freshly ticked hlc; the time field of
+    ::  output.p.lout is whatever ++load returned (often *hlc), and
+    ::  log entries must carry this ingress's clock.
     ::
     =?  cor  ?=(^ chng-set.output.st)
-      (apply-move-qualified [(prefix-move [p+our ~] output.st) %.n])
+      =^  time=hlc  cor  ingress-tick
+      =/  out=move  output.st(time time)
+      (apply-move-qualified [(prefix-move [p+our ~] out) %.n])
     ::
     ::  store entry, replacing any prior of the same name
     ::
@@ -1073,6 +1078,8 @@
       ::
       =/  out=move  output.p.drop-out
       =?  cor  ?=(^ chng-set.out)
+        =^  time=hlc  cor  ingress-tick
+        =.  out  out(time time)
         (apply-move-qualified [(prefix-move [p+our ~] out) %.n])
       =/  pairs=(list [stem view])  ~(tap by views.u.found)
       |-  ^+  cor
