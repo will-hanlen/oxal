@@ -2,6 +2,10 @@ make a real blog app, then modify its form config to prove that inplace migratio
 
 ---
 
+give every mesh a vine? this would certainly make it more useful...
+
+---
+
 render doctests fully
 
 ---

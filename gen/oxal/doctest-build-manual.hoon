@@ -7,8 +7,8 @@
 ::    each script's data into a single mesh-data tree at the script's
 ::    stem (so /sample/title, /sample/pass, etc.).  it then pokes
 ::    oxal with %doctest-build, which (in one cause) drops the prior
-::    %doctest mesh, loads a fresh one declaring a form at /doctest,
-::    and do-moves the mesh-data into the form.
+::    %doctest mesh, loads a fresh one declaring a form at
+::    /doctest/results, and do-moves the mesh-data into the form.
 ::
 ::    dropping the %doctest mesh wipes all data so a re-run with
 ::    renamed scripts leaves no orphan leaves behind.

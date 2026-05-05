@@ -258,10 +258,10 @@
 ::
 ++  data-to-doctest-chngs
   ::
-  ::  convert a doctest-mesh data subtree (relative to /doctest) into
-  ::  a (set chng) with the /doctest prefix welded on.  used by the
-  ::  agent's %doctest-build poke to populate the mesh's form via
-  ::  ingress-do-move.
+  ::  convert a doctest-mesh data subtree (relative to /doctest/results)
+  ::  into a (set chng) with the /doctest/results prefix welded on.
+  ::  used by the agent's %doctest-build poke to populate the mesh's
+  ::  form via ingress-do-move.
   ::
   |=  d=data
   ^-  (set chng)
@@ -269,37 +269,37 @@
   %+  turn  ~(tap do d)
   |=  [p=pith n=node]
   ^-  chng
-  [%ins (welp /doctest p) n]
+  [%ins (welp /doctest/results p) n]
 ::
 ++  doctest-mesh-source
   ::
   ::  fixed %mono mesh-core text for the %doctest mesh.  declares
-  ::  one form-stem at /doctest; ++load is a no-op on data (the
-  ::  agent's %doctest-build sequence drops the mesh first to wipe
-  ::  prior data, then loads, then pokes do-move).  ++drop walks the
-  ::  prior data subtree at /doctest and emits %del for every leaf,
-  ::  so dropping the mesh leaves no orphans behind.
+  ::  one form-stem at /doctest/results; ++load is a no-op on data
+  ::  (the agent's %doctest-build sequence drops the mesh first to
+  ::  wipe prior data, then loads, then pokes do-move).  ++drop walks
+  ::  the prior data subtree at /doctest/results and emits %del for
+  ::  every leaf, so dropping the mesh leaves no orphans behind.
   ::
   ^-  @t
   '''
   |_  [our=@p name=@tas]
   ::
-  ++  forms  (silt ~[/doctest])
+  ++  forms  (silt ~[/doctest/results])
   ::
   ++  load
     |=  =prior-forms
-    =/  vs=(map stem view-spec)  (malt ~[[/doctest [%form ~]]])
+    =/  vs=(map stem view-spec)  (malt ~[[/doctest/results [%form ~]]])
     [vs *move]
   ::
   ++  drop
     |=  =prior-forms
-    =/  prior=data  data:(~(got by prior-forms) /doctest)
+    =/  prior=data  data:(~(got by prior-forms) /doctest/results)
     =/  del-chngs=(set chng)
       %-  silt
       %+  turn  ~(tap do prior)
       |=  [p=pith *]
       ^-  chng
-      [%del (welp /doctest p)]
+      [%del (welp /doctest/results p)]
     ^-  move
     [*hlc del-chngs]
   --
