@@ -466,47 +466,18 @@
     =/  infos=(list (unit [tape manx]))
       :~
         info-node
-        info-view
+        info-lord
         info-logs
         info-bump
         info-auth
       ==
-    =/  first=tape
-      |-
-      ?~  infos  "none"
-      ?~  i.infos  $(infos t.infos)
-      -.u.i.infos
-    ;div.fc.bbv.mr5.ml3.br2.bd1.b2.scroll-none
+    ;div.mr5.ml3.b2
       =style  hid
       =data-show  "$_rowopen{nid}"
-      ::
-      ;div.fr.bbh
-        =data-signals  "\{'_info{nid}': '{first}'}"
-        ;*
-        %+  murn  infos
-        |=  i=(unit [label=tape body=manx])
-        ?~  i  ~
-        :-  ~
-        ;button.p-2.b3.hover
-          =data-on_click  "$_info{nid} = '{label.u.i}'"
-          =data-class_toggled  "$_info{nid} == '{label.u.i}'"
-          ;-  label.u.i
-        ==
-      ==
-      ::
-      ;*
-      %+  murn  infos
-      |=  i=(unit [label=tape body=manx])
-      ?~  i  ~
-      :-  ~
-      ;div.fc.p2
-        =data-show  "$_info{nid} == '{label.u.i}'"
-        =style  hid
-        ;+  body.u.i
-      ==
+      ;+  (make-tabs "row" infos)
     ==
   ::
-  ++  info-view
+  ++  info-lord
     ::
     ::
     ::    mono+lens  read-only display: source/sauc, dep, lyf:cas,
@@ -534,16 +505,52 @@
       %form
         :-  ~
         :-  "form"
-        ?:  is-poly
-          ;div.fc.g2
-            ;+  data-add
-            ;+  poly-edit
-          ==
-        ;div.fc.g2
-          ;div.fs-2.o6: out: -
-          ;+  data-add
+        %+  make-tabs  "form"
+        :~
+          `["insert" data-add]
+          ?.  is-poly  ~  `["edit" poly-edit]
         ==
     ==
+  ::
+  ++  make-tabs
+    ::
+    |=  [id=tape tabs=(list (unit [tape manx]))]
+    =/  full=(list [tape manx])
+      %+  murn  tabs
+      |=  =(unit [tape manx])
+      ?~  unit  ~
+      `u.unit
+    ?:  =(~ full)
+      ;div.p3
+        ; none
+      ==
+    =/  first=tape  (head (head full))
+    =/  signal  "_tab{id}{nid}"
+    ;div.fc.bbv.br2.bd1.scroll-none
+      ;+  %^  add-class-if  =(1 (lent full))  "hidden"
+      ;div.fr.bbh
+        =data-signals  "\{'{signal}': '{first}'}"
+        ;*
+        %+  turn  full
+        |=  [label=tape =manx]
+        ;button.p-2.b2.hover
+          =data-on_click  "${signal} = '{label}'"
+          =data-class_toggled  "${signal} == '{label}'"
+          ;-  label
+        ==
+      ==
+      ;div.fc.p2
+        ;*
+        %+  turn  full
+        |=  [label=tape =manx]
+        ;div
+          =style  hid
+          =data-show  "${signal} == '{label}'"
+          ;+  manx
+        ==
+      ==
+    ==
+    ::
   ::
   ++  poly-edit
     ::
@@ -717,6 +724,7 @@
     ;div.fc.bbv.br2.bd1.scroll-none
       ;+
       ?+  node  ;div: not renderable: {(print-aura node)}
+        @tas  ;div: {"%"}{(trip node)}
         aota  ;div:(-(node-summary node))
         [%manx *]
           ;iframe.max-h20
