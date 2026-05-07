@@ -22,6 +22,7 @@
 ::
 /-  *doctest
 /+  *zozo
+/*  doctest-mesh-wain  %txt  /lib/doctest-mesh/txt
 |%
 ::
 ++  parse-stem-name
@@ -273,37 +274,22 @@
 ::
 ++  doctest-mesh-source
   ::
-  ::  fixed %mono mesh-core text for the %doctest mesh.  declares
-  ::  one form-stem at /doctest/results; ++load is a no-op on data
-  ::  (the agent's %doctest-build sequence drops the mesh first to
-  ::  wipe prior data, then loads, then pokes do-move).  ++drop walks
-  ::  the prior data subtree at /doctest/results and emits %del for
-  ::  every leaf, so dropping the mesh leaves no orphans behind.
+  ::  fixed %mono mesh-core text for the %doctest mesh.  declares one
+  ::  form-stem at /doctest/results and one lens-stem at /doctest/manual.
+  ::  the form holds the raw report data; the lens transforms each
+  ::  script's subtree into a manx page (one leaf per script under
+  ::  /doctest/manual).  ++load is a no-op on data (the agent's
+  ::  %doctest-build sequence drops the mesh first to wipe prior data,
+  ::  then loads, then pokes do-move).  ++drop walks the prior data
+  ::  subtree at /doctest/results and emits %del for every leaf, so
+  ::  dropping the mesh leaves no orphans behind; the engine handles
+  ::  cleanup of the lens output on next install.
+  ::
+  ::  the source lives in /lib/doctest-mesh.txt because it embeds a
+  ::  triple-quoted lens cord that can't nest inside another '''-cord.
   ::
   ^-  @t
-  '''
-  |_  [our=@p name=@tas]
-  ::
-  ++  forms  (silt ~[/doctest/results])
-  ::
-  ++  load
-    |=  =prior-forms
-    =/  vs=(map stem view-spec)  (malt ~[[/doctest/results [%form ~]]])
-    [vs *move]
-  ::
-  ++  drop
-    |=  =prior-forms
-    =/  prior=data  data:(~(got by prior-forms) /doctest/results)
-    =/  del-chngs=(set chng)
-      %-  silt
-      %+  turn  ~(tap do prior)
-      |=  [p=pith *]
-      ^-  chng
-      [%del (welp /doctest/results p)]
-    ^-  move
-    [*hlc del-chngs]
-  --
-  '''
+  (of-wain:format doctest-mesh-wain)
 ::
 ++  reports-to-tang
   ::

@@ -1,0 +1,86 @@
+!:
+=;  cor
+|_  [our=@p name=@tas]
++*  engine  ~(. cor [our name])
+::
+++  forms  (silt ~[/doctest/results])
+::
+++  load
+  ::
+  |=  =prior-forms
+  :_  *move
+  ^-  (map stem view-spec)
+  %-  malt
+  ^-  (list [pith view-spec])
+  :~  [#/doctest/results %form ~]
+      ::
+      [#/doctest/pages %lens render-page-lens:engine]
+      ::
+  ==
+::
+++  drop
+  ::
+  |=  =prior-forms
+  =/  prior=data  data:(~(got by prior-forms) /doctest/results)
+  =/  del-chngs=(set chng)
+    %-  silt
+    %+  turn  ~(tap do prior)
+    |=  [p=pith *]
+    ^-  chng
+    [%del (welp /doctest/results p)]
+  ^-  move
+  [*hlc del-chngs]
+--
+::
+|_  [our=@p name=term]
+++  render-page-lens
+  ^-  lens-spec
+  :^  [our #/[name]/results]  ~  ~
+  '''
+  !:
+  =;  cor
+    |=  [mine=data snap=data =move life=@ case=@]
+    (cor mine snap move life case)
+  |_  [mine=data snap=data =move life=@ case=@]
+  ++  $
+    ^-  (set chng)
+    ?.  =(~ chng-set.move)
+      =/  affected=(set stem)
+        %-  ~(run in chng-set.move)
+        |=  =chng
+        ?-  -.chng
+          %ins  #/[(head pith.chng)]
+          %del  #/[(head pith.chng)]
+        ==
+      ::
+      :: %-  silt
+      ^-  (set chng)
+      %-  ~(run in affected)
+      |=  =stem
+      ^-  chng
+      ?.  (~(hos do snap) stem)  [%del stem]
+      =/  script  (~(dip do snap) stem)
+      [%ins stem manx+(build-page script)]
+      ::
+    :: recompute everything from snapshot
+    %-  silt
+    ^-  (list chng)
+    %-  ~(myr do snap)
+    |=  [=iota =data]
+    ^-  (unit chng)
+    `[%ins #/[iota] manx+(build-page data)]
+  ::
+  ++  build-page
+    ::
+    |=  script=data
+    ^-  manx
+    ;div
+      ;h1
+        ;-  (~(pib do script) /title)
+      ==
+      ;div: XX render the rest
+    ==
+    ::
+  --
+  '''
+--
