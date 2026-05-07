@@ -1,3 +1,12 @@
+oxal--mesh vine: collapseable kids for faster rendering of large tree.
+trees start off collapsed.
+
+---
+
+copy new .dojo.sh from ut
+
+---
+
 make a real blog app, then modify its form config to prove that inplace migrations work
 
 ---
@@ -16,7 +25,9 @@ the semantics of bumping are wrong i think.
 
 implement $shape schemas
 
-  static definition of what places below are allowed to have data
+  static definition of what places below are allowed to have data.
+  the most important one is out.form, because then we can build
+  smart forms that limit what can be put in the data tree.
 
 ---
 

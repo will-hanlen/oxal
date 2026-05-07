@@ -400,7 +400,9 @@
       [%del =pith]
   ==
 +$  meta-move  $+(meta-move (set meta-chng))
-+$  transformer  $-([mine=data snap=data =move life=@ case=@] (set chng))
++$  transformer
+  $+  transformer
+  $-([mine=data snap=data =move life=@ case=@] (set chng))
 ::
 ++  ref-to-pith
   ::
@@ -536,18 +538,15 @@
     ^-  [iota xal]
     (need ram)
   ::
-  ++  dys  :: y leaf
+  ++  dys
+    ::
+    ::  list of kids level with leafs
     ::
     ^-  (list (pair iota item))
     %+  murn  (tap:ion kids.fat)
     |=  [=iota f=_fat]
     ?~  leaf.f  ~
     `[iota u.leaf.f]
-  ::
-  ++  only-y
-    ::
-    ^+  fat
-    fat
   ::
   ++  fit
     ::
@@ -586,6 +585,7 @@
     =.  loc  (snoc loc seg)
     $(fat (dip #/[seg]))
     ::
+  ::
   ++  abo
     ::
     ::  +anc without self
@@ -915,17 +915,24 @@
     ::
     |=  g=$-([iota xal] (unit manx))
     ^-  marl
-    %-  flop
-    =<  -
-    %^  (dip:ion marl)  kids.fat  ~
-    |=  [=marl k=iota v=xal]
-    :-  ~
-    :-  %.n
-    =/  try=(unit manx)  (g k v)
-    ?~  try  marl
-    [u.try marl]
+    (myr g)
+  ::
+  ++  myr
+    ::
+    ::  transform and filter direct child subtrees
+    ::
+    |*  g=gate  :: $-([iota xal] (unit *))
+    =/  a  kid-list
+    |-
+    ?~  a  ~
+    =/  x  (g i.a)
+    ?~  x  $(a t.a)
+    [i=+.x t=$(a t.a)]
+    ::
   ::
   ++  tur
+    ::
+    ::  transform bonds
     ::
     |*  g=gate
     ::
@@ -936,6 +943,8 @@
     ::
   ::
   ++  mur
+    ::
+    ::  transform and filter bonds
     ::
     |*  g=gate
     ::
@@ -1543,6 +1552,7 @@
   ++  ran  ran:ox
   ++  run  run:ox
   ++  ren  ren:ox
+  ++  myr  myr:ox
   ++  ram  ram:ox
   ++  rom  rom:ox
   ++  mol  mol:ox
@@ -1628,6 +1638,7 @@
   ::
 ::
 +$  easy-core  $+  easy-core
+  ::
   $_  ^&
   |%
   ++  ins
@@ -1662,6 +1673,7 @@
   ==
 ::
 ++  easy-mirror
+  ::
   %-  easy-transform
   |%
   ++  ins
