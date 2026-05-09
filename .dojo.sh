@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 # Send a command to an Urbit dojo running in tmux and return its output.
 #
-# Usage: dojo.sh <session:window> <timeout_secs> <command> [--sync=<pier-location>]
+# Usage: dojo.sh <session:window> <timeout_secs> <command> [--sync=<src>:<dest>]
 #   e.g. dojo.sh oxal:master-migrev-dolseg 30 '(add 2 3)'
 #        dojo.sh oxal:master-migrev-dolseg 360 '|commit %oxal' \
-#                --sync=.piers/master-migrev-dolseg/oxal
+#                --sync=lodge:.piers/master-migrev-dolseg/oxal/lodge
 #
 # The first arg is passed to tmux as the exact target (the `=` prefix
 # is added when this script calls tmux), so it may be any valid tmux
 # session:window pair — the window name need not match the ship's @p.
 #
-# --sync=<desk-location> (optional): before running the command,
-# rsync this repo's source tree into <desk-location> (the
-# development desk). Pair with '|commit %oxal' to apply source changes.
+# --sync=<src>:<dest> (optional): before running the command,
+# rsync <src> (relative to the caller's cwd) into <dest>. Pair with
+# '|commit %oxal' to apply source changes. <src> can be a subdirectory
+# (e.g. "lodge") or "." for the whole cwd.
 #
 # stdout:  Dojo output (between start and done sentinels)
 # stderr:  OK / TIMEOUT / ABORT
@@ -31,12 +32,12 @@ set -euo pipefail
 TARGET=""
 TIMEOUT=""
 COMMAND=""
-PIER=""
+SYNC_SPEC=""
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --sync=*) PIER="${1#--sync=}"; shift ;;
-    --sync)   PIER="${2:?--sync requires a pier location}"; shift 2 ;;
+    --sync=*) SYNC_SPEC="${1#--sync=}"; shift ;;
+    --sync)   SYNC_SPEC="${2:?--sync requires <src>:<dest>}"; shift 2 ;;
     -*)       echo "Unknown flag: $1" >&2; exit 1 ;;
     *)
       if   [ -z "$TARGET" ];  then TARGET="$1"
@@ -49,20 +50,32 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ -z "$TARGET" ] || [ -z "$TIMEOUT" ] || [ -z "$COMMAND" ]; then
-  echo "Usage: dojo.sh <session:window> <timeout_secs> <command> [--sync=<pier-location>]" >&2
+  echo "Usage: dojo.sh <session:window> <timeout_secs> <command> [--sync=<src>:<dest>]" >&2
   exit 1
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 INTERVAL=1
 
-if [ -n "$PIER" ]; then
-  if [ ! -d "$PIER" ]; then
-    echo "Error: pier location not found at ${PIER}" >&2
+if [ -n "$SYNC_SPEC" ]; then
+  SRC="${SYNC_SPEC%%:*}"
+  DEST="${SYNC_SPEC#*:}"
+  if [ -z "$SRC" ] || [ -z "$DEST" ]; then
+    echo "Error: --sync requires <src>:<dest>, got '$SYNC_SPEC'" >&2
     exit 1
   fi
-  echo "Syncing source to ${PIER}..." >&2
-  rsync -avL --delete --exclude='.*' "${SCRIPT_DIR}/" "${PIER}"
+  DEST_DIR="$(eval echo "$DEST")"
+  mkdir -p "$DEST_DIR"
+  if [ "$SRC" = "." ]; then
+    SRC_DIR="${PWD}/."
+  else
+    SRC_DIR="${PWD}/${SRC}"
+    if [ ! -d "$SRC_DIR" ]; then
+      echo "Error: source directory not found: ${SRC_DIR}" >&2
+      exit 1
+    fi
+  fi
+  echo "Syncing ${SRC} → ${DEST_DIR}..." >&2
+  rsync -avL --delete --exclude='.*' "${SRC_DIR}/" "${DEST_DIR}/"
 fi
 
 # Unique ID prevents collisions between concurrent/sequential runs

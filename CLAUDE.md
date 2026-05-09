@@ -36,8 +36,11 @@ scripts read the local setup from `.env` in the repo root — copy
 - `OXAL_SHIPS` — space-separated list of ship aliases. Each alias
   is also the tmux window name, so `${OXAL_TMUX_SESSION}:${ship}`
   is the dojo target.
-- `OXAL_<ship>_PIER` — pier path (relative to repo root) for each
-  listed ship. Used by `--sync` runs to rsync the source tree in.
+- `OXAL_<ship>_SYNC` — rsync spec for each listed ship, formatted
+  as `<src>:<dest>` (the same shape `.dojo.sh`'s `--sync` flag
+  takes). `<src>` is relative to the repo root (use `.` for the
+  whole tree, or a subdir like `lodge`); a relative `<dest>` is
+  resolved against the repo root before the sync runs.
 - `OXAL_TIMEOUT` — default dojo command timeout in seconds.
 
 Helper scripts. All but `.dojo.sh` fan their command out to every
@@ -54,10 +57,12 @@ Exit is non-zero if any ship's run failed.
 - `sh .dojo-fan.sh <cmd> [--sync]` — the fan-out primitive that the
   three wrappers above are built on; reach for it only when you need
   a different command + sync combination than they offer.
-- `sh .dojo.sh <session:window> <timeout> <cmd> [--sync=<pier>]` —
-  the single-ship primitive `.dojo-fan.sh` shells out to; reach for
-  it only when targeting one specific ship outside the `.env` set
-  (different ship, custom timeout, etc.).
+- `sh .dojo.sh <session:window> <timeout> <cmd> [--sync=<src>:<dest>]`
+  — the single-ship primitive `.dojo-fan.sh` shells out to; reach
+  for it only when targeting one specific ship outside the `.env`
+  set (different ship, custom timeout, etc.). `<src>` is relative
+  to the repo root; `<dest>` is taken as-is (`eval`-expanded for
+  `~`).
 
 ## Typed dojo testing via `-build-file`
 

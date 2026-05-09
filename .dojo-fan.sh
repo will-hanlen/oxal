@@ -5,8 +5,11 @@
 # header. Exits non-zero if any ship's run failed.
 #
 # Usage: .dojo-fan.sh <command> [--sync]
-#   --sync  rsync the source tree into each ship's pier before running
-#           (passed through to .dojo.sh as --sync=<repo>/<pier>)
+#   --sync  rsync source into each ship before running. The per-ship
+#           sync spec comes from OXAL_<ship>_SYNC in .env, formatted as
+#           <src>:<dest> (the same shape .dojo.sh's --sync flag takes).
+#           <src> is relative to the repo root; a relative <dest> is
+#           resolved to the repo root before being passed through.
 
 set -euo pipefail
 
@@ -55,9 +58,13 @@ for ship in "${SHIPS[@]}"; do
     exit 1
   fi
   if [ "$SYNC" -eq 1 ]; then
-    pier_var="OXAL_${ship}_PIER"
-    if [ -z "${!pier_var:-}" ]; then
-      echo "Error: ${pier_var} not set in .env (required for --sync)" >&2
+    sync_var="OXAL_${ship}_SYNC"
+    if [ -z "${!sync_var:-}" ]; then
+      echo "Error: ${sync_var} not set in .env (required for --sync)" >&2
+      exit 1
+    fi
+    if [[ "${!sync_var}" != *:* ]]; then
+      echo "Error: ${sync_var} must be <src>:<dest>, got '${!sync_var}'" >&2
       exit 1
     fi
   fi
@@ -74,8 +81,15 @@ for ship in "${SHIPS[@]}"; do
 
   args=("$target" "$OXAL_TIMEOUT" "$COMMAND")
   if [ "$SYNC" -eq 1 ]; then
-    pier_var="OXAL_${ship}_PIER"
-    args+=(--sync="${SCRIPT_DIR}/${!pier_var}")
+    sync_var="OXAL_${ship}_SYNC"
+    spec="${!sync_var}"
+    src="${spec%%:*}"
+    dest="${spec#*:}"
+    case "$dest" in
+      /*|~*) ;;
+      *) dest="${SCRIPT_DIR}/${dest}" ;;
+    esac
+    args+=(--sync="${src}:${dest}")
   fi
 
   (
